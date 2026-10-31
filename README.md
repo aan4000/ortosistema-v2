@@ -53,6 +53,7 @@ Todas, salvo login y salud, piden `Authorization: Bearer <token>`.
 ## Despliegue en Render
 
 - La base vive en Neon: proyecto `ortosistema-v2`, base `ortosistema`, región `aws-us-east-2`. La cadena completa va en `DATABASE_URL` (local y Render); no se sube al repositorio.
+- Desplegado en Render: https://ortosistema-v2.onrender.com (`/api/salud` como health check; plan free, se duerme tras ~15 min sin uso).
 - El repositorio incluye `render.yaml`: crea un servicio web `ortosistema-v2` en la región `ohio` (misma que Neon `us-east-2`), con `AUTO_SCHEMA=1` y `JWT_HORAS=8`.
 - Build: `pip install -r requirements.txt`
 - Start: `uvicorn main:app --host 0.0.0.0 --port $PORT`
