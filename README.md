@@ -2,7 +2,7 @@
 
 FastAPI + PostgreSQL (Neon). Login con JWT, permisos por rol aplicados en el servidor, auditoría de accesos y cambios.
 
-Esta es la versión 2 (`ortosistema-v2`). El front-end se sirve desde el mismo servidor en `/` y la base de datos es la base `ortosistema` del proyecto Neon existente (PostgreSQL 18, región `us-east-2`).
+Esta es la versión 2 (`ortosistema-v2`). El front-end se sirve desde el mismo servidor en `/` y la base de datos es la base `ortosistema` del proyecto Neon `ortosistema-v2` (PostgreSQL 18, región `aws-us-east-2`). Se migraron los datos del sistema anterior.
 
 ## Puesta en marcha
 
@@ -52,6 +52,7 @@ Todas, salvo login y salud, piden `Authorization: Bearer <token>`.
 
 ## Despliegue en Render
 
+- La base vive en Neon: proyecto `ortosistema-v2`, base `ortosistema`, región `aws-us-east-2`. La cadena completa va en `DATABASE_URL` (local y Render); no se sube al repositorio.
 - El repositorio incluye `render.yaml`: crea un servicio web `ortosistema-v2` en la región `ohio` (misma que Neon `us-east-2`), con `AUTO_SCHEMA=1` y `JWT_HORAS=8`.
 - Build: `pip install -r requirements.txt`
 - Start: `uvicorn main:app --host 0.0.0.0 --port $PORT`
