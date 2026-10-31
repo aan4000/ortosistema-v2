@@ -1,0 +1,16 @@
+# Secretos: nunca subir .env
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.log
+
+# Copias locales / temporales
+ortosistema.html
+*.bak
+*.tmp
