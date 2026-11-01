@@ -149,6 +149,53 @@ tr:hover td{background:var(--pri2)}
 .card.k{transition:transform .15s,box-shadow .15s}.card.k:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(15,40,70,.12)}
 @media(max-width:800px){.tdt{display:none}}
 @media(prefers-reduced-motion:reduce){.card.k{transition:none}}
+
+/* ===== Pulido UX/UI (pase global sobre todas las pantallas) ===== */
+:root{--rad:10px;--rad-sm:8px;--rad-lg:14px;--gap:18px;--sh2:0 2px 8px rgba(15,40,70,.07),0 8px 24px rgba(15,40,70,.06)}
+.card{border-radius:var(--rad);box-shadow:var(--sh2);padding:18px 20px}
+.card.k{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.card.k:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,40,70,.1);border-color:var(--pri)}
+.grid,.g2,.kb,.kpi{gap:18px;margin:18px 0}
+.k b{font-size:30px;letter-spacing:-.02em;line-height:1}
+.k small,.k .mu{font-size:13px}
+input,select,textarea{border-radius:var(--rad-sm);padding:9px 12px;transition:border-color .15s ease,box-shadow .15s ease}
+input:focus,select:focus,textarea:focus{border-color:var(--pri);box-shadow:0 0 0 3px var(--pri2);outline:none}
+.btn{border-radius:var(--rad-sm);transition:transform .12s ease,box-shadow .12s ease,background .15s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn.p:hover{box-shadow:0 4px 14px rgba(15,108,189,.32)}
+th,td{padding:12px 10px}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+tbody tr{transition:background .12s ease}
+tbody tr:hover{background:var(--bg)}
+tbody tr:nth-child(even){background:rgba(15,108,189,.025)}
+tbody tr:nth-child(even):hover{background:var(--bg)}
+.tabs{gap:2px;margin-bottom:20px}
+.tabs button{border-radius:8px 8px 0 0;padding:0 16px;transition:color .15s ease,background .15s ease}
+.tabs button:hover{background:var(--bg)}
+.top{padding:10px 18px;box-shadow:0 1px 0 var(--bd)}
+.side{padding:14px 10px}
+.nav{min-height:46px;margin:2px 0}
+.gl{padding:16px 12px 6px}
+.md{border-radius:var(--rad-lg);box-shadow:0 16px 48px rgba(0,0,0,.2)}
+.ov{backdrop-filter:blur(3px)}
+.ts{border-radius:var(--rad);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.ph{padding:12px 0;margin-bottom:10px}
+.stp span{border-radius:var(--rad-sm)}
+.b,.bd{border-radius:12px}
+.av{box-shadow:0 0 0 2px var(--sf)}
+.mu{line-height:1.45}
+h1,h2,h3{letter-spacing:-.01em}
+.pg{padding:20px 28px 56px}
+.empty{display:grid;place-items:center;text-align:center;padding:48px 16px;color:var(--sec)}
+.empty .ic{width:44px;height:44px;opacity:.35;margin-bottom:12px}
+.empty b{display:block;color:var(--tx);font-size:16px;margin-bottom:4px}
+.sk{background:linear-gradient(90deg,var(--bg) 0%,var(--sf) 50%,var(--bg) 100%);background-size:200% 100%;animation:shimmer 1.4s linear infinite;border-radius:var(--rad-sm)}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media(max-width:800px){.pg{padding:14px 16px 48px}.card{padding:14px 16px}.top{padding:8px 12px}}
+@media(prefers-reduced-motion:reduce){.sk{animation:none}.card.k:hover{transform:none}.btn:hover{transform:none}.ov{backdrop-filter:none}}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--sh2:none}tbody tr:nth-child(even){background:rgba(255,255,255,.035)}}
+:root[data-theme="dark"]{--sh2:none}
 </style>
 </head>
 <body>
@@ -203,7 +250,19 @@ x:"<path d='M6.2 6.2l11.6 11.6M17.8 6.2 6.2 17.8'/>",
 save:"<path d='M19 20.4H5A1.6 1.6 0 0 1 3.4 18.8V5.2A1.6 1.6 0 0 1 5 3.6h10.6l5 5v10.2a1.6 1.6 0 0 1-1.6 1.6z'/><path d='M7.6 20.4v-6.2h8.8v6.2'/><path d='M7.6 3.6v4h5.8'/>",
 calplus:"<rect x='3' y='5' width='18' height='16' rx='2.5'/><path d='M3 9.6h18M8 3v3.6M16 3v3.6'/><path d='M12 13.2v5M9.5 15.7h5'/>",
 chevl:"<path d='M14.4 5.6 8 12l6.4 6.4'/>",
-chevr:"<path d='M9.6 5.6 16 12l-6.4 6.4'/>"};
+chevr:"<path d='M9.6 5.6 16 12l-6.4 6.4'/>",
+mail:"<rect width='20' height='16' x='2' y='4' rx='2'/><path d='m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7'/>",
+phone:"<path d='M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z'/>",
+"message-circle":"<path d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/>",
+paperclip:"<path d='m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48'/>",
+copy:"<rect width='14' height='14' x='8' y='8' rx='2' ry='2'/><path d='M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2'/>",
+link:"<path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/>",
+lock:"<rect width='18' height='11' x='3' y='11' rx='2' ry='2'/><path d='M7 11V7a5 5 0 0 1 10 0v4'/>",
+unlock:"<rect width='18' height='11' x='3' y='11' rx='2' ry='2'/><path d='M7 11V7a5 5 0 0 1 9.9-1'/>",
+key:"<path d='m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4'/>",
+pdf:"<path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/><path d='M9 13h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H9v-4z'/><path d='M13 13h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2v-4z'/>",
+archive:"<rect width='20' height='5' x='2' y='3' rx='1'/><path d='M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8'/><path d='M10 12h4'/>",
+printer:"<path d='M6 9V2h12v7'/><path d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/><path d='M6 14h12v8H6z'/>"};
 const ic=(n,s=18)=>`<svg class="ic" viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${IC[n]||IC.dotc}</svg>`;
 const rw=(k,r)=>r.map(a=>Object.fromEntries(k.split(" ").map((x,i)=>[x,a[i]])));
 const T0=()=>[["Consulta y control","Consulta ortopédica"],["Consulta y control","Control posoperatorio"],["Inmovilización","Colocación de yeso o férula"],["Inmovilización","Reducción cerrada de fractura"],["Infiltraciones","Infiltración articular"],["Fracturas","Reducción abierta y fijación interna"],["Fracturas","Fijación de fractura de radio distal"],["Fracturas","Clavo endomedular de fémur"],["Fracturas","Retiro de material de osteosíntesis"],["Artroscopia","Artroscopia de rodilla"],["Artroscopia","Meniscectomía artroscópica"],["Artroscopia","Reconstrucción de LCA"],["Artroscopia","Artroscopia de hombro"],["Artroscopia","Reparación del manguito rotador"],["Mano y pie","Liberación del túnel carpiano"],["Mano y pie","Cirugía de hallux valgus"],["Prótesis","Prótesis total de cadera"],["Prótesis","Prótesis total de rodilla"],["Columna","Discectomía lumbar"]].map(([g,n])=>({g,c:"",n,p:0,f:""}));

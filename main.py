@@ -23,6 +23,15 @@ from psycopg.types.json import Jsonb
 from psycopg_pool import ConnectionPool
 from pydantic import BaseModel
 
+# Carga .env local si existe (no sobrescribe variables ya definidas, p.ej. en Render).
+_env = Path(__file__).parent / ".env"
+if _env.is_file():
+    for _line in _env.read_text(encoding="utf-8").splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _v = _line.split("=", 1)
+            os.environ[_k.strip()] = _v.strip().strip('"').strip("'")
+
 DATABASE_URL = os.environ["DATABASE_URL"]
 JWT_SECRET = os.environ["JWT_SECRET"]
 JWT_HORAS = int(os.getenv("JWT_HORAS", "8"))
@@ -154,7 +163,7 @@ def aplicar_schema():
 
 @asynccontextmanager
 async def ciclo(app):
-    pool.open()
+    pool.open(wait=True, timeout=30)
     if os.getenv("AUTO_SCHEMA", "1") == "1":
         aplicar_schema()
     cargar_funciones()
@@ -665,7 +674,7 @@ def crear_usuario(usuario, rol, nombre):
     if len(clave) < 10:
         sys.exit("La contraseña es demasiado corta")
     h = bcrypt.hashpw(clave.encode(), bcrypt.gensalt()).decode()
-    pool.open()
+    pool.open(wait=True, timeout=30)
     aplicar_schema()
     with pool.connection() as c:
         c.execute("insert into usuarios(usuario,nombre,rol,password_hash) values (%s,%s,%s,%s) "
