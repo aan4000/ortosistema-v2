@@ -561,7 +561,7 @@ const vRehab=()=>sec("Rehabilitación")+card("Sesiones de fisioterapia",tbl(["Fe
 const vRef=()=>sec("Referimientos")+card("Enviados y recibidos",tbl(["Fecha","Paciente","Referimiento","Estado"],fa(DB.R).map(x=>[x.f,pl(x.p),esc(x.t),bd(x.e)])));
 const vAut=()=>{const o=["Por solicitar","Enviada","Aprobada","Rechazada"];return sec("Autorizaciones")+card("Preautorizaciones por estado",tbl(["Paciente","Procedimiento","Seguro","Estado","Plazo"],[...fa(DB.A)].sort((x,y)=>o.indexOf(x.e)-o.indexOf(y.e)).map(x=>[pl(x.p),esc(x.t),esc(x.s),bd(x.e),x.e=="Enviada"?`vence en ${x.d} días`:x.e=="Por solicitar"?"Pendiente de enviar":"—"])))};
 function vCargos(){const s=e=>mon(fa(DB.B).filter(x=>x.e==e).reduce((a,x)=>a+x.m,0));
-return`<p><button class="btn p" data-a="ef">${ic("plus",16)} Nuevo cargo</button></p>`+`<div class="grid"><div class="card k"><b>${s("Pendiente")}</b>Por cobrar</div><div class="card k"><b>${s("Cobrado")}</b>Cobrado</div></div>`+card("Cargos",tbl(["Fecha","Paciente","Código","Concepto","Médico","Monto","Estado",""],DB.B.map((x,i)=>[x,i]).filter(([x])=>!S.ap||!S.only||x.p==S.ap).map(([x,i])=>[x.f,pl(x.p),esc(x.c||"—"),esc(x.t),esc(x.dr||"—"),mon(x.m),bd(x.e),`<button class="btn" data-a="ef:${i}">Editar</button> `+(x.e=="Pendiente"?`<button class="btn" data-a="cob:${i}">Registrar cobro</button>`:"")])))}
+return`<p><button class="btn p" data-r="facturacion-nueva">${ic("plus",16)} Nuevo cargo</button></p>`+`<div class="grid"><div class="card k"><b>${s("Pendiente")}</b>Por cobrar</div><div class="card k"><b>${s("Cobrado")}</b>Cobrado</div></div>`+card("Cargos",tbl(["Fecha","Paciente","Código","Concepto","Médico","Monto","Estado",""],DB.B.map((x,i)=>[x,i]).filter(([x])=>!S.ap||!S.only||x.p==S.ap).map(([x,i])=>[x.f,pl(x.p),esc(x.c||"—"),esc(x.t),esc(x.dr||"—"),mon(x.m),bd(x.e),`<button class="btn" data-a="facp:${i}">${ic("doc",14)} Ver/Imprimir</button> <button class="btn" data-a="ef:${i}">Editar</button> `+(x.e=="Pendiente"?`<button class="btn" data-a="cob:${i}">Registrar cobro</button>`:"")])))}
 function vExp(id,tab="resumen"){const p=pk(id);if(!p.n)return"<p>Paciente no encontrado.</p>";
 const f=a=>DB[a].filter(x=>x.p==id),E=f("E"),I=f("I"),C=f("C"),F=f("F"),M=f("M"),R=f("R"),A=f("A"),B=f("B"),Dd=f("D"),PPn=f("PP"),OPn=f("OP");
 const T=[["resumen","Resumen",0],["clinica","Clínica",E.length+I.length],["procedimientos","Procedimientos",C.length+PPn.length],["ortesis","Órtesis",OPn.length],["rehab","Rehabilitación",F.length+M.length],["gestion","Gestión",R.length+A.length+B.length],["documentos","Documentos",Dd.length]];
@@ -591,7 +591,9 @@ if(S.route!==RUTA_ANT){RUTA_ANT=S.route;const pg=$("#main .pg");if(pg&&!sinMov()
 const vb0=$("#vbox0");if(vb0&&VIS.length)viewer(vb0,VIS,VIS[0]);
 const ps=$("#ps");if(ps)ps.oninput=()=>{$("#pl").innerHTML=listaP(ps.value)};
 const nf=$("#nf");if(nf)nf.onchange=()=>{const e=edadDe(nf.value);$("#ne").value=e===""?"":e+" años"};
-const uf=$("#uf");if(uf){const add=fl=>{upAdd([...fl].filter(f=>f.type.startsWith("image/")));uf.value=""};uf.onchange=()=>add(uf.files);const z=$("#upz");z.ondragover=e=>e.preventDefault();z.ondrop=e=>{e.preventDefault();add(e.dataTransfer.files)};uvDraw()}}
+const uf=$("#uf");if(uf){const add=fl=>{upAdd([...fl].filter(f=>f.type.startsWith("image/")));uf.value=""};uf.onchange=()=>add(uf.files);const z=$("#upz");z.ondragover=e=>e.preventDefault();z.ondrop=e=>{e.preventDefault();add(e.dataTransfer.files)};uvDraw()}
+const bfq=$("#bf_q");if(bfq)bfq.onchange=()=>{const t=DB.T[bfq.value];if(!t)return;const k=$("#bf_k"),tt=$("#bf_t"),m=$("#bf_m");if(k)k.value=t.c||"";if(tt)tt.value=t.n;if(m&&t.p)m.value=t.p};
+const bfg=$("#bf_g");if(bfg)bfg.onclick=async()=>{const v=s=>$("#"+s).value.trim(),er=m=>{$("#bf_e2").textContent=m};const pp=+v("bf_p"),fi=v("bf_f"),t=v("bf_t"),m=+v("bf_m");if(!pp)return er("Elige el paciente.");if(!fi)return er("Elige la fecha.");if(!t)return er("Escribe el concepto.");if(!(m>=0))return er("Monto inválido.");const r={p:pp,f:dmy(fi),c:v("bf_k"),t,m,dr:v("bf_d"),e:v("bf_e")};try{const id=await crearK("B",r);DB.B.push({...r,id});toast("Factura guardada");go("facturacion")}catch(e){er(e.message)}};}
 function go(r){S.route=r;$("#side").classList.remove("open");draw();const m=$("#main");if(m){if(sinMov())m.scrollTop=0;else m.scrollTo({top:0,behavior:"smooth"})}try{history.replaceState(null,"","#"+r)}catch(e){}}
 
 function fAnt(){const p=pk(S.ap||(S.route.split("-")[0]=="p"?S.route.split("-")[1]:0));if(!p.n)return toast("Activa un paciente primero");
@@ -718,7 +720,69 @@ function rxPrint(idx){
 }
 
 
-function vFac(b){const T=`<div class="tabs"><button class="${b=="catalogo"?"":"on"}" data-r="facturacion">Cargos</button><button class="${b=="catalogo"?"on":""}" data-r="facturacion-catalogo">Catálogo de procedimientos</button></div>`;return sec("Facturación")+T+(b=="catalogo"?vCat():vCargos())}
+
+function vFacNueva(){
+  const ap=S.ap?pk(S.ap):null;
+  const dm=DB.users.filter(u=>u.rol=="medico");
+  const dr0=S.user.rol=="medico"?S.user.nombre:(dm[0]?dm[0].nombre:"");
+  return sec("Nueva factura")+`<p><button class="btn" data-r="facturacion">? Volver a cargos</button></p>`
+    +`<div class="card"><div class="fg">
+      ${fx("bf_p","Paciente *",`<select id="bf_p">${DB.P.map(p=>`<option value="${p.id}"${(ap&&p.id==ap.id)?" selected":""}>${esc(p.n)}</option>`).join("")}</select>`)}
+      ${fx("bf_f","Fecha *",`<input id="bf_f" type="date" value="${iso(hoy)}">`)}
+      ${fx("bf_q","Procedimiento (cat?logo)",`<select id="bf_q"><option value="">? selecciona ?</option>${DB.T.map((t,i)=>`<option value="${i}">${esc(t.n)}${t.p?" ? "+mon(t.p):""}</option>`).join("")}</select>`)}
+      ${fx("bf_k","C?digo",`<input id="bf_k">`)}
+      ${fx("bf_t","Concepto *",`<input id="bf_t">`)}
+      ${fx("bf_m","Monto (RD$)",`<input id="bf_m" type="number" min="0" step="0.01">`)}
+      ${fx("bf_d","M?dico",fsel("bf_d",dm.length?dm.map(u=>u.nombre):[dr0],dr0))}
+      ${fx("bf_e","Estado",fsel("bf_e",["Pendiente","Cobrado"],"Pendiente"))}
+    </div>
+    <div class="er2" id="bf_e2" role="alert"></div>
+    <div class="tb"><button class="btn p" id="bf_g">${ic("save",16)} Guardar factura</button><button class="btn" data-r="facturacion">Cancelar</button></div></div>`;
+}
+function facPrint(idx){
+  const x=DB.B[idx]; if(!x) return;
+  const p=pk(x.p);
+  const o=modal(`<h3>Imprimir / Enviar factura</h3>
+    <p class="mu">Paciente: <b>${esc(p.n)}</b> ? ${x.f} ? ${bd(x.e)}</p>
+    <label class="ck" style="display:block;margin:8px 0"><input type="checkbox" id="fac_pac" checked> Incluir datos del paciente</label>
+    <label class="ck" style="display:block;margin:8px 0"><input type="checkbox" id="fac_med" checked> Incluir m?dico y fecha</label>
+    <div class="er2" id="fac_er" role="alert"></div>
+    <div class="tb" style="margin-top:12px">
+      <button class="btn p" id="fac_print">${ic("printer",14)} Imprimir</button>
+      <button class="btn" id="fac_wa">${ic("message-circle",14)} WhatsApp</button>
+      <button class="btn" id="fac_mail">${ic("mail",14)} Correo</button>
+      <button class="btn" id="fac_close">Cerrar</button>
+    </div>`, "w");
+  const buildText=()=>{
+    const incPac=o.querySelector("#fac_pac").checked;
+    const incMed=o.querySelector("#fac_med").checked;
+    let txt="FACTURA - OrtoSistema\n";
+    if(incPac) txt+="Paciente: "+p.n+"\n"+(p.e?p.e+" a?os\n":"")+(p.c?"C?dula: "+p.c+"\n":"")+(p.s?"Seguro: "+p.s+"\n":"")+(p.al?"Alergias: "+p.al+"\n":"");
+    txt+="\nConcepto: "+x.t+"\n";
+    if(x.c) txt+="C?digo: "+x.c+"\n";
+    txt+="Monto: RD$ "+x.m.toLocaleString("es-DO")+"\n";
+    txt+="Estado: "+x.e+"\n";
+    if(x.notas) txt+="Notas: "+x.notas+"\n";
+    if(incMed) txt+="\nM?dico: "+(x.dr||"?")+"\nFecha: "+x.f+"\n";
+    return txt;
+  };
+  const buildHtml=()=>{
+    const incPac=o.querySelector("#fac_pac").checked;
+    const incMed=o.querySelector("#fac_med").checked;
+    return "<!doctype html><html><head><meta charset='utf-8'><title>Factura</title><style>body{font-family:system-ui,sans-serif;padding:24px;max-width:720px;margin:0 auto;color:#14212e}h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:16px 0 6px;border-bottom:1px solid #dce4ec;padding-bottom:4px}.row{display:flex;justify-content:space-between;margin:4px 0;font-size:14px}.mu{color:#586a7c;font-size:13px}.tot{font-size:20px;font-weight:700;color:#0f6cbd;margin-top:8px}@media print{body{padding:12px}}</style></head><body><h1>Factura</h1><p class='mu'>OrtoSistema ? Ortopedia y Traumatolog?a</p>"
+      +(incPac?"<h2>Paciente</h2><div class='row'><span><b>"+esc(p.n)+"</b></span><span>"+(p.e?p.e+" a?os":"")+"</span></div><div class='row'><span>C?dula: "+esc(p.c||"?")+"</span><span>Seguro: "+esc(p.s||"?")+"</span></div>"+(p.al?"<div class='row'><span>Alergias: "+esc(p.al)+"</span></div>":""):"")
+      +"<h2>Servicio</h2><div class='row'><span>C?digo: "+esc(x.c||"?")+"</span><span>Fecha: "+x.f+"</span></div><div class='row'><span>Concepto: "+esc(x.t)+"</span></div><div class='row'><span>Estado: "+esc(x.e)+"</span></div><div class='tot'>Monto: RD$ "+x.m.toLocaleString("es-DO")+"</div>"
+      +(incMed?"<div style='margin-top:24px;border-top:1px solid #dce4ec;padding-top:8px'><div class='row'><span>M?dico: "+esc(x.dr||"?")+"</span></div><div class='row mu'><span>Firma: ____________________</span></div></div>":"")
+      +"</body></html>";
+  };
+  o.querySelector("#fac_print").onclick=()=>{const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para imprimir");return}w.document.write(buildHtml());w.document.close();w.focus();setTimeout(()=>{w.print()},250)};
+  o.querySelector("#fac_wa").onclick=()=>{window.open("https://wa.me/?text="+encodeURIComponent(buildText()),"_blank")};
+  o.querySelector("#fac_mail").onclick=()=>{window.location.href="mailto:?subject="+encodeURIComponent("Factura - "+pk(x.p).n)+"&body="+encodeURIComponent(buildText())};
+  o.querySelector("#fac_close").onclick=()=>o.remove();
+}
+
+
+function vFac(b){const T=`<div class="tabs"><button class="${b=="catalogo"?"":"on"}" data-r="facturacion">Cargos</button><button class="${b=="catalogo"?"on":""}" data-r="facturacion-catalogo">Catálogo de procedimientos</button><button class="${b=="nueva"?"on":""}" data-r="facturacion-nueva">Nueva factura</button></div>`;return sec("Facturación")+T+(b=="catalogo"?vCat():b=="nueva"?vFacNueva():vCargos())}
 const vCat=()=>`<div class="row"><p class="mu">Define lo que puedes facturar y su precio. Carga los precios aprobados por tu fuente (SDOT, aseguradora o tarifa propia). Al crear un cargo, el precio se llena solo.</p><div><button class="btn" data-a="imp">Importar lista</button> <button class="btn p" data-a="ep">${ic("plus",16)} Nuevo procedimiento</button></div></div>`+card("Catálogo de procedimientos",tbl(["Código","Procedimiento","Categoría","Fuente","Precio aprobado",""],DB.T.map((x,i)=>[esc(x.c||"—"),esc(x.n),esc(x.g||"General"),esc(x.f||"—"),x.p?mon(x.p):'<span class="b wa">Por definir</span>',`<button class="btn" data-a="ep:${i}">Editar</button>`])));
 function fProc(i){const nu=i==null,x=nu?{c:"",n:"",f:"",p:0}:DB.T[i];
 const o=modal(`<h3>${nu?"Nuevo procedimiento":"Editar procedimiento"}</h3><label>Código (opcional)<input id="pc" value="${esc(x.c||"")}"></label><label>Procedimiento<input id="pn" value="${esc(x.n)}"></label><label>Categoría<input id="pg" list="pl3" value="${esc(x.g||"")}"><datalist id="pl3">${cats().map(c=>`<option value="${esc(c)}">`).join("")}</datalist></label><label>Fuente del precio<input id="pf" list="pl2" value="${esc(x.f||"")}"><datalist id="pl2"><option value="SDOT"><option value="SeNaSa"><option value="IDOPPRIL"><option value="Aseguradora (ARS)"><option value="Tarifa propia"></datalist></label><label>Precio aprobado (RD$)<input id="pp" type="number" min="0" step="0.01" value="${x.p||""}"></label><div class="er2" id="px" role="alert"></div><button class="btn p" id="ps2">Guardar</button>${nu?"":' <button class="btn" id="pd">Eliminar</button>'}`);
@@ -1034,7 +1098,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-r],[data-a
 const[a,v]=(t.dataset.a||"").split(":");
 if(t.dataset.r){ovx();return go(t.dataset.r)}
 if(["np","ci","ev","cx","pz","oz","nui","nud","ef"].includes(a))ovx();
-({adm:()=>{S.open=!S.open;draw()},nu:()=>fUs(),eu:()=>fUs(+v),ant:fAnt,rst,st:vStats,x:ovx,ef:()=>fFac(v?+v:undefined),ep:()=>fProc(v?+v:undefined),imp:fImp,sa:()=>{listaProc().r.forEach(([x,i])=>S.sel.add(i));draw()},sc:()=>{S.sel.clear();draw()},as:asignar,ap:()=>{S.pa.p=+v;go("procedimientos")},pr:async()=>{const x=DB.PP[v];x.e="Realizado";try{await editarK("PP",x);draw()}catch(e){toast(e.message)}},pq:async()=>{const x=DB.PP[v];try{await borrarK("PP",x);DB.PP.splice(v,1);draw()}catch(e){toast(e.message)}},ui:()=>{S.upP=+v;go("estudios-subir")},sv:guardarImg,vw:()=>verImg(+v),ac:()=>{S.ap=+v;S.pa.p=+v;draw()},ca:()=>{S.ap=null;if(S.route.split("-")[0]=="p")go("pacientes");else draw()},er:()=>{const[k,i]=v.split("."),x=DB[k][+i];k=="B"?fFac(+i):k=="C"?fCir(+i):k=="E"&&x&&x.d?(S.evi=+i,go("evaluacion-"+(x.tp=="Física"?"fis":"med"))):fReg(k,+i)},vf:async()=>{const[k,i]=v.split("."),x=DB[k][+i];try{await verificarK(k,x,!x.v);draw()}catch(e){toast(e.message)}},sd:subirDoc,dd:()=>bajarDoc(+v),dx:()=>{const x=DB.D[+v];conf("¿Eliminar el documento “"+x.t+"”?",async()=>{try{await borrarK("D",x);DB.D.splice(+v,1);draw()}catch(e){toast(e.message)}})},ud:()=>{S.ap=+v;go("documentos")},rp:()=>resetPw(+v),oa1:()=>{listaOrt().r.forEach(([x,i])=>S.os.add(i));draw()},oc:()=>{S.os.clear();S.ox={};draw()},oas:asignarOrt,ao:()=>{S.ap=+v;go("ortesis")},es:()=>fEst(+v),qe:async()=>{const p=pk(+v),n=NEXT[p.ea];if(n&&cambiar(p,"ea",n,"")){try{await editarK("P",p);draw()}catch(e){toast(e.message)}}},um,np:()=>go("nuevo"),gp,ev:()=>{S.evi=null;go("evaluacion-"+(v=="fis"?"fis":"med"))},ge:()=>guardarEval(v=="fis"?"Física":"Médica"),nm:menuNuevo,rxtab:()=>{S.rxTab=v;draw()},rxn:()=>fRx(),rxp:()=>rxPrint(+v),rxe:()=>fRx(+v),fmt:()=>{localStorage.setItem("fmtHora",hora12()?"24":"12");draw()},ci:()=>fCita(v===undefined||v===""?undefined:+v),cc:()=>cancelarCita(+v),ad:()=>agDia(+v),cx:()=>fCir(undefined,v?+v:undefined),pz:()=>go("procedimientos"),oz:()=>go("ortesis"),nui:()=>go("estudios-subir"),nud:()=>go("documentos"),pal,mn:()=>$("#side").classList.toggle("open"),
+({adm:()=>{S.open=!S.open;draw()},nu:()=>fUs(),eu:()=>fUs(+v),ant:fAnt,rst,st:vStats,x:ovx,ef:()=>fFac(v?+v:undefined),ep:()=>fProc(v?+v:undefined),imp:fImp,sa:()=>{listaProc().r.forEach(([x,i])=>S.sel.add(i));draw()},sc:()=>{S.sel.clear();draw()},as:asignar,ap:()=>{S.pa.p=+v;go("procedimientos")},pr:async()=>{const x=DB.PP[v];x.e="Realizado";try{await editarK("PP",x);draw()}catch(e){toast(e.message)}},pq:async()=>{const x=DB.PP[v];try{await borrarK("PP",x);DB.PP.splice(v,1);draw()}catch(e){toast(e.message)}},ui:()=>{S.upP=+v;go("estudios-subir")},sv:guardarImg,vw:()=>verImg(+v),ac:()=>{S.ap=+v;S.pa.p=+v;draw()},ca:()=>{S.ap=null;if(S.route.split("-")[0]=="p")go("pacientes");else draw()},er:()=>{const[k,i]=v.split("."),x=DB[k][+i];k=="B"?fFac(+i):k=="C"?fCir(+i):k=="E"&&x&&x.d?(S.evi=+i,go("evaluacion-"+(x.tp=="Física"?"fis":"med"))):fReg(k,+i)},vf:async()=>{const[k,i]=v.split("."),x=DB[k][+i];try{await verificarK(k,x,!x.v);draw()}catch(e){toast(e.message)}},sd:subirDoc,dd:()=>bajarDoc(+v),dx:()=>{const x=DB.D[+v];conf("¿Eliminar el documento “"+x.t+"”?",async()=>{try{await borrarK("D",x);DB.D.splice(+v,1);draw()}catch(e){toast(e.message)}})},ud:()=>{S.ap=+v;go("documentos")},rp:()=>resetPw(+v),oa1:()=>{listaOrt().r.forEach(([x,i])=>S.os.add(i));draw()},oc:()=>{S.os.clear();S.ox={};draw()},oas:asignarOrt,ao:()=>{S.ap=+v;go("ortesis")},es:()=>fEst(+v),qe:async()=>{const p=pk(+v),n=NEXT[p.ea];if(n&&cambiar(p,"ea",n,"")){try{await editarK("P",p);draw()}catch(e){toast(e.message)}}},um,np:()=>go("nuevo"),gp,ev:()=>{S.evi=null;go("evaluacion-"+(v=="fis"?"fis":"med"))},ge:()=>guardarEval(v=="fis"?"Física":"Médica"),nm:menuNuevo,rxtab:()=>{S.rxTab=v;draw()},rxn:()=>fRx(),rxp:()=>rxPrint(+v),rxe:()=>fRx(+v),fmt:()=>{localStorage.setItem("fmtHora",hora12()?"24":"12");draw()},facp:()=>facPrint(+v),ci:()=>fCita(v===undefined||v===""?undefined:+v),cc:()=>cancelarCita(+v),ad:()=>agDia(+v),cx:()=>fCir(undefined,v?+v:undefined),pz:()=>go("procedimientos"),oz:()=>go("ortesis"),nui:()=>go("estudios-subir"),nud:()=>go("documentos"),pal,mn:()=>$("#side").classList.toggle("open"),
 rev:async()=>{const x=DB.I[v];x.r="Revisado";try{await editarK("I",x);draw()}catch(e){toast(e.message)}},cob:async()=>{const x=DB.B[v];x.e="Cobrado";try{await editarK("B",x);draw()}catch(e){toast(e.message)}} })[a]?.()});
 addEventListener("keydown",e=>{if(!S.user)return;const g=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
 if((e.ctrlKey||e.metaKey)&&e.key=="k"){e.preventDefault();pal()}
