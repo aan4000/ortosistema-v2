@@ -254,6 +254,7 @@ save:"<path d='M19 20.4H5A1.6 1.6 0 0 1 3.4 18.8V5.2A1.6 1.6 0 0 1 5 3.6h10.6l5 
 calplus:"<rect x='3' y='5' width='18' height='16' rx='2.5'/><path d='M3 9.6h18M8 3v3.6M16 3v3.6'/><path d='M12 13.2v5M9.5 15.7h5'/>",
 chevl:"<path d='M14.4 5.6 8 12l6.4 6.4'/>",
 chevr:"<path d='M9.6 5.6 16 12l-6.4 6.4'/>",
+rx:"<path d='M6 4h4a3 3 0 0 1 0 6H6zM6 10v10M10 10l6 10'/>",
 mail:"<rect width='20' height='16' x='2' y='4' rx='2'/><path d='m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7'/>",
 phone:"<path d='M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z'/>",
 "message-circle":"<path d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/>",
@@ -311,7 +312,7 @@ const verif=r=>r.verificado_por?{u:r.verificado_por,f:r.verificado_en?f2d(String
 /* Fila de PostgreSQL -> objeto del front-end */
 function fromK(k,r){
   let o;
-  if(k=="P")o={id:r.id,n:r.nombre||"",e:r.edad??"",c:r.cedula||"",s:r.seguro||"",al:r.alergias||"",
+  if(k=="P")o={id:r.id,cd:r.codigo||"",n:r.nombre||"",e:r.edad??"",c:r.cedula||"",s:r.seguro||"",al:r.alergias||"",
     dx:r.diagnostico||"",st:r.etapa||0,fn:r.fecha_nacimiento?String(r.fecha_nacimiento).slice(0,10):"",
     sx:r.sexo||"",tl:r.telefono||"",em:r.correo||"",na:r.numero_afiliado||"",
     am:r.antecedentes_morbidos||"",aq:r.antecedentes_quirurgicos||"",
@@ -438,7 +439,7 @@ async function subirImagen(estudioId,dataUrl){
 }
 const S={user:null,open:false,sel:new Set(),pf:{g:"",q:"",pr:false},pa:{p:null,dr:"",f:"",e:"Indicado",cg:true},ef:{p:"",t:""},upP:null,ap:null,only:true,ag:null,evi:null,of:{g:"",q:""},pe:{a:"",u:""},os:new Set(),ox:{},oa:{p:null,dr:"",f:"",e:"Indicada",ind:""},route:(location.hash||"#inicio").slice(1)||"inicio"};
 const RL={medico:"Médico",secretaria:"Secretaría",fisio:"Fisioterapeuta",admin:"Administrador"};
-const M=[["inicio","home","Inicio"],["agenda","cal","Agenda"],["pacientes","users","Pacientes"],["procedimientos","clip","Procedimientos"],["recetas","pill","Recetas"],["ortesis","ort","Órtesis"],["quirofano","act","Quirófano"],["estudios","img","Estudios"],["documentos","doc","Documentos"],["rehab","ref","Rehabilitación"]];
+const M=[["inicio","home","Inicio"],["agenda","cal","Agenda"],["pacientes","users","Pacientes"],["procedimientos","clip","Procedimientos"],["recetas","rx","Recetas"],["ortesis","ort","Órtesis"],["quirofano","act","Quirófano"],["estudios","img","Estudios"],["documentos","doc","Documentos"],["rehab","ref","Rehabilitación"]];
 const AD=[["referimientos","swap","Referimientos"],["autorizaciones","ok","Autorizaciones"],["facturacion","usd","Facturación"]];
 const ST=["Consulta","Estudio","Preauth","Cirugía","Fisio","PROM","Facturado"];
 const BC={Activo:"ok",Inactivo:"er",Programada:"in",Realizada:"ok",Pendiente:"wa","Por revisar":"wa",Revisado:"ok",Aprobada:"ok","Por solicitar":"wa",Enviada:"in",Rechazada:"er",Respondido:"ok",Cobrado:"ok",Anulada:"er",Indicado:"in",Cancelada:"er",Indicada:"in",Entregada:"ok",Programado:"in"};
@@ -558,7 +559,7 @@ const DS={inicio:"Resumen de tu jornada: indicadores, agenda y alertas que requi
 const TD={resumen:"Datos clave, antecedentes y todo lo ocurrido con el paciente, de lo más reciente a lo más antiguo.",clinica:"Evaluaciones médicas y estudios de imagen.",procedimientos:"Cirugías del paciente y los implantes utilizados.",rehab:"Sesiones de fisioterapia y cuestionarios de resultados (PROMs).",gestion:"Referimientos, preautorizaciones y cargos de este paciente.",documentos:"Archivos y documentos del paciente.",ortesis:"Órtesis indicadas al paciente, con lado, talla e indicaciones de uso."};
 const SI={agenda:"cal",pacientes:"users",procedimientos:"clip",ortesis:"ort",quirofano:"act",estudios:"img",documentos:"doc",rehab:"ref",referimientos:"swap",autorizaciones:"ok",facturacion:"usd",admin:"cog",nuevo:"plus",evaluacion:"act"},KI={agenda:"cal",quirofano:"act",estudios:"img",rehab:"ref",autorizaciones:"ok",facturacion:"usd",pacientes:"users",referimientos:"swap"};
 const sec=t=>{const k=S.route.split("-")[0];return`<div class="sh"><h2><span class="hi">${ic(SI[k]||"chart",22)}</span>${t}</h2><p class="mu">${DS[k]||""}</p></div>`};
-const listaP=q=>tbl(["Paciente","Edad","Seguro","Diagnóstico","Atención","Autorización",""],DB.P.filter(p=>(p.n+(p.c||"")+(p.s||"")).toLowerCase().includes(q.toLowerCase())&&(!S.pe.a||p.ea==S.pe.a)&&(!S.pe.u||effAu(p)==S.pe.u)).map(p=>[pl(p.id)+(S.ap==p.id?' <span class="b in">Activo</span>':""),p.e,esc(p.s),esc(p.dx||"—"),chip(EA,p.ea),chip(EU,effAu(p)),`<button class="btn${S.ap==p.id?"":" p"}" data-a="ac:${p.id}">${S.ap==p.id?"Activo":"Activar"}</button> <button class="btn" data-r="p-${p.id}">${ic("folder",14)} Abrir expediente</button>`]));
+const listaP=q=>tbl(["Código","Paciente","Edad","Seguro","Diagnóstico","Atención","Autorización",""],DB.P.filter(p=>(p.n+(p.c||"")+(p.s||"")+(p.cd||"")).toLowerCase().includes(q.toLowerCase())&&(!S.pe.a||p.ea==S.pe.a)&&(!S.pe.u||effAu(p)==S.pe.u)).map(p=>[esc(p.cd||"—"),pl(p.id)+(S.ap==p.id?' <span class="b in">Activo</span>':""),p.e,esc(p.s),esc(p.dx||"—"),chip(EA,p.ea),chip(EU,effAu(p)),`<button class="btn${S.ap==p.id?"":" p"}" data-a="ac:${p.id}">${S.ap==p.id?"Activo":"Activar"}</button> <button class="btn" data-r="p-${p.id}">${ic("folder",14)} Abrir expediente</button>`]));
 const vPac=()=>`<div class="row">${sec("Pacientes")}<button class="btn p" data-a="np">${ic("plus",16)} Nuevo paciente</button></div><div class="fg"><div><label class="mu" for="ps">Buscar</label><input id="ps" placeholder="Nombre, cédula o seguro"></div><div><label class="mu" for="pe1">Estado de atención</label><select id="pe1" data-pe="a"><option value="">Todos</option>${Object.keys(EA).map(s=>`<option${s==S.pe.a?" selected":""}>${s}</option>`).join("")}</select></div><div><label class="mu" for="pe2">Autorización</label><select id="pe2" data-pe="u"><option value="">Todas</option>${Object.keys(EU).map(s=>`<option${s==S.pe.u?" selected":""}>${s}</option>`).join("")}</select></div></div><div id="pl">${listaP("")}</div>`;
 const vRehab=()=>sec("Rehabilitación")+card("Sesiones de fisioterapia",tbl(["Fecha","Paciente","Sesión","Dolor"],fa(DB.F).map(x=>[x.f,pl(x.p),esc(x.t),x.d+"/10"])))+"<br>"+card("PROMs",tbl(["Fecha","Paciente","Cuestionario","Resultado"],fa(DB.M).map(x=>[x.f,pl(x.p),esc(x.t),`<span class="b ${x.s<50?"er":"ok"}">${x.s}%</span>`])));
 const vRef=()=>sec("Referimientos")+card("Enviados y recibidos",tbl(["Fecha","Paciente","Referimiento","Estado"],fa(DB.R).map(x=>[x.f,pl(x.p),esc(x.t),bd(x.e)])));
@@ -577,7 +578,7 @@ gestion:()=>card("Referimientos",tk("R",id,["Fecha","Detalle","Estado"],x=>[x.f,
 ortesis:()=>`<p><button class="btn p" data-a="ao:${id}">${ic("plus",16)} Asignar órtesis</button></p>`+card("Órtesis indicadas",tk("OP",id,["Fecha","Órtesis","Lado","Talla","Médico","Estado"],x=>[x.f,esc(x.n),esc(x.lado||"—"),esc(x.talla||"—"),esc(x.dr||"—"),bd(x.e)])),
 documentos:()=>`<p><button class="btn p" data-a="ud:${id}">${ic("up",16)} Subir documento</button></p>`+card("Documentos del paciente",tDocs(DB.D.map((x,i)=>[x,i]).filter(([x])=>x.p==id),false))
 };
-return `<div class="card ph"><div class="row"><div><h2>${esc(p.n)}</h2><span class="mu">${p.e} años · Cédula ${esc(p.c)} · ${esc(p.s)}</span></div><div class="tb"><button class="btn p" data-a="ev:med">Evaluación médica</button><button class="btn" data-a="ev:fis">Evaluación física</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
+return `<div class="card ph"><div class="row"><div><h2>${esc(p.n)}</h2><span class="mu">${p.cd?esc(p.cd)+" ? ":""}${p.e} años · Cédula ${esc(p.c)} · ${esc(p.s)}</span></div><div class="tb"><button class="btn p" data-a="ev:med">Evaluación médica</button><button class="btn" data-a="ev:fis">Evaluación física</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
 <div class="stp">${ST.map((s,i)=>`<span class="${i<p.st?"d":i==p.st?"c":""}">${s}</span>`).join("")}</div>
 <div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="p-${id}-${k}">${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p>${(B2[tab]||B2.resumen)()}`}
 
@@ -625,7 +626,12 @@ if(!fn)return er("Elige la fecha de nacimiento en el calendario.");
 if(!v("nx"))return er("Selecciona el sexo.");
 const mb=[...document.querySelectorAll(".mb")].filter(x=>x.checked).map(x=>x.value).concat(v("no")?[v("no")]:[]);
 const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),em:v("nm"),s:v("ns"),na:v("na"),al:v("nl"),dx:v("ni"),am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,st:0,ea:"Por agendar",eu:/Privado/i.test(v("ns"))?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
-try{const id=await crearK("P",rec);DB.P.push({...rec,id});go("p-"+id)}catch(e){er(e.message)}}
+const dup=DB.P.find(x=> (rec.c && x.c && x.c===rec.c) || (x.n.toLowerCase()===rec.n.toLowerCase() && x.fn===rec.fn));
+if(dup){const o=modal(`<h3>Paciente ya registrado</h3><p>Ya existe un paciente con ${rec.c&&dup.c===rec.c?"la misma cédula":"el mismo nombre y fecha de nacimiento"}: <b>${esc(dup.n)}</b> (código ${esc(dup.cd||"")}).</p><p class="mu">?Deseas abrir su expediente en lugar de crear un duplicado?</p><div class="tb"><button class="btn" id="dup_no">Crear de todos modos</button><button class="btn p" id="dup_si">Abrir expediente</button></div>`,"w");
+  o.querySelector("#dup_si").onclick=()=>{o.remove();S.ap=dup.id;S.pa.p=dup.id;go("p-"+dup.id)};
+  o.querySelector("#dup_no").onclick=async()=>{o.remove();try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}};
+  return}
+try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}}
 
 function vRecetas(){
   const ap=S.ap?pk(S.ap):null;
@@ -634,7 +640,7 @@ function vRecetas(){
   const rx=DB.X.filter(x=>x.p==ap.id).sort((a,b)=>iso(b.f).localeCompare(iso(a.f)));
   const lista=rx.filter(x=>x.t==tab);
   return sec("Recetas . "+ap.n)+`<p class="mu">Paciente activo: <b>${esc(ap.n)}</b> . ${ap.e} anos . ${esc(ap.s||"?")}</p>`
-    +`<div class="tabs">${[["medicamento","Medicamentos ortopedicos"],["protesis","Protesis"]].map(([k,l])=>`<button class="${k==tab?"on":""}" data-a="rxtab:${k}">${ic(k=="medicamento"?"pill":"ort",16)} ${l}</button>`).join("")}</div>`
+    +`<div class="tabs">${[["medicamento","Medicamentos ortopedicos"],["protesis","Protesis"]].map(([k,l])=>`<button class="${k==tab?"on":""}" data-a="rxtab:${k}">${ic(k=="medicamento"?"rx":"ort",16)} ${l}</button>`).join("")}</div>`
     +`<p><button class="btn p" data-a="rxn">${ic("plus",16)} Nueva ${tab=="medicamento"?"receta":"orden de protesis"}</button></p>`
     +card(tab=="medicamento"?"Medicamentos recetados":"Protesis indicadas",
        tbl(["Fecha","Titulo","Items","Verificacion",""],

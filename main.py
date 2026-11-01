@@ -44,7 +44,7 @@ pool = ConnectionPool(DATABASE_URL, min_size=1, max_size=5, open=False,
 # Tablas y columnas permitidas. Es la única lista que toca SQL dinámico:
 # si una tabla o columna no está aquí, la API la rechaza.
 TABLAS = {
-    "pacientes": ["nombre", "edad", "cedula", "seguro", "alergias", "diagnostico", "etapa",
+    "pacientes": ["codigo", "nombre", "edad", "cedula", "seguro", "alergias", "diagnostico", "etapa",
                   "antecedentes_morbidos", "antecedentes_quirurgicos", "medicamentos",
                   "antecedentes_familiares", "habitos", "fecha_nacimiento", "sexo", "telefono",
                   "correo", "numero_afiliado",

@@ -11,12 +11,16 @@ create table if not exists usuarios(
   debe_cambiar_clave boolean not null default false);
 alter table usuarios add column if not exists debe_cambiar_clave boolean not null default false;
 
+create sequence if not exists paciente_codigo_seq start 1;
 create table if not exists pacientes(
   id serial primary key,
+  codigo text unique,
   nombre text not null, edad int, cedula text, seguro text,
   alergias text, diagnostico text,
   etapa int not null default 0,
   creado_en timestamptz not null default now());
+alter table pacientes add column if not exists codigo text unique;
+alter table pacientes alter column codigo set default ('P-' || lpad(nextval('paciente_codigo_seq')::text, 4, '0'));
 alter table pacientes add column if not exists antecedentes_morbidos text;
 alter table pacientes add column if not exists antecedentes_quirurgicos text;
 alter table pacientes add column if not exists medicamentos text;
@@ -205,3 +209,7 @@ create table if not exists recetas(
 alter table recetas add column if not exists verificado_por text;
 alter table recetas add column if not exists verificado_en timestamptz;
 create index if not exists ix_recetas_pac on recetas(paciente_id);
+
+-- Codigo de paciente: rellenar los que no lo tengan y sincronizar la secuencia.
+update pacientes set codigo = 'P-' || lpad(id::text, 4, '0') where codigo is null;
+select setval('paciente_codigo_seq', coalesce((select max(id) from pacientes), 1));
