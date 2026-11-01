@@ -574,7 +574,7 @@ const DS={inicio:"Resumen de tu jornada: indicadores, agenda y alertas que requi
 const TD={resumen:"Datos clave, antecedentes y todo lo ocurrido con el paciente, de lo más reciente a lo más antiguo.",clinica:"Evaluaciones médicas y estudios de imagen.",procedimientos:"Cirugías del paciente y los implantes utilizados.",rehab:"Sesiones de fisioterapia y cuestionarios de resultados (PROMs).",gestion:"Referimientos, preautorizaciones y cargos de este paciente.",documentos:"Archivos y documentos del paciente.",ortesis:"Órtesis indicadas al paciente, con lado, talla e indicaciones de uso."};
 const SI={agenda:"cal",pacientes:"users",procedimientos:"clip",ortesis:"ort",quirofano:"act",estudios:"img",documentos:"doc",rehab:"ref",referimientos:"swap",autorizaciones:"ok",facturacion:"usd",admin:"cog",nuevo:"plus",evaluacion:"act"},KI={agenda:"cal",quirofano:"act",estudios:"img",rehab:"ref",autorizaciones:"ok",facturacion:"usd",pacientes:"users",referimientos:"swap"};
 const sec=t=>{const k=S.route.split("-")[0];return`<div class="sh"><h2><span class="hi">${ic(SI[k]||"chart",22)}</span>${t}</h2><p class="mu">${DS[k]||""}</p></div>`};
-const listaP=q=>tbl(["Código","Paciente","Edad","Seguro","Diagnóstico","Atención","Autorización",""],DB.P.filter(p=>(p.n+(p.c||"")+(p.s||"")+(p.cd||"")).toLowerCase().includes(q.toLowerCase())&&(!S.pe.a||p.ea==S.pe.a)&&(!S.pe.u||effAu(p)==S.pe.u)).map(p=>[`<span class="code">${esc(p.cd||"—")}</span>`,pl(p.id)+(S.ap==p.id?' <span class="b in">Activo</span>':""),p.e,esc(p.s),esc(p.dx||"—"),chip(EA,p.ea),chip(EU,effAu(p)),`<button class="btn${S.ap==p.id?"":" p"}" data-a="ac:${p.id}">${S.ap==p.id?"Activo":"Activar"}</button> <button class="btn" data-r="p-${p.id}">${ic("folder",14)} Abrir expediente</button>`]));
+const listaP=q=>tbl(["Código","Paciente","Edad","Seguro","Diagnóstico","Atención","Autorización",""],DB.P.filter(p=>(p.n+(p.c||"")+(p.s||"")+(p.cd||"")).toLowerCase().includes(q.toLowerCase())&&(!S.pe.a||p.ea==S.pe.a)&&(!S.pe.u||effAu(p)==S.pe.u)).map(p=>[`<span class="code">${esc(p.cd||"—")}</span>`,pl(p.id)+(S.ap==p.id?' <span class="b in">Activo</span>':""),p.e,esc(p.s),esc(p.dx||"—"),chip(EA,p.ea),chip(EU,effAu(p)),`<button class="btn${S.ap==p.id?"":" p"}" data-a="ac:${p.id}">${S.ap==p.id?"Activo":"Activar"}</button> <button class="btn" data-r="p-${p.id}">${ic("folder",14)} Abrir expediente</button> <button class="btn d" data-a="delp:${p.id}" title="Eliminar paciente" aria-label="Eliminar paciente">${ic("trash",14)}</button>`]));
 const vPac=()=>`<div class="row">${sec("Pacientes")}<button class="btn p" data-a="np">${ic("plus",16)} Nuevo paciente</button></div><div class="fg"><div><label class="mu" for="ps">Buscar</label><input id="ps" placeholder="Nombre, cédula o seguro"></div><div><label class="mu" for="pe1">Estado de atención</label><select id="pe1" data-pe="a"><option value="">Todos</option>${Object.keys(EA).map(s=>`<option${s==S.pe.a?" selected":""}>${s}</option>`).join("")}</select></div><div><label class="mu" for="pe2">Autorización</label><select id="pe2" data-pe="u"><option value="">Todas</option>${Object.keys(EU).map(s=>`<option${s==S.pe.u?" selected":""}>${s}</option>`).join("")}</select></div></div><div id="pl">${listaP("")}</div>`;
 const vRehab=()=>sec("Rehabilitación")+card("Sesiones de fisioterapia",tbl(["Fecha","Paciente","Sesión","Dolor"],fa(DB.F).map(x=>[x.f,pl(x.p),esc(x.t),x.d+"/10"])))+"<br>"+card("PROMs",tbl(["Fecha","Paciente","Cuestionario","Resultado"],fa(DB.M).map(x=>[x.f,pl(x.p),esc(x.t),`<span class="b ${x.s<50?"er":"ok"}">${x.s}%</span>`])));
 const vRef=()=>sec("Referimientos")+card("Enviados y recibidos",tbl(["Fecha","Paciente","Referimiento","Estado"],fa(DB.R).map(x=>[x.f,pl(x.p),esc(x.t),bd(x.e)])));
@@ -593,9 +593,106 @@ gestion:()=>card("Referimientos",tk("R",id,["Fecha","Detalle","Estado"],x=>[x.f,
 ortesis:()=>`<p><button class="btn p" data-a="ao:${id}">${ic("plus",16)} Asignar órtesis</button></p>`+card("Órtesis indicadas",tk("OP",id,["Fecha","Órtesis","Lado","Talla","Médico","Estado"],x=>[x.f,esc(x.n),esc(x.lado||"—"),esc(x.talla||"—"),esc(x.dr||"—"),bd(x.e)])),
 documentos:()=>`<p><button class="btn p" data-a="ud:${id}">${ic("up",16)} Subir documento</button></p>`+card("Documentos del paciente",tDocs(DB.D.map((x,i)=>[x,i]).filter(([x])=>x.p==id),false))
 };
-return `<div class="card ph"><div class="row"><div><h2>${esc(p.n)}</h2><span class="mu">${p.cd?`<span class="code">${esc(p.cd)}</span> `:""}${p.e} años · Cédula ${esc(p.c)} · ${esc(p.s)}</span></div><div class="tb"><button class="btn p" data-a="ev:med">Evaluación médica</button><button class="btn" data-a="ev:fis">Evaluación física</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
+return `<div class="card ph"><div class="row"><div><h2>${esc(p.n)}</h2><span class="mu">${p.cd?`<span class="code">${esc(p.cd)}</span> `:""}${p.e} años · Cédula ${esc(p.c)} · ${esc(p.s)}</span></div><div class="tb"><button class="btn p" data-a="ev:med">Evaluación médica</button><button class="btn" data-a="ev:fis">Evaluación física</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
 <div class="stp">${ST.map((s,i)=>`<span class="${i<p.st?"d":i==p.st?"c":""}">${s}</span>`).join("")}</div>
 <div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="p-${id}-${k}">${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p>${(B2[tab]||B2.resumen)()}`}
+
+function fDelP(id){
+  const p=pk(id);if(!p||!p.n)return;
+  const nE=DB.E.filter(x=>x.p==id).length,nX=DB.X.filter(x=>x.p==id).length,nB=DB.B.filter(x=>x.p==id).length,nD=DB.D.filter(x=>x.p==id).length;
+  const o=modal(`<h3>Eliminar paciente</h3>
+    <p>Vas a eliminar a <b>${esc(p.n)}</b>${p.cd?" ("+esc(p.cd)+")":""}.</p>
+    <p class="mu">Se borrarán también ${nE} evaluación(es), ${nX} receta(s), ${nB} cargo(s), ${nD} documento(s), además de citas, cirugías, órtesis e imágenes. Esta acción no se puede deshacer.</p>
+    <label class="mu" style="display:block;margin:10px 0 6px">Para confirmar escribe <b>ELIMINAR</b>:</label>
+    <input id="delp_t" autocomplete="off" spellcheck="false" placeholder="ELIMINAR">
+    <div class="er2" id="delp_e" role="alert"></div>
+    <div class="tb"><button class="btn" id="delp_no">Cancelar</button><button class="btn d" id="delp_ok">${ic("trash",14)} Eliminar definitivamente</button></div>`,"w");
+  const t=o.querySelector("#delp_t"),e=o.querySelector("#delp_e"),b=o.querySelector("#delp_ok");
+  o.querySelector("#delp_no").onclick=()=>o.remove();
+  b.onclick=async()=>{
+    if(t.value.trim().toUpperCase()!=="ELIMINAR"){e.textContent="Escribe ELIMINAR para confirmar.";t.focus();return}
+    b.disabled=true;b.textContent="Eliminando…";
+    try{
+      await borrarK("P",p);
+      if(S.ap===p.id)S.ap=null;
+      if(S.pa.p===p.id)S.pa.p=null;
+      o.remove();
+      await cargar();
+      toast("Paciente eliminado");
+      go("pacientes");
+    }catch(err){e.textContent=err.message;b.disabled=false;b.innerHTML=ic("trash",14)+" Eliminar definitivamente"}
+  };
+  t.focus();
+}
+
+function recPrint(id){
+  const p=pk(id);if(!p||!p.n)return;
+  const byF=(a,b)=>String(b.f||"").localeCompare(String(a.f||""));
+  const E=DB.E.filter(x=>x.p==id).sort(byF),I=DB.I.filter(x=>x.p==id).sort(byF),C=DB.C.filter(x=>x.p==id).sort(byF),PP=DB.PP.filter(x=>x.p==id).sort(byF),OP=DB.OP.filter(x=>x.p==id).sort(byF),X=DB.X.filter(x=>x.p==id).sort(byF),F=DB.F.filter(x=>x.p==id).sort(byF),M=DB.M.filter(x=>x.p==id).sort(byF),R=DB.R.filter(x=>x.p==id).sort(byF),AU=DB.A.filter(x=>x.p==id),B=DB.B.filter(x=>x.p==id).sort(byF),D=DB.D.filter(x=>x.p==id).sort(byF);
+  const SECC=[["datos","Datos del paciente"],["ante","Antecedentes"],["eval","Evaluaciones"],["proc","Procedimientos"],["cx","Cirugías e implantes"],["ort","Órtesis"],["rx","Recetas y prótesis"],["rehab","Rehabilitación"],["gest","Gestión y facturación"],["docs","Documentos"],["img","Estudios de imagen"],["estado","Historial de estados"]];
+  const o=modal(`<h3>Imprimir / Enviar expediente</h3>
+    <p class="mu">Paciente: <b>${esc(p.n)}</b>${p.cd?" · "+esc(p.cd):""}</p>
+    <p class="mu">Marca las secciones a incluir:</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin:8px 0 4px">${SECC.map(([k,l])=>`<label class="ck" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="rc_${k}" checked> <span>${l}</span></label>`).join("")}</div>
+    <p class="mu" style="margin:8px 0 0">${p.em?"Correo: "+esc(p.em):"Paciente sin correo registrado"} · ${p.tl?"WhatsApp: "+esc(p.tl):"sin teléfono registrado"}</p>
+    <div class="er2" id="rc_er" role="alert"></div>
+    <div class="tb" style="margin-top:12px">
+      <button class="btn" id="rc_view">${ic("eye",14)} Ver</button>
+      <button class="btn p" id="rc_print">${ic("printer",14)} Imprimir</button>
+      <button class="btn" id="rc_wa">${ic("message-circle",14)} WhatsApp</button>
+      <button class="btn" id="rc_mail">${ic("mail",14)} Correo</button>
+      <button class="btn" id="rc_close">Cerrar</button>
+    </div>`, "w");
+  const inc=k=>{const c=o.querySelector("#rc_"+k);return !!c&&c.checked};
+  const blocks=()=>{
+    const blk=[];
+    const sec=(t,l)=>{blk.push({s:t});if(l&&l.length)blk.push({l})};
+    if(inc("datos")){
+      blk.push({s:"DATOS DEL PACIENTE"});
+      blk.push({p:"Nombre: "+p.n+(p.cd?" · Código: "+p.cd:"")});
+      if(p.fn)blk.push({p:"Fecha de nacimiento: "+dmy(p.fn)+(p.e?" ("+p.e+" años)":"")});
+      if(p.sx)blk.push({p:"Sexo: "+p.sx});
+      if(p.c)blk.push({p:"Cédula: "+p.c});
+      if(p.tl)blk.push({p:"Teléfono: "+p.tl});
+      if(p.em)blk.push({p:"Correo: "+p.em});
+      if(p.s)blk.push({p:"Seguro: "+p.s+(p.na?" · afiliado "+p.na:"")});
+      if(p.dx)blk.push({p:"Diagnóstico: "+p.dx});
+      if(p.al)blk.push({p:"Alergias: "+p.al});
+      if(p.ea)blk.push({p:"Estado de atención: "+p.ea});
+      if(p.eu)blk.push({p:"Autorización: "+p.eu});
+    }
+    if(inc("ante")){
+      const ant=[["Mórbidos",p.am],["Quirúrgicos",p.aq],["Medicamentos actuales",p.me],["Familiares",p.af],["Hábitos",p.ha]].filter(x=>x[1]);
+      if(ant.length){blk.push({s:"ANTECEDENTES"});ant.forEach(x=>blk.push({p:x[0]+": "+x[1]}))}
+    }
+    if(inc("eval")&&E.length)sec("EVALUACIONES",E.map(x=>x.f+" · "+(x.tp||"General")+": "+x.t));
+    if(inc("proc")&&PP.length)sec("PROCEDIMIENTOS",PP.map(x=>x.f+" · "+x.t+(x.g?" · "+x.g:"")+(x.dr?" · "+x.dr:"")+(x.pr?" · "+mon(+x.pr||0):"")+(x.e?" · "+x.e:"")));
+    if(inc("cx")&&C.length)sec("CIRUGÍAS E IMPLANTES",C.map(x=>x.f+" · "+x.t+(x.i?" · implante "+x.i:"")+(x.e?" · "+x.e:"")));
+    if(inc("ort")&&OP.length)sec("ÓRTESIS",OP.map(x=>x.f+" · "+x.n+(x.lado?" · "+x.lado:"")+(x.talla?" · talla "+x.talla:"")+(x.dr?" · "+x.dr:"")+(x.e?" · "+x.e:"")));
+    if(inc("rx")&&X.length)sec("RECETAS Y PRÓTESIS",X.map(x=>x.f+" · "+(x.ti||(x.t=="protesis"?"Orden de prótesis":"Receta"))+(x.dr?" · "+x.dr:"")+": "+(((x.it||[]).map(it=>it.nombre+(it.dosis?" ("+it.dosis+")":"")+(it.cantidad?" x"+it.cantidad:"")).join(", "))||"sin ítems")));
+    if(inc("rehab")){
+      if(F.length)sec("FISIOTERAPIA",F.map(x=>x.f+" · "+x.t+" · dolor "+x.d+"/10"));
+      if(M.length)sec("CUESTIONARIOS (PROMs)",M.map(x=>x.f+" · "+x.t+" · "+x.s+"%"));
+    }
+    if(inc("gest")){
+      if(R.length)sec("REFERIMIENTOS",R.map(x=>x.f+" · "+x.t+(x.e?" · "+x.e:"")));
+      if(AU.length)sec("AUTORIZACIONES",AU.map(x=>x.t+" · "+x.s+(x.e?" · "+x.e:"")));
+      if(B.length){sec("CARGOS Y FACTURACIÓN",B.map(x=>x.f+" · "+x.t+(x.dr?" · "+x.dr:"")+" · "+mon(+x.m||0)+(x.e?" · "+x.e:"")));blk.push({p:"Total facturado: "+mon(B.reduce((a,x)=>a+(+x.m||0),0))})}
+    }
+    if(inc("docs")&&D.length)sec("DOCUMENTOS",D.map(x=>x.f+" · "+x.t+(x.tp?" ("+x.tp+")":"")));
+    if(inc("img")&&I.length)sec("ESTUDIOS DE IMAGEN",I.map(x=>x.f+" · "+x.t+(x.r?" · "+x.r:"")));
+    if(inc("estado")&&(p.hs||[]).length)sec("HISTORIAL DE ESTADOS",(p.hs||[]).slice().reverse().map(x=>x.f+" "+x.h+" · "+x.t+" · "+(x.de||"")+" → "+(x.a||"")+(x.n?" · "+x.n:"")));
+    return blk;
+  };
+  const renderText=blk=>blk.map(b=>b.s?("\n"+b.s):b.p?b.p:b.l?b.l.map(x=>"  - "+x).join("\n"):"").join("\n").replace(/\n{3,}/g,"\n\n").trim();
+  const renderHtml=blk=>"<!doctype html><html lang='es'><head><meta charset='utf-8'><title>Expediente - "+esc(p.n)+"</title><style>body{font-family:system-ui,'Segoe UI',sans-serif;padding:26px;max-width:760px;margin:0 auto;color:#14212e;font-size:14px}h1{font-size:21px;margin:0 0 2px}h2{font-size:13px;margin:18px 0 6px;border-bottom:1px solid #dce4ec;padding-bottom:4px;text-transform:uppercase;letter-spacing:.04em;color:#2b5f8a}p{margin:3px 0;line-height:1.5}ul{margin:4px 0 8px;padding-left:18px}li{margin:3px 0}.mu{color:#586a7c;font-size:12px}@media print{body{padding:10px}h2{page-break-after:avoid}}</style></head><body><h1>Expediente clínico</h1><p class='mu'>OrtoSistema · Ortopedia y Traumatología</p>"+blk.map(b=>b.s?"<h2>"+esc(b.s)+"</h2>":b.p?"<p>"+esc(b.p)+"</p>":b.l?"<ul>"+b.l.map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>":"").join("")+"</body></html>";
+  const prep=()=>{const blk=blocks();if(!blk.length){o.querySelector("#rc_er").textContent="Marca al menos una sección.";return null}o.querySelector("#rc_er").textContent="";return blk};
+  o.querySelector("#rc_view").onclick=()=>{const blk=prep();if(!blk)return;const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para ver");return}w.document.write(renderHtml(blk));w.document.close();w.focus()};
+  o.querySelector("#rc_print").onclick=()=>{const blk=prep();if(!blk)return;const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para imprimir");return}w.document.write(renderHtml(blk));w.document.close();w.focus();setTimeout(()=>{w.print()},250)};
+  o.querySelector("#rc_wa").onclick=()=>{const blk=prep();if(!blk)return;const d=String(p.tl||"").replace(/\D/g,"");const tel=d.length==10?"1"+d:(d.length==11&&d[0]=="1"?d:"");window.open("https://wa.me/"+tel+"?text="+encodeURIComponent(renderText(blk)),"_blank")};
+  o.querySelector("#rc_mail").onclick=()=>{const blk=prep();if(!blk)return;window.location.href="mailto:"+String(p.em||"").trim()+"?subject="+encodeURIComponent("Expediente clínico - "+p.n)+"&body="+encodeURIComponent(renderText(blk))};
+  o.querySelector("#rc_close").onclick=()=>o.remove();
+}
 
 let RUTA_ANT=null;
 const SUBORDEN={"facturacion":["facturacion","facturacion-catalogo","facturacion-nueva"],"estudios":["estudios","estudios-subir"],"quirofano":["quirofano"]};
@@ -1156,7 +1253,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-r],[data-a
 const[a,v]=(t.dataset.a||"").split(":");
 if(t.dataset.r){ovx();return go(t.dataset.r)}
 if(["np","ci","ev","cx","pz","oz","nui","nud","ef"].includes(a))ovx();
-({adm:()=>{S.open=!S.open;draw()},nu:()=>fUs(),eu:()=>fUs(+v),ant:fAnt,rst,st:vStats,x:ovx,ef:()=>fFac(v?+v:undefined),ep:()=>fProc(v?+v:undefined),imp:fImp,sa:()=>{listaProc().r.forEach(([x,i])=>S.sel.add(i));draw()},sc:()=>{S.sel.clear();draw()},as:asignar,ap:()=>{S.pa.p=+v;go("procedimientos")},pr:async()=>{const x=DB.PP[v];x.e="Realizado";try{await editarK("PP",x);draw()}catch(e){toast(e.message)}},pq:async()=>{const x=DB.PP[v];try{await borrarK("PP",x);DB.PP.splice(v,1);draw()}catch(e){toast(e.message)}},ui:()=>{S.upP=+v;go("estudios-subir")},sv:guardarImg,vw:()=>verImg(+v),ac:()=>{S.ap=+v;S.pa.p=+v;draw()},ca:()=>{S.ap=null;if(S.route.split("-")[0]=="p")go("pacientes");else draw()},er:()=>{const[k,i]=v.split("."),x=DB[k][+i];k=="B"?fFac(+i):k=="C"?fCir(+i):k=="E"&&x&&x.d?(S.evi=+i,go("evaluacion-"+(x.tp=="Física"?"fis":"med"))):fReg(k,+i)},vf:async()=>{const[k,i]=v.split("."),x=DB[k][+i];try{await verificarK(k,x,!x.v);draw()}catch(e){toast(e.message)}},sd:subirDoc,dd:()=>bajarDoc(+v),dx:()=>{const x=DB.D[+v];conf("¿Eliminar el documento “"+x.t+"”?",async()=>{try{await borrarK("D",x);DB.D.splice(+v,1);draw()}catch(e){toast(e.message)}})},ud:()=>{S.ap=+v;go("documentos")},rp:()=>resetPw(+v),oa1:()=>{listaOrt().r.forEach(([x,i])=>S.os.add(i));draw()},oc:()=>{S.os.clear();S.ox={};draw()},oas:asignarOrt,ao:()=>{S.ap=+v;go("ortesis")},es:()=>fEst(+v),qe:async()=>{const p=pk(+v),n=NEXT[p.ea];if(n&&cambiar(p,"ea",n,"")){try{await editarK("P",p);draw()}catch(e){toast(e.message)}}},um,np:()=>go("nuevo"),gp,ev:()=>{S.evi=null;go("evaluacion-"+(v=="fis"?"fis":"med"))},ge:()=>guardarEval(v=="fis"?"Física":"Médica"),nm:menuNuevo,pickfile:()=>$("#dfile")?.click(),rxtab:()=>{S.rxTab=v;draw()},rxn:()=>fRx(),rxp:()=>rxPrint(+v),rxe:()=>fRx(+v),fmt:()=>{localStorage.setItem("fmtHora",hora12()?"24":"12");draw()},facp:()=>facPrint(+v),ci:()=>fCita(v===undefined||v===""?undefined:+v),cc:()=>cancelarCita(+v),ad:()=>agDia(+v),cx:()=>fCir(undefined,v?+v:undefined),pz:()=>go("procedimientos"),oz:()=>go("ortesis"),nui:()=>go("estudios-subir"),nud:()=>go("documentos"),pal,mn:()=>$("#side").classList.toggle("open"),
+({adm:()=>{S.open=!S.open;draw()},nu:()=>fUs(),eu:()=>fUs(+v),ant:fAnt,rst,st:vStats,x:ovx,ef:()=>fFac(v?+v:undefined),ep:()=>fProc(v?+v:undefined),imp:fImp,sa:()=>{listaProc().r.forEach(([x,i])=>S.sel.add(i));draw()},sc:()=>{S.sel.clear();draw()},as:asignar,ap:()=>{S.pa.p=+v;go("procedimientos")},pr:async()=>{const x=DB.PP[v];x.e="Realizado";try{await editarK("PP",x);draw()}catch(e){toast(e.message)}},pq:async()=>{const x=DB.PP[v];try{await borrarK("PP",x);DB.PP.splice(v,1);draw()}catch(e){toast(e.message)}},ui:()=>{S.upP=+v;go("estudios-subir")},sv:guardarImg,vw:()=>verImg(+v),ac:()=>{S.ap=+v;S.pa.p=+v;draw()},ca:()=>{S.ap=null;if(S.route.split("-")[0]=="p")go("pacientes");else draw()},er:()=>{const[k,i]=v.split("."),x=DB[k][+i];k=="B"?fFac(+i):k=="C"?fCir(+i):k=="E"&&x&&x.d?(S.evi=+i,go("evaluacion-"+(x.tp=="Física"?"fis":"med"))):fReg(k,+i)},vf:async()=>{const[k,i]=v.split("."),x=DB[k][+i];try{await verificarK(k,x,!x.v);draw()}catch(e){toast(e.message)}},sd:subirDoc,dd:()=>bajarDoc(+v),dx:()=>{const x=DB.D[+v];conf("¿Eliminar el documento “"+x.t+"”?",async()=>{try{await borrarK("D",x);DB.D.splice(+v,1);draw()}catch(e){toast(e.message)}})},ud:()=>{S.ap=+v;go("documentos")},rp:()=>resetPw(+v),oa1:()=>{listaOrt().r.forEach(([x,i])=>S.os.add(i));draw()},oc:()=>{S.os.clear();S.ox={};draw()},oas:asignarOrt,ao:()=>{S.ap=+v;go("ortesis")},es:()=>fEst(+v),qe:async()=>{const p=pk(+v),n=NEXT[p.ea];if(n&&cambiar(p,"ea",n,"")){try{await editarK("P",p);draw()}catch(e){toast(e.message)}}},um,np:()=>go("nuevo"),gp,ev:()=>{S.evi=null;go("evaluacion-"+(v=="fis"?"fis":"med"))},ge:()=>guardarEval(v=="fis"?"Física":"Médica"),nm:menuNuevo,pickfile:()=>$("#dfile")?.click(),rxtab:()=>{S.rxTab=v;draw()},rxn:()=>fRx(),rxp:()=>rxPrint(+v),rxe:()=>fRx(+v),recp:()=>recPrint(+v),delp:()=>fDelP(+v),fmt:()=>{localStorage.setItem("fmtHora",hora12()?"24":"12");draw()},facp:()=>facPrint(+v),ci:()=>fCita(v===undefined||v===""?undefined:+v),cc:()=>cancelarCita(+v),ad:()=>agDia(+v),cx:()=>fCir(undefined,v?+v:undefined),pz:()=>go("procedimientos"),oz:()=>go("ortesis"),nui:()=>go("estudios-subir"),nud:()=>go("documentos"),pal,mn:()=>$("#side").classList.toggle("open"),
 rev:async()=>{const x=DB.I[v];x.r="Revisado";try{await editarK("I",x);draw()}catch(e){toast(e.message)}},cob:async()=>{const x=DB.B[v];x.e="Cobrado";try{await editarK("B",x);draw()}catch(e){toast(e.message)}} })[a]?.()});
 addEventListener("keydown",e=>{if(!S.user)return;const g=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
 if((e.ctrlKey||e.metaKey)&&e.key=="k"){e.preventDefault();pal()}
