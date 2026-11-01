@@ -682,6 +682,7 @@ function rxPrint(idx){
     <label class="ck" style="display:block;margin:8px 0"><input type="checkbox" id="rxck_med" checked> Incluir medico y fecha</label>
     <div class="er2" id="rxp_er" role="alert"></div>
     <div class="tb" style="margin-top:12px">
+      <button class="btn" id="rxp_view">${ic("eye",14)} Ver</button>
       <button class="btn p" id="rxp_print">${ic("printer",14)} Imprimir</button>
       <button class="btn" id="rxp_wa">${ic("message-circle",14)} WhatsApp</button>
       <button class="btn" id="rxp_mail">${ic("mail",14)} Correo</button>
@@ -713,6 +714,7 @@ function rxPrint(idx){
       +(incMed?"<div style='margin-top:24px;border-top:1px solid #dce4ec;padding-top:8px'><div class='row'><span>Medico: "+esc(r.dr||"?")+"</span><span>Fecha: "+r.f+"</span></div><div class='row mu'><span>Firma: ____________________</span></div></div>":"")
       +"</body></html>";
   };
+  o.querySelector("#rxp_view").onclick=()=>{const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para ver");return}w.document.write(buildHtml());w.document.close();w.focus()};
   o.querySelector("#rxp_print").onclick=()=>{const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para imprimir");return}w.document.write(buildHtml());w.document.close();w.focus();setTimeout(()=>{w.print()},250)};
   o.querySelector("#rxp_wa").onclick=()=>{window.open("https://wa.me/?text="+encodeURIComponent(buildText()),"_blank")};
   o.querySelector("#rxp_mail").onclick=()=>{window.location.href="mailto:?subject="+encodeURIComponent("Receta - "+pk(r.p).n)+"&body="+encodeURIComponent(buildText())};
@@ -748,6 +750,7 @@ function facPrint(idx){
     <label class="ck" style="display:block;margin:8px 0"><input type="checkbox" id="fac_med" checked> Incluir m?dico y fecha</label>
     <div class="er2" id="fac_er" role="alert"></div>
     <div class="tb" style="margin-top:12px">
+      <button class="btn" id="fac_view">${ic("eye",14)} Ver</button>
       <button class="btn p" id="fac_print">${ic("printer",14)} Imprimir</button>
       <button class="btn" id="fac_wa">${ic("message-circle",14)} WhatsApp</button>
       <button class="btn" id="fac_mail">${ic("mail",14)} Correo</button>
@@ -757,24 +760,25 @@ function facPrint(idx){
     const incPac=o.querySelector("#fac_pac").checked;
     const incMed=o.querySelector("#fac_med").checked;
     let txt="FACTURA - OrtoSistema\n";
-    if(incPac) txt+="Paciente: "+p.n+"\n"+(p.e?p.e+" a?os\n":"")+(p.c?"C?dula: "+p.c+"\n":"")+(p.s?"Seguro: "+p.s+"\n":"")+(p.al?"Alergias: "+p.al+"\n":"");
+    if(incPac) txt+="Paciente: "+p.n+"\n"+(p.e?p.e+" anos\n":"")+(p.c?"Cedula: "+p.c+"\n":"")+(p.s?"Seguro: "+p.s+"\n":"")+(p.al?"Alergias: "+p.al+"\n":"");
     txt+="\nConcepto: "+x.t+"\n";
-    if(x.c) txt+="C?digo: "+x.c+"\n";
+    if(x.c) txt+="Codigo: "+x.c+"\n";
     txt+="Monto: RD$ "+x.m.toLocaleString("es-DO")+"\n";
     txt+="Estado: "+x.e+"\n";
     if(x.notas) txt+="Notas: "+x.notas+"\n";
-    if(incMed) txt+="\nM?dico: "+(x.dr||"?")+"\nFecha: "+x.f+"\n";
+    if(incMed) txt+="\nMedico: "+(x.dr||"-")+"\nFecha: "+x.f+"\n";
     return txt;
   };
   const buildHtml=()=>{
     const incPac=o.querySelector("#fac_pac").checked;
     const incMed=o.querySelector("#fac_med").checked;
-    return "<!doctype html><html><head><meta charset='utf-8'><title>Factura</title><style>body{font-family:system-ui,sans-serif;padding:24px;max-width:720px;margin:0 auto;color:#14212e}h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:16px 0 6px;border-bottom:1px solid #dce4ec;padding-bottom:4px}.row{display:flex;justify-content:space-between;margin:4px 0;font-size:14px}.mu{color:#586a7c;font-size:13px}.tot{font-size:20px;font-weight:700;color:#0f6cbd;margin-top:8px}@media print{body{padding:12px}}</style></head><body><h1>Factura</h1><p class='mu'>OrtoSistema ? Ortopedia y Traumatolog?a</p>"
+    return "<!doctype html><html><head><meta charset='utf-8'><title>Factura</title><style>body{font-family:system-ui,sans-serif;padding:24px;max-width:720px;margin:0 auto;color:#14212e}h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:16px 0 6px;border-bottom:1px solid #dce4ec;padding-bottom:4px}.row{display:flex;justify-content:space-between;margin:4px 0;font-size:14px}.mu{color:#586a7c;font-size:13px}.tot{font-size:20px;font-weight:700;color:#0f6cbd;margin-top:8px}@media print{body{padding:12px}}</style></head><body><h1>Factura</h1><p class='mu'>OrtoSistema - Ortopedia y Traumatologia</p>"
       +(incPac?"<h2>Paciente</h2><div class='row'><span><b>"+esc(p.n)+"</b></span><span>"+(p.e?p.e+" a?os":"")+"</span></div><div class='row'><span>C?dula: "+esc(p.c||"?")+"</span><span>Seguro: "+esc(p.s||"?")+"</span></div>"+(p.al?"<div class='row'><span>Alergias: "+esc(p.al)+"</span></div>":""):"")
       +"<h2>Servicio</h2><div class='row'><span>C?digo: "+esc(x.c||"?")+"</span><span>Fecha: "+x.f+"</span></div><div class='row'><span>Concepto: "+esc(x.t)+"</span></div><div class='row'><span>Estado: "+esc(x.e)+"</span></div><div class='tot'>Monto: RD$ "+x.m.toLocaleString("es-DO")+"</div>"
       +(incMed?"<div style='margin-top:24px;border-top:1px solid #dce4ec;padding-top:8px'><div class='row'><span>M?dico: "+esc(x.dr||"?")+"</span></div><div class='row mu'><span>Firma: ____________________</span></div></div>":"")
       +"</body></html>";
   };
+  o.querySelector("#fac_view").onclick=()=>{const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para ver");return}w.document.write(buildHtml());w.document.close();w.focus()};
   o.querySelector("#fac_print").onclick=()=>{const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para imprimir");return}w.document.write(buildHtml());w.document.close();w.focus();setTimeout(()=>{w.print()},250)};
   o.querySelector("#fac_wa").onclick=()=>{window.open("https://wa.me/?text="+encodeURIComponent(buildText()),"_blank")};
   o.querySelector("#fac_mail").onclick=()=>{window.location.href="mailto:?subject="+encodeURIComponent("Factura - "+pk(x.p).n)+"&body="+encodeURIComponent(buildText())};
