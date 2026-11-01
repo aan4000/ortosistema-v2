@@ -189,3 +189,19 @@ create index if not exists ix_citas_fecha on citas(fecha);
 create index if not exists ix_estudios_pac on estudios_imagenes(paciente_id);
 create index if not exists ix_cirugias_pac on cirugias(paciente_id);
 create index if not exists ix_aud_fecha on auditoria(fecha);
+
+
+-- Recetas (medicamentos ortopedicos y protesis).
+create table if not exists recetas(
+  id serial primary key,
+  paciente_id int not null references pacientes(id) on delete cascade,
+  fecha date not null default current_date,
+  tipo text not null check (tipo in ('medicamento','protesis')),
+  titulo text,
+  items jsonb not null default '[]'::jsonb,
+  notas text,
+  medico text,
+  creado_en timestamptz not null default now());
+alter table recetas add column if not exists verificado_por text;
+alter table recetas add column if not exists verificado_en timestamptz;
+create index if not exists ix_recetas_pac on recetas(paciente_id);

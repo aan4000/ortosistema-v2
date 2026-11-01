@@ -68,13 +68,13 @@ TABLAS = {
                                 "precio", "medico", "estado"],
     "ortesis_paciente": ["paciente_id", "fecha", "ortesis", "categoria", "lado", "talla",
                          "indicacion", "medico", "estado"],
-    "documentos": ["paciente_id", "nombre", "url", "tipo", "fecha", "mime", "tamano"],
+    "recetas": ["paciente_id", "fecha", "tipo", "titulo", "items", "notas", "medico"],
 }
 # Columnas jsonb: se envían como objeto/lista y psycopg las adapta con Jsonb.
-JSONB = {"autorizacion", "historial", "detalle", "checklist"}
+JSONB = {"autorizacion", "historial", "detalle", "checklist", "items"}
 CLINICAS = {"pacientes", "citas", "evaluaciones", "estudios_imagenes", "cirugias", "implantes",
             "pt_sesiones", "formularios_proms", "referimientos", "documentos",
-            "procedimientos_paciente", "ortesis_paciente"}
+            "procedimientos_paciente", "ortesis_paciente", "recetas"}
 GESTION = {"pacientes", "citas", "referimientos", "autorizaciones_preauth",
            "cargos_facturacion", "tarifario", "documentos"}
 PERMISOS = {  # los permisos se aplican aquí, en el servidor
@@ -98,12 +98,13 @@ MODULOS = {  # función del menú -> tablas que gobierna
     "referimientos": ["referimientos"],
     "autorizaciones": ["autorizaciones_preauth"],
     "facturacion": ["cargos_facturacion", "tarifario"],
+    "recetas": ["recetas"],
 }
 TABLA_MODULO = {t: m for m, ts in MODULOS.items() for t in ts}
 FUNC_INICIAL = {
     "medico": set(MODULOS),
     "secretaria": {"agenda", "pacientes", "documentos", "referimientos", "autorizaciones",
-                   "facturacion"},
+                   "facturacion", "recetas"},
     "fisio": {"agenda", "pacientes", "rehab", "ortesis"},
 }
 FUNC: dict = {}  # rol -> funciones activas (el administrador siempre tiene todas)
