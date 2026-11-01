@@ -35,14 +35,20 @@ a{color:var(--pri)}h2{font-size:24px;margin:8px 0}h3{font-size:18px;margin:0 0 8
 /* Transición al cambiar de sección/submenú (1 s en total): la página entra y su contenido se escalona. */
 @keyframes secIn{0%{opacity:0;transform:translate3d(0,26px,0) scale(.982)}42%{opacity:1}100%{opacity:1;transform:none}}
 @keyframes secUp{0%{opacity:0;transform:translate3d(0,14px,0)}100%{opacity:1;transform:none}}
+@keyframes secDer{0%{opacity:0;transform:translate3d(46px,0,0)}45%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes secIzq{0%{opacity:0;transform:translate3d(-46px,0,0)}45%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes secUpH{0%{opacity:0;transform:translate3d(12px,0,0)}100%{opacity:1;transform:none}}
 .pg.entra{animation:secIn 1s cubic-bezier(.16,.84,.28,1) both;will-change:transform,opacity}
+.pg.entra-der{animation:secDer .55s cubic-bezier(.2,.8,.2,1) both;will-change:transform,opacity}
+.pg.entra-izq{animation:secIzq .55s cubic-bezier(.2,.8,.2,1) both;will-change:transform,opacity}
 .pg.entra>:not(.ph){animation:secUp .7s cubic-bezier(.16,.84,.28,1) both}
-.pg.entra>:nth-child(2){animation-delay:.06s}
-.pg.entra>:nth-child(3){animation-delay:.12s}
-.pg.entra>:nth-child(4){animation-delay:.18s}
-.pg.entra>:nth-child(5){animation-delay:.24s}
-.pg.entra>:nth-child(6){animation-delay:.30s}
-.pg.entra>:nth-child(n+7){animation-delay:.34s}
+.pg.entra-der>:not(.ph),.pg.entra-izq>:not(.ph){animation:secUpH .45s cubic-bezier(.2,.8,.2,1) both}
+.pg.entra>:nth-child(2),.pg.entra-der>:nth-child(2),.pg.entra-izq>:nth-child(2){animation-delay:.05s}
+.pg.entra>:nth-child(3),.pg.entra-der>:nth-child(3),.pg.entra-izq>:nth-child(3){animation-delay:.1s}
+.pg.entra>:nth-child(4),.pg.entra-der>:nth-child(4),.pg.entra-izq>:nth-child(4){animation-delay:.15s}
+.pg.entra>:nth-child(5),.pg.entra-der>:nth-child(5),.pg.entra-izq>:nth-child(5){animation-delay:.2s}
+.pg.entra>:nth-child(6),.pg.entra-der>:nth-child(6),.pg.entra-izq>:nth-child(6){animation-delay:.25s}
+.pg.entra>:nth-child(n+7),.pg.entra-der>:nth-child(n+7),.pg.entra-izq>:nth-child(n+7){animation-delay:.28s}
 .mb{display:none}
 input,select,textarea{width:100%;min-height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
 .top input{max-width:420px;flex:1}
@@ -76,7 +82,7 @@ ul.l{list-style:none;margin:0;padding:0}ul.l li{padding:6px 0;border-bottom:1px 
 .pre{white-space:pre-wrap}.al2{color:var(--er);margin:4px 0}
 .ts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--tx);color:var(--bg);padding:8px 16px;border-radius:8px}
 @media(max-width:800px){.side{position:fixed;z-index:15;height:100%;transform:translateX(-100%);transition:transform .2s;padding-top:calc(12px + env(safe-area-inset-top,0px))}.side.open{transform:none}.mb{display:inline-flex;align-items:center}.pg{padding:12px}}
-@media(prefers-reduced-motion:reduce){.side{transition:none}html,.main{scroll-behavior:auto}.pg.entra,.pg.entra>*{animation:none}}
+@media(prefers-reduced-motion:reduce){.side{transition:none}html,.main{scroll-behavior:auto}.pg.entra,.pg.entra-der,.pg.entra-izq,.pg.entra>*,.pg.entra-der>*,.pg.entra-izq>*{animation:none}}
 .ic{flex:none;vertical-align:-3px}
 .lb{display:flex;align-items:center;gap:10px;color:var(--pri)}
 .lg{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
@@ -592,6 +598,9 @@ return `<div class="card ph"><div class="row"><div><h2>${esc(p.n)}</h2><span cla
 <div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="p-${id}-${k}">${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p>${(B2[tab]||B2.resumen)()}`}
 
 let RUTA_ANT=null;
+const SUBORDEN={"facturacion":["facturacion","facturacion-catalogo","facturacion-nueva"],"estudios":["estudios","estudios-subir"],"quirofano":["quirofano"]};
+function subInfo(ruta){const parts=ruta.split("-");if(parts[0]==="p"){const sub=parts[2]||"resumen";return{main:"p-"+parts[1],sub,order:["resumen","clinica","procedimientos","ortesis","rehab","gestion","documentos"]}}const main=parts[0];const sub=ruta;const order=SUBORDEN[main]||[main];return{main,sub,order}}
+function dirSub(ant,nuevo){const a=subInfo(ant),b=subInfo(nuevo);if(a.main!==b.main)return null;if(a.sub===b.sub)return null;const ia=a.order.indexOf(a.sub),ib=b.order.indexOf(b.sub);if(ia>=0&&ib>=0)return ib>ia?1:-1;return b.sub>a.sub?1:-1}
 const sinMov=()=>matchMedia("(prefers-reduced-motion:reduce)").matches;
 function tickReloj(){const e=document.getElementById("reloj");if(e)e.textContent=new Date().toLocaleTimeString("es-DO",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:hora12()})}
 setInterval(tickReloj,1000);
@@ -604,7 +613,7 @@ $("#side").innerHTML=menu(a);
 $("#main").innerHTML=bar()+banner()+`<div class="pg"><div class="mu">${cr}</div>${a=="p"?vExp(b,c):(V[a]||vInicio)()}</div>`;
 $("#main").classList.toggle("en-paciente",a=="p");
 $("#main").classList.toggle("en-pacientes",a=="pacientes");
-if(S.route!==RUTA_ANT){RUTA_ANT=S.route;const pg=$("#main .pg");if(pg&&!sinMov())pg.classList.add("entra")}
+if(S.route!==RUTA_ANT){const prev=RUTA_ANT;RUTA_ANT=S.route;const dir=prev?dirSub(prev,S.route):null;const pg=$("#main .pg");if(pg&&!sinMov()){if(dir===null)pg.classList.add("entra");else if(dir>0)pg.classList.add("entra-der");else pg.classList.add("entra-izq")}}
 const vb0=$("#vbox0");if(vb0&&VIS.length)viewer(vb0,VIS,VIS[0]);
 const ps=$("#ps");if(ps)ps.oninput=()=>{$("#pl").innerHTML=listaP(ps.value)};
 const nf=$("#nf");if(nf)nf.onchange=()=>{const e=edadDe(nf.value);$("#ne").value=e===""?"":e+" años"};
