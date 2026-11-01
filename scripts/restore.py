@@ -30,8 +30,8 @@ ORDEN = [
     "usuarios", "funciones_rol", "pacientes", "tarifario",
     "estudios_imagenes", "imagenes_estudio", "cirugias", "implantes",
     "citas", "evaluaciones", "documentos", "procedimientos_paciente",
-    "cargos_facturacion", "ortesis_paciente", "pt_sesiones", "referimientos",
-    "formularios_proms", "autorizaciones_preauth", "auditoria",
+    "recetas", "cargos_facturacion", "ortesis_paciente", "pt_sesiones",
+    "referimientos", "formularios_proms", "autorizaciones_preauth", "auditoria",
 ]
 
 
