@@ -183,7 +183,10 @@ tbody tr:nth-child(even):hover{background:var(--bg)}
 .md{border-radius:var(--rad-lg);box-shadow:0 16px 48px rgba(0,0,0,.2)}
 .ov{backdrop-filter:blur(3px)}
 .ts{border-radius:var(--rad);box-shadow:0 8px 24px rgba(0,0,0,.18)}
-.ph{padding:12px 0;margin-bottom:10px}
+.ph .btn{min-height:34px;padding:0 10px;font-size:13px}
+.ph .tb{gap:4px}
+.en-paciente .btn{min-height:32px;padding:0 9px;font-size:13px}
+.en-paciente .tb{gap:4px}
 .stp span{border-radius:var(--rad-sm)}
 .b,.bd{border-radius:12px}
 .av{box-shadow:0 0 0 2px var(--sf)}
@@ -591,6 +594,7 @@ const lb=a=="admin"?"Administración":a=="nuevo"?"Nuevo paciente":a=="evaluacion
 const cr=a=="inicio"?"Inicio":`<button class="bc" data-r="inicio">Inicio</button> › `+(a=="p"?`<button class="bc" data-r="pacientes">Pacientes</button> › ${esc(pk(b).n||"")}`:lb);
 $("#side").innerHTML=menu(a);
 $("#main").innerHTML=bar()+banner()+`<div class="pg"><div class="mu">${cr}</div>${a=="p"?vExp(b,c):(V[a]||vInicio)()}</div>`;
+$("#main").classList.toggle("en-paciente",a=="p");
 if(S.route!==RUTA_ANT){RUTA_ANT=S.route;const pg=$("#main .pg");if(pg&&!sinMov())pg.classList.add("entra")}
 const vb0=$("#vbox0");if(vb0&&VIS.length)viewer(vb0,VIS,VIS[0]);
 const ps=$("#ps");if(ps)ps.oninput=()=>{$("#pl").innerHTML=listaP(ps.value)};
