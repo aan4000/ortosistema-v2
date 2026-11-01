@@ -144,6 +144,14 @@ def cargar_funciones():
             c.execute("insert into funciones_rol(rol,modulo) values ('_up_ortesis','_') "
                       "on conflict do nothing")
             filas = c.execute("select rol, modulo from funciones_rol").fetchall()
+        if not any(f["rol"] == "_up_recetas" for f in filas):
+            # "recetas" se agrego despues: se activa para medico y secretaria.
+            for r in ("medico", "secretaria"):
+                c.execute("insert into funciones_rol(rol,modulo) values (%s,'recetas') "
+                          "on conflict do nothing", (r,))
+            c.execute("insert into funciones_rol(rol,modulo) values ('_up_recetas','_') "
+                      "on conflict do nothing")
+            filas = c.execute("select rol, modulo from funciones_rol").fetchall()
     FUNC.clear()
     for f in filas:
         FUNC.setdefault(f["rol"], set()).add(f["modulo"])
