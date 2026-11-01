@@ -549,7 +549,7 @@ h+=`<a class="nav" href="#" data-a="adm">${ic("folder")} Administrativo${n?`<spa
 if(op)ad.forEach(([k,i,l])=>h+=nv(k,i,l," sub"))}
 if(S.user.rol=="admin")h+=nv("admin","cog","Administración");
 return h+`<div class="sp"></div><a class="nav" href="#" data-a="um"><span class="av">${esc(S.user.nombre.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase())}</span><span style="display:grid;line-height:1.25"><b style="font-weight:600">${esc(S.user.nombre)}</b><span class="mu">${RL[S.user.rol]}</span></span></a>`}
-const bar=()=>`<div class="top"><button class="btn mb" data-a="mn" aria-label="Menú">${ic("menu")}</button><input id="q" readonly placeholder="Buscar paciente o sección (Ctrl+K)" data-a="pal"><span class="mu tdt">${fechaLarga()}</span><button class="btn" data-a="fmt" title="Formato de hora">${hora12()?"12h":"24h"}</button><button class="btn p" data-a="nm">${ic("plus",16)} Nuevo</button></div>`;
+const bar=()=>`<div class="top"><button class="btn mb" data-a="mn" aria-label="Menú">${ic("menu")}</button><input id="q" readonly placeholder="Buscar paciente o sección (Ctrl+K)" data-a="pal"><span class="mu tdt">${fechaLarga()}</span><span class="mu" id="reloj" style="font-variant-numeric:tabular-nums;font-weight:600">${new Date().toLocaleTimeString("es-DO",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:hora12()})}</span><button class="btn" data-a="fmt" title="Formato de hora">${hora12()?"12h":"24h"}</button><button class="btn p" data-a="nm">${ic("plus",16)} Nuevo</button></div>`;
 
 function vInicio(){const{C,I,M,B,R,F,P}=DB,Q=DB.Q.filter(q=>q.f==hoy&&q.e!="Cancelada"),n=pend();
 const last=id=>F.filter(x=>x.p==id).pop(),est=P.filter(p=>{const l=last(p.id);return l&&l.d>=6}).length;
@@ -593,6 +593,8 @@ return `<div class="card ph"><div class="row"><div><h2>${esc(p.n)}</h2><span cla
 
 let RUTA_ANT=null;
 const sinMov=()=>matchMedia("(prefers-reduced-motion:reduce)").matches;
+function tickReloj(){const e=document.getElementById("reloj");if(e)e.textContent=new Date().toLocaleTimeString("es-DO",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:hora12()})}
+setInterval(tickReloj,1000);
 function draw(){VIS=[];$("#side").style.display=S.user?"":"none";if(!S.user)return vLogin();let[a,b,c]=S.route.split("-");
 if(!(a=="p"||a=="nuevo"||a=="evaluacion"?can("pacientes"):a=="admin"?S.user.rol=="admin":can(a))){a="inicio";S.route="inicio"}if(a=="p"&&pk(b).n)S.ap=+b;
 const V={inicio:vInicio,agenda:vAgenda,pacientes:vPac,quirofano:vQuir,estudios:()=>vEst(b),procedimientos:vProc,recetas:vRecetas,documentos:vDocs,ortesis:vOrt,rehab:vRehab,referimientos:vRef,autorizaciones:vAut,facturacion:()=>vFac(b),nuevo:vNuevo,evaluacion:()=>vEval(b),admin:()=>vAdmin(b)};
@@ -637,11 +639,32 @@ if(!fn)return er("Elige la fecha de nacimiento en el calendario.");
 if(!v("nx"))return er("Selecciona el sexo.");
 const mb=[...document.querySelectorAll(".mb")].filter(x=>x.checked).map(x=>x.value).concat(v("no")?[v("no")]:[]);
 const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),em:v("nm"),s:v("ns"),na:v("na"),al:v("nl"),dx:v("ni"),am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,st:0,ea:"Por agendar",eu:/Privado/i.test(v("ns"))?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
-const dup=DB.P.find(x=> (rec.c && x.c && x.c===rec.c) || (x.n.toLowerCase()===rec.n.toLowerCase() && x.fn===rec.fn));
-if(dup){const o=modal(`<h3>Paciente ya registrado</h3><p>Ya existe un paciente con ${rec.c&&dup.c===rec.c?"la misma cédula":"el mismo nombre y fecha de nacimiento"}: <b>${esc(dup.n)}</b> (código ${esc(dup.cd||"")}).</p><p class="mu">?Deseas abrir su expediente en lugar de crear un duplicado?</p><div class="tb"><button class="btn" id="dup_no">Crear de todos modos</button><button class="btn p" id="dup_si">Abrir expediente</button></div>`,"w");
-  o.querySelector("#dup_si").onclick=()=>{o.remove();S.ap=dup.id;S.pa.p=dup.id;go("p-"+dup.id)};
-  o.querySelector("#dup_no").onclick=async()=>{o.remove();try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}};
-  return}
+const dupByCode = rec.c?null: (rec.cd ? DB.P.find(x=>x.cd && x.cd===rec.cd) : null);
+const dupByCed = rec.c ? DB.P.find(x=>x.c && x.c===rec.c) : null;
+const dupByName = DB.P.filter(x=>x.n.toLowerCase()===rec.n.toLowerCase());
+const dups = [];
+if (dupByCode && !dups.includes(dupByCode)) dups.push(dupByCode);
+if (dupByCed && !dups.includes(dupByCed)) dups.push(dupByCed);
+dupByName.forEach(x=>{ if(!dups.includes(x)) dups.push(x) });
+if (dups.length) {
+  const dup=dups[0];
+  const motivo = dupByCode ? "el mismo código" : (dupByCed ? "la misma cédula" : "el mismo nombre");
+  const aviso = dupByName.length && !dupByCed && !dupByCode
+    ? "Ya existe un paciente con ese nombre. ¿Es un paciente nuevo?"
+    : "Ya existe un paciente registrado con "+motivo+".";
+  const o=modal(`<h3>Paciente ya registrado</h3>
+    <p>${aviso}</p>
+    <p class="mu">Coincidencia: <b>${esc(dup.n)}</b> (código ${esc(dup.cd||"?")})${dup.c?" · cédula "+esc(dup.c):""}.</p>
+    <p class="mu">?Deseas agregar la información al paciente existente, crear uno nuevo de todos modos, o cancelar?</p>
+    <div class="tb"><button class="btn" id="dup_cancel">Cancelar</button><button class="btn" id="dup_nuevo">Crear como nuevo</button><button class="btn p" id="dup_add">Agregar al existente</button></div>`, "w");
+  o.querySelector("#dup_cancel").onclick=()=>o.remove();
+  o.querySelector("#dup_nuevo").onclick=async()=>{o.remove();try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}};
+  o.querySelector("#dup_add").onclick=async()=>{o.remove();
+    const campos=["n","e","c","s","al","dx","fn","sx","tl","em","na","am","aq","me","af","ha","ea","eu"];
+    for(const k of campos){ if(rec[k]!==undefined && rec[k]!=="" && rec[k]!==null && (dup[k]===undefined || dup[k]==="" || dup[k]===null)){ dup[k]=rec[k] } }
+    // also set codigo stays
+    try{ await editarK("P",dup); const idx=DB.P.findIndex(x=>x.id==dup.id); if(idx>=0) DB.P[idx]=dup; S.ap=dup.id; S.pa.p=dup.id; toast("Información agregada al paciente existente"); go("p-"+dup.id) }catch(e){er(e.message)} };
+  }
 try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}}
 
 function vRecetas(){
