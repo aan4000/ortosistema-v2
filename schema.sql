@@ -26,9 +26,7 @@ alter table pacientes add column if not exists fecha_nacimiento date;
 alter table pacientes add column if not exists sexo text;
 alter table pacientes add column if not exists telefono text;
 alter table pacientes add column if not exists correo text;
-alter table pacientes add column if not exists direccion text;
 alter table pacientes add column if not exists numero_afiliado text;
-alter table pacientes add column if not exists tipo_sangre text;
 -- Estado del episodio: atención, autorización, datos de la autorización e historial de cambios.
 alter table pacientes add column if not exists estado_atencion text not null default 'Por agendar';
 alter table pacientes add column if not exists estado_autorizacion text not null default 'Por solicitar';
@@ -79,6 +77,19 @@ alter table cirugias add column if not exists checklist jsonb not null default '
 alter table cirugias add column if not exists sin_autorizacion boolean not null default false;
 alter table cirugias add column if not exists verificado_por text;
 alter table cirugias add column if not exists verificado_en timestamptz;
+alter table cirugias add column if not exists tipo_sangre text;
+-- Migracion unica: copia el tipo de sangre del paciente a sus cirugias (si la columna vieja aun existe).
+do $$ begin
+  if exists (select 1 from information_schema.columns
+             where table_schema='public' and table_name='pacientes' and column_name='tipo_sangre') then
+    update cirugias c set tipo_sangre = p.tipo_sangre
+      from pacientes p where c.paciente_id = p.id
+        and c.tipo_sangre is null and p.tipo_sangre is not null;
+  end if;
+end $$;
+-- Limpieza final: quitar los campos movidos/eliminados del paciente.
+alter table pacientes drop column if exists tipo_sangre;
+alter table pacientes drop column if exists direccion;
 
 create table if not exists implantes(
   id serial primary key,
