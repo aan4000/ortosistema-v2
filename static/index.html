@@ -727,20 +727,21 @@ function vFacNueva(){
   const ap=S.ap?pk(S.ap):null;
   const dm=DB.users.filter(u=>u.rol=="medico");
   const dr0=S.user.rol=="medico"?S.user.nombre:(dm[0]?dm[0].nombre:"");
-  return sec("Nueva factura")+`<p><button class="btn" data-r="facturacion">? Volver a cargos</button></p>`
+  return sec("Nueva factura")+`<p><button class="btn" data-r="facturacion">Volver a cargos</button></p>`
     +`<div class="card"><div class="fg">
-      ${fx("bf_p","Paciente *",`<select id="bf_p">${DB.P.map(p=>`<option value="${p.id}"${(ap&&p.id==ap.id)?" selected":""}>${esc(p.n)}</option>`).join("")}</select>`)}
-      ${fx("bf_f","Fecha *",`<input id="bf_f" type="date" value="${iso(hoy)}">`)}
-      ${fx("bf_q","Procedimiento (cat?logo)",`<select id="bf_q"><option value="">? selecciona ?</option>${DB.T.map((t,i)=>`<option value="${i}">${esc(t.n)}${t.p?" ? "+mon(t.p):""}</option>`).join("")}</select>`)}
-      ${fx("bf_k","C?digo",`<input id="bf_k">`)}
-      ${fx("bf_t","Concepto *",`<input id="bf_t">`)}
+      ${fx("bf_p","Paciente",`<select id="bf_p">${DB.P.map(p=>`<option value="${p.id}"${(ap&&p.id==ap.id)?" selected":""}>${esc(p.n)}</option>`).join("")}</select>`)}
+      ${fx("bf_f","Fecha",`<input id="bf_f" type="date" value="${iso(hoy)}">`)}
+      ${fx("bf_q","Procedimiento (catálogo)",`<select id="bf_q"><option value="">selecciona</option>${DB.T.map((t,i)=>`<option value="${i}">${esc(t.n)}${t.p?" - "+mon(t.p):""}</option>`).join("")}</select>`)}
+      ${fx("bf_k","Código",`<input id="bf_k">`)}
+      ${fx("bf_t","Concepto",`<input id="bf_t">`)}
       ${fx("bf_m","Monto (RD$)",`<input id="bf_m" type="number" min="0" step="0.01">`)}
-      ${fx("bf_d","M?dico",fsel("bf_d",dm.length?dm.map(u=>u.nombre):[dr0],dr0))}
+      ${fx("bf_d","Médico",fsel("bf_d",dm.length?dm.map(u=>u.nombre):[dr0],dr0))}
       ${fx("bf_e","Estado",fsel("bf_e",["Pendiente","Cobrado"],"Pendiente"))}
     </div>
     <div class="er2" id="bf_e2" role="alert"></div>
     <div class="tb"><button class="btn p" id="bf_g">${ic("save",16)} Guardar factura</button><button class="btn" data-r="facturacion">Cancelar</button></div></div>`;
 }
+
 function facPrint(idx){
   const x=DB.B[idx]; if(!x) return;
   const p=pk(x.p);
