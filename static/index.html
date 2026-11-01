@@ -32,17 +32,17 @@ a{color:var(--pri)}h2{font-size:24px;margin:8px 0}h3{font-size:18px;margin:0 0 8
 .main{flex:1;min-width:0;overflow:auto;scroll-behavior:smooth}
 .top{position:sticky;top:0;z-index:5;display:flex;gap:8px;align-items:center;padding:8px 16px;background:var(--sf);border-bottom:1px solid var(--bd)}
 .pg{padding:16px 24px 48px;max-width:1200px}
-/* Transición al cambiar de sección (1 s en total): la página entra y su contenido se escalona. */
-@keyframes secIn{0%{opacity:0;transform:translate3d(0,16px,0) scale(.9975)}55%{opacity:1}100%{opacity:1;transform:none}}
-@keyframes secUp{0%{opacity:0;transform:translate3d(0,10px,0)}100%{opacity:1;transform:none}}
-.pg.entra{animation:secIn 1s cubic-bezier(.16,.84,.28,1) both}
-.pg.entra>:not(.ph){animation:secUp .66s cubic-bezier(.16,.84,.28,1) both}
-.pg.entra>:nth-child(2){animation-delay:.05s}
-.pg.entra>:nth-child(3){animation-delay:.1s}
-.pg.entra>:nth-child(4){animation-delay:.16s}
-.pg.entra>:nth-child(5){animation-delay:.22s}
-.pg.entra>:nth-child(6){animation-delay:.28s}
-.pg.entra>:nth-child(n+7){animation-delay:.32s}
+/* Transición al cambiar de sección/submenú (1 s en total): la página entra y su contenido se escalona. */
+@keyframes secIn{0%{opacity:0;transform:translate3d(0,26px,0) scale(.982)}42%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes secUp{0%{opacity:0;transform:translate3d(0,14px,0)}100%{opacity:1;transform:none}}
+.pg.entra{animation:secIn 1s cubic-bezier(.16,.84,.28,1) both;will-change:transform,opacity}
+.pg.entra>:not(.ph){animation:secUp .7s cubic-bezier(.16,.84,.28,1) both}
+.pg.entra>:nth-child(2){animation-delay:.06s}
+.pg.entra>:nth-child(3){animation-delay:.12s}
+.pg.entra>:nth-child(4){animation-delay:.18s}
+.pg.entra>:nth-child(5){animation-delay:.24s}
+.pg.entra>:nth-child(6){animation-delay:.30s}
+.pg.entra>:nth-child(n+7){animation-delay:.34s}
 .mb{display:none}
 input,select,textarea{width:100%;min-height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
 .top input{max-width:420px;flex:1}
