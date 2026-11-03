@@ -9,9 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--pri:#0F6CBD;--onp:#fff;--pri2:#E5F0FA;--acc:#0E9384;--sec:#586A7C;--bg:#F3F6FA;--sf:#fff;--tx:#14212E;--bd:#DCE4EC;--ok:#1B8A4B;--wa:#B35C00;--er:#C0392B;--sh:0 1px 2px rgba(15,40,70,.06),0 4px 14px rgba(15,40,70,.05);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--pri:#5BA8F0;--onp:#0A1520;--pri2:#16314C;--acc:#2DD4BF;--sec:#9DB0C2;--bg:#0B131B;--sf:#121D28;--tx:#E8EFF6;--bd:#253443;--ok:#5FCB88;--wa:#F2A33A;--er:#F28B82;--sh:none}}
-:root[data-theme="dark"]{--pri:#5BA8F0;--onp:#0A1520;--pri2:#16314C;--acc:#2DD4BF;--sec:#9DB0C2;--bg:#0B131B;--sf:#121D28;--tx:#E8EFF6;--bd:#253443;--ok:#5FCB88;--wa:#F2A33A;--er:#F28B82;--sh:none}
+:root{--pri:#0F6CBD;--onp:#fff;--pri2:#E5F0FA;--acc:#0E9384;--sec:#586A7C;--bg:#F3F6FA;--sf:#fff;--tx:#14212E;--bd:#DCE4EC;--ok:#1B8A4B;--wa:#B35C00;--er:#C0392B;--hm:#2F6FB5;--hmb:#E8F1FB;--hf:#B0457C;--hfb:#FCEBF3;--hn:#7A8B9B;--hnb:#EEF2F6;--sh:0 1px 2px rgba(15,40,70,.06),0 4px 14px rgba(15,40,70,.05);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--pri:#5BA8F0;--onp:#0A1520;--pri2:#16314C;--acc:#2DD4BF;--sec:#9DB0C2;--bg:#0B131B;--sf:#121D28;--tx:#E8EFF6;--bd:#253443;--ok:#5FCB88;--wa:#F2A33A;--er:#F28B82;--hm:#7FB6EA;--hmb:#152B40;--hf:#E48FBB;--hfb:#3A1E2C;--hn:#9DB0C2;--hnb:#1A2734;--sh:none}}
+:root[data-theme="dark"]{--pri:#5BA8F0;--onp:#0A1520;--pri2:#16314C;--acc:#2DD4BF;--sec:#9DB0C2;--bg:#0B131B;--sf:#121D28;--tx:#E8EFF6;--bd:#253443;--ok:#5FCB88;--wa:#F2A33A;--er:#F28B82;--hm:#7FB6EA;--hmb:#152B40;--hf:#E48FBB;--hfb:#3A1E2C;--hn:#9DB0C2;--hnb:#1A2734;--sh:none}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
 html,body{height:100%;margin:0}
@@ -201,6 +201,16 @@ tbody tr:nth-child(even):hover{background:var(--bg)}
 .stp span{border-radius:var(--rad-sm)}
 .b,.bd{border-radius:12px}
 .code{display:inline-block;background:var(--pri2);color:var(--pri);padding:2px 8px;border-radius:6px;font-size:9px;font-weight:600;letter-spacing:.02em}
+.avp{display:inline-grid;place-items:center;width:84px;height:84px;border-radius:50%;flex:0 0 auto;border:1px solid var(--bd);background:var(--hnb);color:var(--hn);overflow:hidden;transition:background .2s ease,color .2s ease}
+.avp svg{width:54px;height:54px;fill:currentColor;display:block}
+.avp.mas{background:var(--hmb);color:var(--hm)}
+.avp.fem{background:var(--hfb);color:var(--hf)}
+.avp.sm{width:56px;height:56px}.avp.sm svg{width:38px;height:38px}
+.avp.xs{width:24px;height:24px;border-width:0}.avp.xs svg{width:18px;height:18px}
+.avrow{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+.avrow .mu{font-size:12px;line-height:1.35}
+.phid{display:flex;align-items:center;gap:12px;min-width:0}
+.pcell{display:inline-flex;align-items:center;gap:6px}
 .en-pacientes .pn{font-size:12px}
 .mu{line-height:1.45}
 h1,h2,h3{letter-spacing:-.01em}
@@ -463,6 +473,11 @@ const pk=id=>DB.P.find(p=>p.id==id)||{};
 const pl=id=>pk(id).n?`<button class="pn" data-r="p-${id}">${esc(pk(id).n)}</button>`:"—";
 const tbl=(h,r)=>r.length?`<div class="tw"><table><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr>${r.map(x=>`<tr>${x.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`:`<div class="em">${ic("clip",28)}<p>Sin registros todavía.</p></div>`;
 const card=(t,b)=>`<div class="card"><h3>${t}</h3>${b}</div>`;
+const SILUETA_M='<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10.5"/><path d="M32 34c-10.8 0-19.5 8.4-19.5 18.6V56h39v-3.4C51.5 42.4 42.8 34 32 34z"/></svg>';
+const SILUETA_F='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5.5c-9.4 0-15.5 6.9-15.5 15.7 0 5.5 1.3 10.2 3.1 13.9-.5 1.2-.9 2.4-1.1 3.7 1.5-1.5 3.5-2.4 5.8-2.4h15.4c2.3 0 4.3.9 5.8 2.4-.2-1.3-.6-2.5-1.1-3.7 1.8-3.7 3.1-8.4 3.1-13.9C47.5 12.4 41.4 5.5 32 5.5z"/><path d="M32 36c-9.9 0-18 7.5-18 17.1V56h36v-2.9C50 43.5 41.9 36 32 36z"/></svg>';
+const claseSexo=sx=>/^f/i.test(String(sx||""))?"fem":/^m/i.test(String(sx||""))?"mas":"neu";
+const silueta=sx=>claseSexo(sx)==="fem"?SILUETA_F:SILUETA_M;
+const avSexo=(sx,size)=>`<span class="avp ${claseSexo(sx)}${size?" "+size:""}" aria-hidden="true">${silueta(sx)}</span>`;
 const mon=n=>"RD$ "+n.toLocaleString("es-DO");
 const pend=()=>DB.A.filter(x=>x.e=="Por solicitar"||x.e=="Enviada").length;
 const d8=s=>s.split("/").reverse().join("");
@@ -574,7 +589,7 @@ const DS={inicio:"Resumen de tu jornada: indicadores, agenda y alertas que requi
 const TD={resumen:"Datos clave, antecedentes y todo lo ocurrido con el paciente, de lo más reciente a lo más antiguo.",clinica:"Evaluaciones médicas y estudios de imagen.",procedimientos:"Cirugías del paciente y los implantes utilizados.",rehab:"Sesiones de fisioterapia y cuestionarios de resultados (PROMs).",gestion:"Referimientos, preautorizaciones y cargos de este paciente.",documentos:"Archivos y documentos del paciente.",ortesis:"Órtesis indicadas al paciente, con lado, talla e indicaciones de uso."};
 const SI={agenda:"cal",pacientes:"users",procedimientos:"clip",ortesis:"ort",quirofano:"act",estudios:"img",documentos:"doc",rehab:"ref",referimientos:"swap",autorizaciones:"ok",facturacion:"usd",admin:"cog",nuevo:"plus",evaluacion:"act"},KI={agenda:"cal",quirofano:"act",estudios:"img",rehab:"ref",autorizaciones:"ok",facturacion:"usd",pacientes:"users",referimientos:"swap"};
 const sec=t=>{const k=S.route.split("-")[0];return`<div class="sh"><h2><span class="hi">${ic(SI[k]||"chart",22)}</span>${t}</h2><p class="mu">${DS[k]||""}</p></div>`};
-const listaP=q=>tbl(["Código","Paciente","Edad","Seguro","Diagnóstico","Atención","Autorización",""],DB.P.filter(p=>(p.n+(p.c||"")+(p.s||"")+(p.cd||"")).toLowerCase().includes(q.toLowerCase())&&(!S.pe.a||p.ea==S.pe.a)&&(!S.pe.u||effAu(p)==S.pe.u)).map(p=>[`<span class="code">${esc(p.cd||"—")}</span>`,pl(p.id)+(S.ap==p.id?' <span class="b in">Activo</span>':""),p.e,esc(p.s),esc(p.dx||"—"),chip(EA,p.ea),chip(EU,effAu(p)),`<button class="btn${S.ap==p.id?"":" p"}" data-a="ac:${p.id}">${S.ap==p.id?"Activo":"Activar"}</button> <button class="btn" data-r="p-${p.id}">${ic("folder",14)} Abrir expediente</button> <button class="btn d" data-a="delp:${p.id}" title="Eliminar paciente" aria-label="Eliminar paciente">${ic("trash",14)}</button>`]));
+const listaP=q=>tbl(["Código","Paciente","Edad","Seguro","Diagnóstico","Atención","Autorización",""],DB.P.filter(p=>(p.n+(p.c||"")+(p.s||"")+(p.cd||"")).toLowerCase().includes(q.toLowerCase())&&(!S.pe.a||p.ea==S.pe.a)&&(!S.pe.u||effAu(p)==S.pe.u)).map(p=>[`<span class="code">${esc(p.cd||"—")}</span>`,`<span class="pcell">${avSexo(p.sx,"xs")}${pl(p.id)}</span>${S.ap==p.id?' <span class="b in">Activo</span>':""}`,p.e,esc(p.s),esc(p.dx||"—"),chip(EA,p.ea),chip(EU,effAu(p)),`<button class="btn${S.ap==p.id?"":" p"}" data-a="ac:${p.id}">${S.ap==p.id?"Activo":"Activar"}</button> <button class="btn" data-r="p-${p.id}">${ic("folder",14)} Abrir expediente</button> <button class="btn d" data-a="delp:${p.id}" title="Eliminar paciente" aria-label="Eliminar paciente">${ic("trash",14)}</button>`]));
 const vPac=()=>`<div class="row">${sec("Pacientes")}<button class="btn p" data-a="np">${ic("plus",16)} Nuevo paciente</button></div><div class="fg"><div><label class="mu" for="ps">Buscar</label><input id="ps" placeholder="Nombre, cédula o seguro"></div><div><label class="mu" for="pe1">Estado de atención</label><select id="pe1" data-pe="a"><option value="">Todos</option>${Object.keys(EA).map(s=>`<option${s==S.pe.a?" selected":""}>${s}</option>`).join("")}</select></div><div><label class="mu" for="pe2">Autorización</label><select id="pe2" data-pe="u"><option value="">Todas</option>${Object.keys(EU).map(s=>`<option${s==S.pe.u?" selected":""}>${s}</option>`).join("")}</select></div></div><div id="pl">${listaP("")}</div>`;
 const vRehab=()=>sec("Rehabilitación")+card("Sesiones de fisioterapia",tbl(["Fecha","Paciente","Sesión","Dolor"],fa(DB.F).map(x=>[x.f,pl(x.p),esc(x.t),x.d+"/10"])))+"<br>"+card("PROMs",tbl(["Fecha","Paciente","Cuestionario","Resultado"],fa(DB.M).map(x=>[x.f,pl(x.p),esc(x.t),`<span class="b ${x.s<50?"er":"ok"}">${x.s}%</span>`])));
 const vRef=()=>sec("Referimientos")+card("Enviados y recibidos",tbl(["Fecha","Paciente","Referimiento","Estado"],fa(DB.R).map(x=>[x.f,pl(x.p),esc(x.t),bd(x.e)])));
@@ -593,7 +608,7 @@ gestion:()=>card("Referimientos",tk("R",id,["Fecha","Detalle","Estado"],x=>[x.f,
 ortesis:()=>`<p><button class="btn p" data-a="ao:${id}">${ic("plus",16)} Asignar órtesis</button></p>`+card("Órtesis indicadas",tk("OP",id,["Fecha","Órtesis","Lado","Talla","Médico","Estado"],x=>[x.f,esc(x.n),esc(x.lado||"—"),esc(x.talla||"—"),esc(x.dr||"—"),bd(x.e)])),
 documentos:()=>`<p><button class="btn p" data-a="ud:${id}">${ic("up",16)} Subir documento</button></p>`+card("Documentos del paciente",tDocs(DB.D.map((x,i)=>[x,i]).filter(([x])=>x.p==id),false))
 };
-return `<div class="card ph"><div class="row"><div><h2>${esc(p.n)}</h2><span class="mu">${p.cd?`<span class="code">${esc(p.cd)}</span> `:""}${p.e} años · Cédula ${esc(p.c)} · ${esc(p.s)}</span></div><div class="tb"><button class="btn p" data-a="ev:med">Evaluación médica</button><button class="btn" data-a="ev:fis">Evaluación física</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
+return `<div class="card ph"><div class="row"><div class="phid">${avSexo(p.sx,"sm")}<div><h2>${esc(p.n)}</h2><span class="mu">${p.cd?`<span class="code">${esc(p.cd)}</span> `:""}${p.e} años · Cédula ${esc(p.c)} · ${esc(p.s)}</span></div></div><div class="tb"><button class="btn p" data-a="ev:med">Evaluación médica</button><button class="btn" data-a="ev:fis">Evaluación física</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
 <div class="stp">${ST.map((s,i)=>`<span class="${i<p.st?"d":i==p.st?"c":""}">${s}</span>`).join("")}</div>
 <div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="p-${id}-${k}">${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p>${(B2[tab]||B2.resumen)()}`}
 
@@ -734,10 +749,10 @@ const MB=["Hipertensión","Diabetes","Cardiopatía","Asma o EPOC","Artritis","Os
 const ALG=["Penicilina","Amoxicilina","Aspirina (AAS)","Ibuprofeno","Sulfonamidas","Cefalosporinas","Látex","Yodo / contraste","Anestésicos locales","Codeína","Morfina","Polen","Ácaros del polvo","Caspa de animales","Hongos","Maní","Mariscos","Huevo","Leche","Trigo / gluten","Frutos secos","Fresas","Chocolate","Colorantes alimentarios","Níquel","Cosméticos","Penicilamina","Sulfato de gentamicina"];
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
-${card("1. Datos personales",`<div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",'<input id="nf" type="date" max="'+new Date().toISOString().slice(0,10)+'">')}${f("ne","Edad",'<input id="ne" readonly placeholder="Se calcula sola">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0">')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
-<br>${card("2. Seguro médico",`<div class="fg">${f("ns","Aseguradora",'<select id="ns">'+opt(SEG)+"</select>")}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
-<br>${card("3. Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}${f("ni","Diagnóstico inicial",'<input id="ni">')}</div>`)}
-<br>${card("4. Antecedentes",`${mbSel([])}<div class="fg">${tx("no","Otros antecedentes mórbidos")}${tx("nq","Antecedentes quirúrgicos")}${tx("nu","Medicamentos actuales")}${tx("nh","Antecedentes familiares")}${f("nb","Tabaquismo",'<select id="nb">'+opt(["No fuma","Exfumador","Fumador"])+"</select>")}${f("nal","Alcohol",'<select id="nal">'+opt(["No consume","Ocasional","Frecuente"])+"</select>")}${f("nac","Actividad física",'<select id="nac">'+opt(["Sedentario","Moderada","Alta"])+"</select>")}</div>`)}
+${card("Datos personales",`<div class="avrow"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT">Sexo sin definir</b><div class="mu">La silueta cambia al elegir masculino o femenino.</div></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",'<input id="nf" type="date" max="'+new Date().toISOString().slice(0,10)+'">')}${f("ne","Edad",'<input id="ne" readonly placeholder="Se calcula sola">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0">')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
+<br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",'<select id="ns">'+opt(SEG)+"</select>")}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
+<br>${card("Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}${f("ni","Diagnóstico inicial",'<input id="ni">')}</div>`)}
+<br>${card("Antecedentes",`${mbSel([])}<div class="fg">${tx("no","Otros antecedentes mórbidos")}${tx("nq","Antecedentes quirúrgicos")}${tx("nu","Medicamentos actuales")}${tx("nh","Antecedentes familiares")}${f("nb","Tabaquismo",'<select id="nb">'+opt(["No fuma","Exfumador","Fumador"])+"</select>")}${f("nal","Alcohol",'<select id="nal">'+opt(["No consume","Ocasional","Frecuente"])+"</select>")}${f("nac","Actividad física",'<select id="nac">'+opt(["Sedentario","Moderada","Alta"])+"</select>")}</div>`)}
 <div class="er2" id="nr" role="alert"></div><div class="row"><span></span><div><button class="btn" data-r="pacientes">Cancelar</button> <button class="btn p" data-a="gp">Guardar paciente</button></div></div>`}
 async function gp(){const v=i=>$("#"+i).value.trim(),er=m=>{$("#nr").textContent=m},n=v("nn"),fn=v("nf");
 if(!n)return er("Escribe el nombre completo.");
@@ -761,7 +776,7 @@ if (dups.length) {
   const o=modal(`<h3>Paciente ya registrado</h3>
     <p>${aviso}</p>
     <p class="mu">Coincidencia: <b>${esc(dup.n)}</b> (código ${esc(dup.cd||"?")})${dup.c?" · cédula "+esc(dup.c):""}.</p>
-    <p class="mu">?Deseas agregar la información al paciente existente, crear uno nuevo de todos modos, o cancelar?</p>
+    <p class="mu">¿Deseas agregar la información al paciente existente, crear uno nuevo de todos modos, o cancelar?</p>
     <div class="tb"><button class="btn" id="dup_cancel">Cancelar</button><button class="btn" id="dup_nuevo">Crear como nuevo</button><button class="btn p" id="dup_add">Agregar al existente</button></div>`, "w");
   o.querySelector("#dup_cancel").onclick=()=>o.remove();
   o.querySelector("#dup_nuevo").onclick=async()=>{o.remove();try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}};
@@ -1275,6 +1290,7 @@ else if(d.of){S.of[d.of]=g.value;$("#ocl").innerHTML=listaOrt().html}
 else if(d.ol!=null){const i=+d.ol;g.checked?S.os.add(i):S.os.delete(i);$("#osel").innerHTML=panelOrt()}
 else if(d.ox){const[i,k]=d.ox.split(":");S.ox[i][k]=g.value}
 else if(d.oa){S.oa[d.oa]=g.value}
+else if(g.id=="nx"){const a=document.getElementById("nvav"),t=document.getElementById("nvaT");if(a){a.className="avp "+claseSexo(g.value);a.innerHTML=silueta(g.value)}if(t)t.textContent=g.value==="Femenino"?"Paciente femenina":g.value==="Masculino"?"Paciente masculino":"Sexo sin definir"}
 else if(g.classList&&g.classList.contains("mb")){mbUpd(g)}});
 document.addEventListener("input",e=>{const d=e.target.dataset;if(e.target.type=="range"&&e.target.id){const o=document.getElementById(e.target.id+"o");if(o)o.textContent=e.target.value+"/10"}if(d.pf=="q"){S.pf.q=e.target.value;$("#pcl").innerHTML=listaProc().html}else if(d.pa=="dr")S.pa.dr=e.target.value;else if(d.of=="q"){S.of.q=e.target.value;$("#ocl").innerHTML=listaOrt().html}else if(d.oa=="dr"||d.oa=="ind")S.oa[d.oa]=e.target.value});
 async function boot(){
