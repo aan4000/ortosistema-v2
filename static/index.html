@@ -3,15 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B61A8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A131C" media="(prefers-color-scheme: dark)">
 <title>OrtoSistema · Gestión Ortopédica</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F6CBD'/%3E%3Cpath d='M16 6.4l7.2 3.1v5.5c0 4.4-3.1 7.6-7.2 8.7-4.1-1.1-7.2-4.3-7.2-8.7V9.5z' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cpath d='M12.4 15.1h7.2M16 11.5v7.2' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B61A8'/%3E%3Cpath d='M16 6.4l7.2 3.1v5.5c0 4.4-3.1 7.6-7.2 8.7-4.1-1.1-7.2-4.3-7.2-8.7V9.5z' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cpath d='M12.4 15.1h7.2M16 11.5v7.2' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--pri:#0F6CBD;--onp:#fff;--pri2:#E5F0FA;--acc:#0E9384;--sec:#586A7C;--bg:#F3F6FA;--sf:#fff;--tx:#14212E;--bd:#DCE4EC;--ok:#1B8A4B;--wa:#B35C00;--er:#C0392B;--hm:#2F6FB5;--hmb:#E8F1FB;--hf:#B0457C;--hfb:#FCEBF3;--hn:#7A8B9B;--hnb:#EEF2F6;--sh:0 1px 2px rgba(15,40,70,.06),0 4px 14px rgba(15,40,70,.05);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--pri:#5BA8F0;--onp:#0A1520;--pri2:#16314C;--acc:#2DD4BF;--sec:#9DB0C2;--bg:#0B131B;--sf:#121D28;--tx:#E8EFF6;--bd:#253443;--ok:#5FCB88;--wa:#F2A33A;--er:#F28B82;--hm:#7FB6EA;--hmb:#152B40;--hf:#E48FBB;--hfb:#3A1E2C;--hn:#9DB0C2;--hnb:#1A2734;--sh:none}}
-:root[data-theme="dark"]{--pri:#5BA8F0;--onp:#0A1520;--pri2:#16314C;--acc:#2DD4BF;--sec:#9DB0C2;--bg:#0B131B;--sf:#121D28;--tx:#E8EFF6;--bd:#253443;--ok:#5FCB88;--wa:#F2A33A;--er:#F28B82;--hm:#7FB6EA;--hmb:#152B40;--hf:#E48FBB;--hfb:#3A1E2C;--hn:#9DB0C2;--hnb:#1A2734;--sh:none}
+:root{--pri:#0B61A8;--onp:#fff;--pri2:#E7F1FB;--acc:#0B8C7C;--sec:#4F6474;--bg:#EDF2F8;--sf:#fff;--tx:#0E1D29;--bd:#D5E0EB;--ok:#137A3F;--wa:#9A5600;--er:#B3261E;--hm:#2A6DAE;--hmb:#E4EFFA;--hf:#A33C72;--hfb:#FBE7F1;--hn:#67798A;--hnb:#EBF1F7;--sh:0 1px 2px rgba(11,50,90,.07),0 6px 18px rgba(11,50,90,.06);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--pri:#6FB3F2;--onp:#07131F;--pri2:#12314C;--acc:#31C3AE;--sec:#9DB1C4;--bg:#0A131C;--sf:#111D27;--tx:#E9F1F8;--bd:#213243;--ok:#5CC98A;--wa:#F0A63C;--er:#F08C83;--hm:#85BCEF;--hmb:#13283C;--hf:#E895C1;--hfb:#331B29;--hn:#9DB1C4;--hnb:#182634;--sh:none}}
+:root[data-theme="dark"]{--pri:#6FB3F2;--onp:#07131F;--pri2:#12314C;--acc:#31C3AE;--sec:#9DB1C4;--bg:#0A131C;--sf:#111D27;--tx:#E9F1F8;--bd:#213243;--ok:#5CC98A;--wa:#F0A63C;--er:#F08C83;--hm:#85BCEF;--hmb:#13283C;--hf:#E895C1;--hfb:#331B29;--hn:#9DB1C4;--hnb:#182634;--sh:none}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
 html,body{height:100%;margin:0}
@@ -291,7 +293,19 @@ unlock:"<rect width='18' height='11' x='3' y='11' rx='2' ry='2'/><path d='M7 11V
 key:"<path d='m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4'/>",
 pdf:"<path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/><path d='M9 13h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H9v-4z'/><path d='M13 13h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2v-4z'/>",
 archive:"<rect width='20' height='5' x='2' y='3' rx='1'/><path d='M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8'/><path d='M10 12h4'/>",
-printer:"<path d='M6 9V2h12v7'/><path d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/><path d='M6 14h12v8H6z'/>"};
+printer:"<path d='M6 9V2h12v7'/><path d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/><path d='M6 14h12v8H6z'/>",
+bone:"<path d='M17 10c.7-.7 1.69 0 2.5 0a2.5 2.5 0 1 0 0-5 .5.5 0 0 1-.5-.5 2.5 2.5 0 1 0-5 0c0 .81.7 1.8 0 2.5l-7 7c-.7.7-1.69 0-2.5 0a2.5 2.5 0 0 0 0 5c.28 0 .5.22.5.5a2.5 2.5 0 1 0 5 0c0-.81-.7-1.8 0-2.5Z'/>",
+stethoscope:"<path d='M11 2v2M5 2v2'/><path d='M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1'/><path d='M8 15a6 6 0 0 0 12 0v-3'/><circle cx='20' cy='10' r='2'/>",
+syringe:"<path d='m18 2 4 4M17 7l3-3'/><path d='M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5'/><path d='m9 11 4 4M5 19l-3 3M14 4l6 6'/>",
+bandage:"<rect x='2.6' y='7.6' width='18.8' height='8.8' rx='4.4' transform='rotate(-45 12 12)'/><path d='M9.5 9.5h.01M14.5 14.5h.01M12 12h.01M14.5 9.5h.01M9.5 14.5h.01'/>",
+scan:"<path d='M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2'/><path d='M9.4 12h5.2M12 9.4v5.2'/>",
+footprints:"<path d='M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z'/><path d='M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z'/><path d='M16 17h4M4 13h4'/>",
+pill:"<path d='m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z'/><path d='m8.5 8.5 7 7'/>",
+heartpulse:"<path d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'/><path d='M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27'/>",
+bed:"<path d='M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9'/>",
+dumbbell:"<path d='m6.5 6.5 11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 10l7-7M14 21l7-7'/>",
+cliplist:"<rect x='8' y='2' width='8' height='4' rx='1'/><path d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/><path d='M12 11h4M12 16h4M8 11h.01M8 16h.01'/>",
+filetext:"<path d='M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z'/><path d='M14 2v4a2 2 0 0 0 2 2h4'/><path d='M10 9H8M16 13H8M16 17H8'/>"};
 const ic=(n,s=18)=>`<svg class="ic" viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${IC[n]||IC.dotc}</svg>`;
 const rw=(k,r)=>r.map(a=>Object.fromEntries(k.split(" ").map((x,i)=>[x,a[i]])));
 const T0=()=>[["Consulta y control","Consulta ortopédica"],["Consulta y control","Control posoperatorio"],["Inmovilización","Colocación de yeso o férula"],["Inmovilización","Reducción cerrada de fractura"],["Infiltraciones","Infiltración articular"],["Fracturas","Reducción abierta y fijación interna"],["Fracturas","Fijación de fractura de radio distal"],["Fracturas","Clavo endomedular de fémur"],["Fracturas","Retiro de material de osteosíntesis"],["Artroscopia","Artroscopia de rodilla"],["Artroscopia","Meniscectomía artroscópica"],["Artroscopia","Reconstrucción de LCA"],["Artroscopia","Artroscopia de hombro"],["Artroscopia","Reparación del manguito rotador"],["Mano y pie","Liberación del túnel carpiano"],["Mano y pie","Cirugía de hallux valgus"],["Prótesis","Prótesis total de cadera"],["Prótesis","Prótesis total de rodilla"],["Columna","Discectomía lumbar"]].map(([g,n])=>({g,c:"",n,p:0,f:""}));
@@ -464,7 +478,7 @@ async function subirImagen(estudioId,dataUrl){
 }
 const S={user:null,open:false,sel:new Set(),pf:{g:"",q:"",pr:false},pa:{p:null,dr:"",f:"",e:"Indicado",cg:true},ef:{p:"",t:""},upP:null,ap:null,only:true,ag:null,evi:null,of:{g:"",q:""},pe:{a:"",u:""},os:new Set(),ox:{},oa:{p:null,dr:"",f:"",e:"Indicada",ind:""},route:(location.hash||"#inicio").slice(1)||"inicio"};
 const RL={medico:"Médico",secretaria:"Secretaría",fisio:"Fisioterapeuta",admin:"Administrador"};
-const M=[["inicio","home","Inicio"],["agenda","cal","Agenda"],["pacientes","users","Pacientes"],["procedimientos","clip","Procedimientos"],["recetas","rx","Recetas"],["ortesis","ort","Órtesis"],["quirofano","act","Quirófano"],["estudios","img","Estudios"],["documentos","doc","Documentos"],["rehab","ref","Rehabilitación"]];
+const M=[["inicio","home","Inicio"],["agenda","cal","Agenda"],["pacientes","users","Pacientes"],["procedimientos","bone","Procedimientos"],["recetas","pill","Recetas"],["ortesis","bandage","Órtesis"],["quirofano","syringe","Quirófano"],["estudios","scan","Estudios"],["documentos","doc","Documentos"],["rehab","footprints","Rehabilitación"]];
 const AD=[["referimientos","swap","Referimientos"],["autorizaciones","ok","Autorizaciones"],["facturacion","usd","Facturación"]];
 const ST=["Consulta","Estudio","Preauth","Cirugía","Fisio","PROM","Facturado"];
 const BC={Activo:"ok",Inactivo:"er",Programada:"in",Realizada:"ok",Pendiente:"wa","Por revisar":"wa",Revisado:"ok",Aprobada:"ok","Por solicitar":"wa",Enviada:"in",Rechazada:"er",Respondido:"ok",Cobrado:"ok",Anulada:"er",Indicado:"in",Cancelada:"er",Indicada:"in",Entregada:"ok",Programado:"in"};
