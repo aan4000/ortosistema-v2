@@ -1065,7 +1065,7 @@ function vRecetas(){
   const tab=S.rxTab||"medicamento";
   const rx=DB.X.filter(x=>x.p==ap.id).sort((a,b)=>iso(b.f).localeCompare(iso(a.f)));
   const lista=rx.filter(x=>x.t==tab);
-  return sec("Recetas . "+ap.n)+`<p class="mu">Paciente activo: <b>${esc(ap.n)}</b> . ${ap.e} anos . ${esc(ap.s||"?")}</p>`
+  return `<p class="mu">Paciente activo: <b>${esc(ap.n)}</b> . ${ap.e} anos . ${esc(ap.s||"?")}</p>`
     +`<div class="tabs">${[["medicamento","Medicamentos ortopedicos"],["protesis","Protesis"]].map(([k,l])=>`<button class="${k==tab?"on":""}" data-a="rxtab:${k}">${ic(k=="medicamento"?"rx":"ort",16)} ${l}</button>`).join("")}</div>`
     +`<p><button class="btn p" data-a="rxn">${ic("plus",16)} Nueva ${tab=="medicamento"?"receta":"orden de protesis"}</button></p>`
     +card(tab=="medicamento"?"Medicamentos recetados":"Protesis indicadas",
