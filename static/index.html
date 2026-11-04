@@ -142,10 +142,10 @@ tr:hover td{background:var(--pri2)}
 .vzbar .lab input[type=range]{width:110px;min-height:0;padding:0}
 .acts .icb{width:34px;height:34px}
 @media(max-width:640px){.icb{width:34px;height:34px}.tb.grp{gap:3px}.icb[data-tip]::after{display:none}}
-.agbar{gap:8px}
-.agdate{position:relative}
+.agbar{gap:8px;position:relative;z-index:50}
+.agdate{position:relative;z-index:60}
 .agdate>.btn{min-height:38px}
-.calpop{position:absolute;top:calc(100% + 8px);left:0;z-index:35;width:296px;max-width:calc(100vw - 36px);background:var(--sf);border:1px solid var(--bd);border-radius:12px;box-shadow:0 14px 34px rgba(6,20,35,.22);padding:10px 10px 8px;animation:calin .14s ease}
+.calpop{position:absolute;top:calc(100% + 8px);left:0;z-index:1000;width:296px;max-width:calc(100vw - 36px);background:var(--sf);border:1px solid var(--bd);border-radius:12px;box-shadow:0 14px 34px rgba(6,20,35,.22);padding:10px 10px 8px;animation:calin .14s ease}
 @keyframes calin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 .calpop .ch{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
 .calpop .ch b{font-size:14px;text-transform:capitalize}
@@ -977,6 +977,37 @@ const MEDS=[
   "Colchicina 0.5 mg (tableta) · genérico","Alopurinol 300 mg (tableta) · genérico",
   "Alendronato 70 mg (tableta) · genérico","Calcio + vitamina D 600 mg/400 UI (tableta) · genérico",
   "Levotiroxina 50 µg (tableta) · genérico","Levotiroxina 100 µg (tableta) · genérico"]]];
+const PROTS=[
+ ["Rodilla",[
+  "Prótesis total de rodilla cementada (fémur, tibia y polietileno)","Prótesis total de rodilla no cementada",
+  "Prótesis unicompartimental de rodilla","Prótesis de revisión de rodilla (constreñida)",
+  "Espaciador de rodilla con antibiótico","Componente femoral de revisión","Componente tibial de revisión","Inserto de polietileno de rodilla"]],
+ ["Cadera",[
+  "Prótesis total de cadera cementada (vástago, cotilo y cabeza)","Prótesis total de cadera no cementada",
+  "Hemiartroplastia de cadera (prótesis parcial)","Prótesis de revisión de cadera","Vástago femoral no cementado",
+  "Cotilo acetabular no cementado","Cabeza femoral de cerámica","Par de fricción cerámica-cerámica",
+  "Malla acetabular de reconstrucción","Espaciador de cadera con antibiótico"]],
+ ["Hombro y codo",[
+  "Prótesis total de hombro anatómica","Prótesis invertida de hombro","Hemiartroplastia de hombro",
+  "Prótesis de cabeza radial","Prótesis total de codo"]],
+ ["Tobillo y pie",[
+  "Prótesis total de tobillo","Prótesis de revisión de tobillo","Implante de primera articulación metatarsofalángica","Prótesis de dedo del pie"]],
+ ["Mano y muñeca",[
+  "Prótesis de trapecio","Prótesis de articulación metacarpofalángica","Prótesis de articulación interfalángica","Prótesis de radio distal (cúpula)"]],
+ ["Columna",[
+  "Caja intersomática cervical (PEEK)","Caja intersomática cervical (titanio)","Caja intersomática lumbar (PEEK)",
+  "Caja intersomática lumbar (titanio)","Prótesis discal cervical","Prótesis discal lumbar","Tornillo pedicular",
+  "Bandeja cervical","Placa cervical anterior","Barra y conectores de columna"]],
+ ["Trauma y fijación",[
+  "Placa de compresión bloqueada (LCP)","Placa anatómica de radio distal","Placa anatómica de húmero proximal",
+  "Clavo intramedular de fémur","Clavo intramedular de tibia","Clavo intramedular de húmero","Tornillo canulado",
+  "Tornillo de esponjosa","Anclaje de sutura","Grapa de compresión","Cerclaje de alambre","Fijador externo"]],
+ ["Materiales e injertos",[
+  "Cemento óseo con antibiótico (40 g)","Cemento óseo sin antibiótico (40 g)","Injerto óseo autólogo",
+  "Injerto óseo alogénico","Sustituto óseo (hidroxiapatita)","Malla de reconstrucción"]],
+ ["Órtesis y ayudas",[
+  "Rodillera estabilizadora","Inmovilizador de rodilla","Bota ortopédica (walker)","Collarín cervical blando",
+  "Faja lumbar","Muletas","Bastón","Andador"]]];
 const SURGS=[["Cirugias ortopedicas",["Artroscopia de rodilla","Artroscopia de hombro","Reemplazo total de rodilla","Reemplazo total de cadera","Reduccion abierta y fijacion interna (RAFI)","Osteosintesis de fractura","Fijacion de fractura de radio distal","Cirugia de hallux valgus","Discectomia lumbar","Fusion lumbar","Laminectomia","Cirugia de tunel carpiano","Reparacion de manguito rotador","Reconstruccion de LCA","Meniscectomia","Osteotomia","Extraccion de material de osteosintesis"]],["Cirugias generales",["Apendicectomia","Colecistectomia","Hernioplastia inguinal","Histerectomia","Cesarea","Prostatectomia","Tiroidectomia","Amigdalectomia","Septoplastia","Liberacion de Dupuytren"]],["Cirugias de columna",["Discectomia cervical","Discectomia lumbar","Fusion lumbar","Laminectomia","Artroplastia de facet"]],["Otras cirugias",["Cirugia cardiovascular","Cirugia vascular","Cirugia oncologica","Cirugia bariatri","Trasplante de organo"]]];
 const FAMH=["Diabetes mellitus","Hipertension arterial","Cardiopatia isquemica","Accidente cerebrovascular","Cancer (mama)","Cancer (prostata)","Cancer (colon)","Artritis reumatoide","Artrosis","Osteoporosis","Gota","Asma","EPOC","Epilepsia","Enfermedad de Alzheimer","Enfermedad renal cronica","Hepatopatia","Trastorno de coagulacion","Obesidad","Dislipidemia","Enfermedad tiroidea","Tuberculosis","Anemia","Migraña","SIDA","Fibrosis quistica","Enfermedad de Parkinson","Sarcoidosis","Lupus eritematoso sistemico"];
 const antField=(id,label,catalog,groups,hint)=>`<div class="af"><label class="mu">${label}</label><select id="${id}_sel" data-ant="${id}" class="ant-sel"><option value="">Selecciona...</option>${groups?groups.map(([g,items])=>`<optgroup label="${esc(g)}">${items.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}</optgroup>`).join(""):catalog.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}<option value="__otros__">Otros</option></select><textarea id="${id}_other" rows="2" style="display:none;margin-top:6px" placeholder="Especifica..."></textarea><input type="hidden" id="${id}">${hint?`<p class="mu" style="margin:6px 0 0">${hint}</p>`:""}</div>`;
@@ -1049,23 +1080,44 @@ function fRx(i){
     <div class="tb"><button class="btn p" id="rx_g">Guardar</button>${nu?"":' <button class="btn d" id="rx_d">Eliminar</button>'}</div>`, "w");
   const renderItems=()=>{
     const c=o.querySelector("#rx_items");
-    c.innerHTML=S.rxItems.map((it,idx)=>`<div class="fg" style="align-items:end;margin-bottom:8px">
-      <div><label class="mu">Nombre</label><input class="rx-nombre" data-i="${idx}" value="${esc(it.nombre||"")}"></div>
-      <div><label class="mu">Dosis</label><input class="rx-dosis" data-i="${idx}" value="${esc(it.dosis||"")}"></div>
-      <div><label class="mu">Frecuencia</label><input class="rx-frec" data-i="${idx}" value="${esc(it.frecuencia||"")}"></div>
-      <div><label class="mu">Duracion</label><input class="rx-dur" data-i="${idx}" value="${esc(it.duracion||"")}"></div>
-      <div><label class="mu">Cantidad</label><input class="rx-cant" data-i="${idx}" type="number" min="1" value="${it.cantidad||1}"></div>
-      <div><button class="btn d" data-rxrm="${idx}">${ic("trash",14)}</button></div>
-    </div>`).join("") || "<p class='mu'>Sin items. Agrega al menos uno.</p>";
+    const tipo=o.querySelector("#rx_t").value;
+    const esP=tipo=="protesis";
+    const cat=esP?PROTS:MEDS;
+    const flat=cat.flatMap(([g,its])=>its);
+    c.innerHTML=S.rxItems.map((it,idx)=>{
+      const otros=!!it.nombre&&!flat.includes(it.nombre);
+      return `<div class="rxi" style="border:1px solid var(--bd);border-radius:10px;padding:10px;margin-bottom:10px">
+        <div class="row" style="margin-bottom:6px"><b class="mu" style="margin:0">${esP?"Prótesis":"Medicamento"} ${idx+1}</b><button type="button" class="icb d" data-tip="Quitar" aria-label="Quitar item" data-rxrm="${idx}">${ic("trash",16)}</button></div>
+        <label class="mu" for="rxsel_${idx}">${esP?"Prótesis del catálogo":"Medicamento del catálogo"}</label>
+        <select class="rx-sel" id="rxsel_${idx}" data-i="${idx}" aria-label="${esP?"Prótesis":"Medicamento"}" style="width:100%;margin-bottom:6px">
+          <option value="">Selecciona...</option>
+          ${cat.map(([g,its])=>`<optgroup label="${esc(g)}">${its.map(m=>`<option value="${esc(m)}"${m==it.nombre?" selected":""}>${esc(m)}</option>`).join("")}</optgroup>`).join("")}
+          <option value="__otros__"${otros?" selected":""}>Otro (escribir)</option>
+        </select>
+        <input class="rx-nombre" data-i="${idx}" value="${otros?esc(it.nombre):""}" placeholder="Escribe el nombre" aria-label="Nombre" style="margin-bottom:8px;${otros?"":"display:none"}">
+        <div class="fg">
+          <div><label class="mu" for="rxd_${idx}">${esP?"Talla / medida":"Dosis"}</label><input class="rx-dosis" id="rxd_${idx}" data-i="${idx}" value="${esc(it.dosis||"")}" placeholder="${esP?"Ej. talla 3, 52 mm":"Ej. 1 tableta, 500 mg"}"></div>
+          ${esP?"":`<div><label class="mu" for="rxf_${idx}">Frecuencia</label><input class="rx-frec" id="rxf_${idx}" data-i="${idx}" value="${esc(it.frecuencia||"")}" placeholder="Ej. cada 8 horas"></div><div><label class="mu" for="rxdur_${idx}">Duración</label><input class="rx-dur" id="rxdur_${idx}" data-i="${idx}" value="${esc(it.duracion||"")}" placeholder="Ej. 7 días"></div>`}
+          <div><label class="mu" for="rxc_${idx}">Cantidad</label><input class="rx-cant" id="rxc_${idx}" data-i="${idx}" type="number" min="1" value="${it.cantidad||1}"></div>
+        </div>
+      </div>`;
+    }).join("") || "<p class='mu'>Sin items. Agrega al menos uno.</p>";
+    c.querySelectorAll(".rx-sel").forEach(sl=>sl.onchange=()=>{
+      const idx=+sl.dataset.i,it=S.rxItems[idx];if(!it)return;
+      const tx=c.querySelector('.rx-nombre[data-i="'+idx+'"]');
+      if(sl.value=="__otros__"){it.nombre=tx.value;tx.style.display="";tx.focus()}
+      else{it.nombre=sl.value;tx.value="";tx.style.display="none"}
+    });
     c.querySelectorAll("input").forEach(inp=>{inp.oninput=()=>{const idx=+inp.dataset.i;const it=S.rxItems[idx];if(!it)return;if(inp.classList.contains("rx-nombre"))it.nombre=inp.value;if(inp.classList.contains("rx-dosis"))it.dosis=inp.value;if(inp.classList.contains("rx-frec"))it.frecuencia=inp.value;if(inp.classList.contains("rx-dur"))it.duracion=inp.value;if(inp.classList.contains("rx-cant"))it.cantidad=+inp.value||1;}});
     c.querySelectorAll("[data-rxrm]").forEach(b=>b.onclick=()=>{S.rxItems.splice(+b.dataset.rxrm,1);renderItems()});
   };
   renderItems();
+  o.querySelector("#rx_t").onchange=()=>renderItems();
   o.querySelector("#rx_add").onclick=()=>{S.rxItems.push({nombre:"",dosis:"",frecuencia:"",duracion:"",cantidad:1});renderItems()};
   const v=s=>o.querySelector(s).value.trim();
   o.querySelector("#rx_g").onclick=async()=>{
     const er=m=>o.querySelector("#rx_er").textContent=m;
-    const items=S.rxItems.filter(it=>(it.nombre||"").trim());
+    const items=S.rxItems.filter(it=>(it.nombre||"").trim()).map(it=>v("#rx_t")=="protesis"?{nombre:it.nombre,dosis:it.dosis||"",cantidad:it.cantidad||1}:it);
     if(!items.length) return er("Agrega al menos un item.");
     const rec={id:x.id,p:S.ap,f:v("#rx_f"),t:v("#rx_t"),ti:v("#rx_ti"),it:items,n:v("#rx_n"),dr:v("#rx_dr")};
     try{if(nu){const id=await crearK("X",rec);DB.X.push({...rec,id});toast("Receta guardada")}else{Object.assign(x,rec);await editarK("X",x);toast("Receta actualizada")} o.remove();draw()}catch(e){er(e.message)}};
