@@ -927,17 +927,66 @@ const opt=(a,s)=>a.map(x=>`<option${x==s?" selected":""}>${esc(x)}</option>`).jo
 const SEG=["Privado (sin seguro)","ARS Humano","SeNaSa","ARS Universal","Mapfre Salud ARS","ARS Reservas","ARS Palic","ARS Futuro","ARS Monumental","ARS Yunen","Primera ARS","ARS Simag","ARS Semma","ARS CMD","IDOPPRIL (riesgos laborales)","Otro"];
 const MB=["Hipertensión","Diabetes","Cardiopatía","Asma o EPOC","Artritis","Osteoporosis","Enfermedad tiroidea","Obesidad"];
 const ALG=["Penicilina","Amoxicilina","Aspirina (AAS)","Ibuprofeno","Sulfonamidas","Cefalosporinas","Látex","Yodo / contraste","Anestésicos locales","Codeína","Morfina","Polen","Ácaros del polvo","Caspa de animales","Hongos","Maní","Mariscos","Huevo","Leche","Trigo / gluten","Frutos secos","Fresas","Chocolate","Colorantes alimentarios","Níquel","Cosméticos","Penicilamina","Sulfato de gentamicina"];
-const MEDS=["Paracetamol","Ibuprofeno","Naproxeno","Diclofenaco","Celecoxib","Meloxicam","Ketorolaco","Tramadol","Codeina","Morfina","Fentanilo","Pregabalina","Gabapentina","Amitriptilina","Duloxetina","Omeprazol","Pantoprazol","Metformina","Insulina","Losartan","Enalapril","Amlodipino","Atenolol","Warfarina","Aspirina (AAS)","Prednisona","Dexametasona","Colchicina","Alopurinol","Levotiroxina","Calcio + vitamina D","Alendronato","Ciprofloxacino","Amoxicilina","Azitromicina","Diazepam","Lorazepam","Baclofeno","Ciclobenzaprina","Tizanidina","Etoricoxib"];
+const MEDS=[
+ ["Analgésicos y antiinflamatorios",[
+  "Paracetamol 500 mg (tableta) · genérico","Paracetamol 1 g (tableta) · genérico","Paracetamol 120 mg/5 mL (jarabe) · genérico",
+  "Ibuprofeno 400 mg (tableta) · genérico","Ibuprofeno 600 mg (tableta) · genérico","Ibuprofeno 100 mg/5 mL (suspensión) · genérico",
+  "Naproxeno 250 mg (tableta) · genérico","Naproxeno 500 mg (tableta) · genérico",
+  "Diclofenaco 50 mg (tableta) · genérico","Diclofenaco 75 mg/3 mL (solución inyectable) · genérico",
+  "Ketorolaco 10 mg (tableta) · genérico","Ketorolaco 30 mg/mL (solución inyectable) · genérico",
+  "Meloxicam 7.5 mg (tableta) · genérico","Meloxicam 15 mg (tableta) · genérico",
+  "Celecoxib 200 mg (cápsula) · genérico","Etoricoxib 90 mg (tableta) · genérico"]],
+ ["Opioides y dolor neuropático",[
+  "Tramadol 50 mg (cápsula) · genérico","Tramadol 100 mg/2 mL (solución inyectable) · genérico",
+  "Codeína 30 mg (tableta) · genérico","Morfina 10 mg (tableta) · genérico","Morfina 10 mg/mL (solución inyectable) · genérico",
+  "Fentanilo 50 µg/mL (solución inyectable) · genérico",
+  "Pregabalina 75 mg (cápsula) · genérico","Pregabalina 150 mg (cápsula) · genérico",
+  "Gabapentina 300 mg (cápsula) · genérico","Gabapentina 400 mg (cápsula) · genérico",
+  "Amitriptilina 25 mg (tableta) · genérico","Duloxetina 30 mg (cápsula) · genérico","Duloxetina 60 mg (cápsula) · genérico"]],
+ ["Gastrointestinal",[
+  "Omeprazol 20 mg (cápsula) · genérico","Omeprazol 40 mg (cápsula) · genérico","Pantoprazol 40 mg (tableta) · genérico",
+  "Ondansetrón 4 mg (tableta) · genérico","Ondansetrón 8 mg/4 mL (solución inyectable) · genérico",
+  "Metoclopramida 10 mg (tableta) · genérico","Metoclopramida 5 mg/5 mL (jarabe) · genérico"]],
+ ["Cardiovascular",[
+  "Losartán 50 mg (tableta) · genérico","Losartán 100 mg (tableta) · genérico",
+  "Enalapril 10 mg (tableta) · genérico","Enalapril 20 mg (tableta) · genérico",
+  "Amlodipino 5 mg (tableta) · genérico","Amlodipino 10 mg (tableta) · genérico",
+  "Atenolol 50 mg (tableta) · genérico","Atenolol 100 mg (tableta) · genérico",
+  "Hidroclorotiazida 25 mg (tableta) · genérico","Furosemida 40 mg (tableta) · genérico",
+  "Ácido acetilsalicílico 81 mg (tableta) · genérico","Clopidogrel 75 mg (tableta) · genérico",
+  "Atorvastatina 20 mg (tableta) · genérico","Warfarina 5 mg (tableta) · genérico",
+  "Enoxaparina 40 mg/0.4 mL (jeringa prellenada) · genérico"]],
+ ["Diabetes",[
+  "Metformina 500 mg (tableta) · genérico","Metformina 850 mg (tableta) · genérico","Glibenclamida 5 mg (tableta) · genérico",
+  "Insulina NPH 100 UI/mL (vial) · genérico","Insulina regular 100 UI/mL (vial) · genérico",
+  "Insulina glargina 100 UI/mL (pluma) · marca (Lantus)"]],
+ ["Corticosteroides",[
+  "Prednisona 5 mg (tableta) · genérico","Prednisona 20 mg (tableta) · genérico",
+  "Dexametasona 4 mg/2 mL (solución inyectable) · genérico","Dexametasona 8 mg/2 mL (solución inyectable) · genérico",
+  "Metilprednisolona 40 mg/mL (solución inyectable) · genérico"]],
+ ["Antibióticos",[
+  "Amoxicilina 500 mg (cápsula) · genérico","Amoxicilina 250 mg/5 mL (suspensión oral) · genérico",
+  "Amoxicilina + ácido clavulánico 875/125 mg (tableta) · genérico",
+  "Azitromicina 500 mg (tableta) · genérico","Ciprofloxacino 500 mg (tableta) · genérico",
+  "Clindamicina 300 mg (cápsula) · genérico","Cefalexina 500 mg (cápsula) · genérico",
+  "Trimetoprim + sulfametoxazol 160/800 mg (tableta) · genérico"]],
+ ["Relajantes musculares y ansiolíticos",[
+  "Ciclobenzaprina 10 mg (tableta) · genérico","Baclofeno 10 mg (tableta) · genérico","Tizanidina 2 mg (tableta) · genérico",
+  "Diazepam 5 mg (tableta) · genérico","Lorazepam 1 mg (tableta) · genérico"]],
+ ["Gota, osteoporosis y tiroides",[
+  "Colchicina 0.5 mg (tableta) · genérico","Alopurinol 300 mg (tableta) · genérico",
+  "Alendronato 70 mg (tableta) · genérico","Calcio + vitamina D 600 mg/400 UI (tableta) · genérico",
+  "Levotiroxina 50 µg (tableta) · genérico","Levotiroxina 100 µg (tableta) · genérico"]]];
 const SURGS=[["Cirugias ortopedicas",["Artroscopia de rodilla","Artroscopia de hombro","Reemplazo total de rodilla","Reemplazo total de cadera","Reduccion abierta y fijacion interna (RAFI)","Osteosintesis de fractura","Fijacion de fractura de radio distal","Cirugia de hallux valgus","Discectomia lumbar","Fusion lumbar","Laminectomia","Cirugia de tunel carpiano","Reparacion de manguito rotador","Reconstruccion de LCA","Meniscectomia","Osteotomia","Extraccion de material de osteosintesis"]],["Cirugias generales",["Apendicectomia","Colecistectomia","Hernioplastia inguinal","Histerectomia","Cesarea","Prostatectomia","Tiroidectomia","Amigdalectomia","Septoplastia","Liberacion de Dupuytren"]],["Cirugias de columna",["Discectomia cervical","Discectomia lumbar","Fusion lumbar","Laminectomia","Artroplastia de facet"]],["Otras cirugias",["Cirugia cardiovascular","Cirugia vascular","Cirugia oncologica","Cirugia bariatri","Trasplante de organo"]]];
 const FAMH=["Diabetes mellitus","Hipertension arterial","Cardiopatia isquemica","Accidente cerebrovascular","Cancer (mama)","Cancer (prostata)","Cancer (colon)","Artritis reumatoide","Artrosis","Osteoporosis","Gota","Asma","EPOC","Epilepsia","Enfermedad de Alzheimer","Enfermedad renal cronica","Hepatopatia","Trastorno de coagulacion","Obesidad","Dislipidemia","Enfermedad tiroidea","Tuberculosis","Anemia","Migraña","SIDA","Fibrosis quistica","Enfermedad de Parkinson","Sarcoidosis","Lupus eritematoso sistemico"];
-const antField=(id,label,catalog,groups)=>`<div class="af"><label class="mu">${label}</label><select id="${id}_sel" data-ant="${id}" class="ant-sel"><option value="">Selecciona...</option>${groups?groups.map(([g,items])=>`<optgroup label="${esc(g)}">${items.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}</optgroup>`).join(""):catalog.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}<option value="__otros__">Otros</option></select><textarea id="${id}_other" rows="2" style="display:none;margin-top:6px" placeholder="Especifica..."></textarea><input type="hidden" id="${id}"></div>`;
+const antField=(id,label,catalog,groups,hint)=>`<div class="af"><label class="mu">${label}</label><select id="${id}_sel" data-ant="${id}" class="ant-sel"><option value="">Selecciona...</option>${groups?groups.map(([g,items])=>`<optgroup label="${esc(g)}">${items.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}</optgroup>`).join(""):catalog.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}<option value="__otros__">Otros</option></select><textarea id="${id}_other" rows="2" style="display:none;margin-top:6px" placeholder="Especifica..."></textarea><input type="hidden" id="${id}">${hint?`<p class="mu" style="margin:6px 0 0">${hint}</p>`:""}</div>`;
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
 ${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",'<input id="nf" type="date" max="'+new Date().toISOString().slice(0,10)+'">')}${f("ne","Edad",'<input id="ne" readonly placeholder="Se calcula sola">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0">')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
 <br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",'<select id="ns">'+opt(SEG)+"</select>")}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
 <br>${card("Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}${f("ni","Diagnóstico inicial",'<input id="ni">')}</div>`)}
 <br>${card("Antecedentes",`${mbSel([])}
-<br><div class="fg">${antField("nq","Antecedentes quirurgicos",null,SURGS)}${antField("nu","Medicamentos actuales",MEDS,null)}${antField("nh","Antecedentes familiares",FAMH,null)}</div>
+<br><div class="fg">${antField("nq","Antecedentes quirurgicos",null,SURGS)}${antField("nu","Medicamentos actuales",null,MEDS,"Concentración y forma según el Cuadro Básico de Medicamentos Esenciales (MSP/DIGEMAPS). Cada opción indica si es <b>genérico</b> o de <b>marca</b>.")}${antField("nh","Antecedentes familiares",FAMH,null)}</div>
 <br><div class="fg">${f("nb","Tabaquismo",'<select id="nb">'+opt(["No fuma","Exfumador","Fumador"])+"</select>")}${f("nal","Alcohol",'<select id="nal">'+opt(["No consume","Ocasional","Frecuente"])+"</select>")}${f("nac","Actividad física",'<select id="nac">'+opt(["Sedentario","Moderada","Alta"])+"</select>")}</div>
 <br>${tx("no","Otros antecedentes morbidos (texto libre)")}`)}`}
 async function gp(){const v=i=>$("#"+i).value.trim(),er=m=>{$("#nr").textContent=m},n=v("nn"),fn=v("nf");
