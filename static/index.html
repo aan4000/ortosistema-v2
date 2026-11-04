@@ -166,6 +166,15 @@ tr:hover td{background:var(--pri2)}
 .ab{position:sticky;top:57px;z-index:4;display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:8px 16px;background:var(--pri2);border-bottom:1px solid var(--bd);border-left:5px solid var(--pri)}
 .ai{width:36px;height:36px;border-radius:50%;background:var(--pri);color:var(--onp);display:grid;place-items:center;font-weight:700;flex:none}
 .am{flex:1;min-width:200px}.ab .btn{min-height:34px;padding:0 10px;font-size:13px}.ph{position:static}
+.ph-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.ph-id{display:flex;align-items:center;gap:14px;flex:1;min-width:260px}
+.ph-info{display:flex;flex-direction:column;gap:4px}
+.ph-name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ph-name-row h2{margin:0;font-size:24px;line-height:1.1;letter-spacing:-.01em}
+.ph-meta{font-size:13px;color:var(--sec)}
+.ph-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.ph-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start}
+@media(max-width:640px){.ph-head{flex-direction:column}.ph-actions{width:100%}.ph-actions .btn{flex:1}}
 .ddd>summary{cursor:pointer;list-style:none;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;display:flex;gap:8px;align-items:center;background:var(--sf)}
 .ddd>summary::after{content:"▾";margin-left:auto;color:var(--sec)}.ddd[open]>summary{border-color:var(--pri)}.ddd[open]>summary::after{content:"▴"}
 .ddd summary::-webkit-details-marker,.ds summary::-webkit-details-marker{display:none}
@@ -247,6 +256,7 @@ tbody tr:nth-child(even):hover{background:var(--bg)}
 .avp.fem{background:var(--hfb);color:var(--hf)}
 .avp.sm{width:56px;height:56px}
 .avp.xs{width:24px;height:24px;border-width:0}
+.avp.lg{width:104px;height:104px;box-shadow:0 4px 14px rgba(15,40,70,.12)}
 .avrow{display:flex;align-items:center;gap:12px;margin:0 0 12px}
 .avrow .mu{font-size:12px;line-height:1.35}
 .phid{display:flex;align-items:center;gap:12px;min-width:0}
@@ -789,7 +799,7 @@ gestion:()=>card("Referimientos",tk("R",id,["Fecha","Detalle","Estado"],x=>[x.f,
 ortesis:()=>`<p><button class="btn p" data-a="ao:${id}">${ic("plus",16)} Asignar órtesis</button></p>`+card("Órtesis indicadas",tk("OP",id,["Fecha","Órtesis","Lado","Talla","Médico","Estado"],x=>[x.f,`<span class="ocell">${ortImg(x.n,"sm")}<span>${esc(x.n)}</span></span>`,esc(x.lado||"—"),esc(x.talla||"—"),esc(x.dr||"—"),bd(x.e)])),
 documentos:()=>`<p><button class="btn p" data-a="ud:${id}">${ic("up",16)} Subir documento</button></p>`+card("Documentos del paciente",tDocs(DB.D.map((x,i)=>[x,i]).filter(([x])=>x.p==id),false))
 };
-return `<div class="card ph"><div class="row"><div class="phid">${avSexo(p.sx,"sm")}<div><h2>${esc(p.n)}</h2><span class="mu">${p.cd?`<span class="code">${esc(p.cd)}</span> `:""}${p.e} años · Cédula ${esc(p.c)} · ${esc(p.s)}</span></div></div><div class="tb"><button class="btn p" data-a="ev:med" data-ic="1">${ic(DB.E.some(e=>e.p==p.id&&e.tp=="Médica")?"usercheck":"stethoscope",14)} Evaluación médica</button><button class="btn" data-a="ev:fis">Evaluación física</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
+return `<div class="card ph"><div class="ph-head"><div class="ph-id">${avSexo(p.sx,"lg")}<div class="ph-info"><div class="ph-name-row"><h2>${esc(p.n)}</h2>${p.cd?`<span class="code">${esc(p.cd)}</span>`:""}</div><div class="ph-meta">${p.e} años · Cédula ${esc(p.c||"—")} · ${esc(p.s||"Sin seguro")}</div><div class="ph-chips">${chip(EA,p.ea)}${chip(EU,effAu(p))}${p.al?`<span class="b er">${ic("alert",13)} Alergia</span>`:""}</div></div></div><div class="ph-actions"><button class="btn p" data-a="ev:med" data-ic="1">${ic(DB.E.some(e=>e.p==p.id&&e.tp=="Médica")?"usercheck":"stethoscope",14)} Evaluación médica</button><button class="btn" data-a="ev:fis">${ic("usercheck",14)} Evaluación física</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
 <div class="stp">${ST.map((s,i)=>`<span class="${i<p.st?"d":i==p.st?"c":""}">${s}</span>`).join("")}</div>
 <div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="p-${id}-${k}">${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p>${(B2[tab]||B2.resumen)()}`}
 
