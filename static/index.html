@@ -21,7 +21,8 @@ body{font:15px/1.5 Inter,Roboto,system-ui,sans-serif;background:var(--bg);color:
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--sf);z-index:10}
 a{color:var(--pri)}h2{font-size:24px;margin:8px 0}h3{font-size:18px;margin:0 0 8px}
 .app{display:flex;height:100%}
-.side{width:236px;flex:none;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:12px 8px;overflow:auto}
+.side{width:236px;flex:none;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:12px 8px;overflow:auto;scrollbar-width:none;-ms-overflow-style:none}
+.side::-webkit-scrollbar{display:none;width:0;height:0}
 .side h1{font-size:18px;margin:4px 10px 12px;color:var(--pri)}
 .nav{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 12px;margin:1px 0;border-radius:8px;color:var(--tx);text-decoration:none;font-size:15px;transition:background .18s ease,color .18s ease,box-shadow .18s ease}
 .nav:hover{background:var(--bg)}
