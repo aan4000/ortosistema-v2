@@ -1167,12 +1167,13 @@ function rxPrint(idx){
     const incPac=o.querySelector("#rxck_pac").checked;
     const incMed=o.querySelector("#rxck_med").checked;
     const sel=selItems();
-    let txt="RECETA MEDICA - OrtoSistema\n";
-    if(incPac) txt+="Paciente: "+p.n+"\n"+(p.e?p.e+" anos\n":"")+(p.c?"Cedula: "+p.c+"\n":"")+(p.s?"Seguro: "+p.s+"\n":"")+(p.al?"Alergias: "+p.al+"\n":"");
-    txt+="\n"+(r.t=="medicamento"?"MEDICAMENTOS ORTOPEDICOS":"PROTESIS INDICADAS")+":\n";
-    sel.forEach((it,i)=>{ txt+=(i+1)+". "+it.nombre; if(it.dosis) txt+=" - "+it.dosis; if(it.frecuencia) txt+=" - "+it.frecuencia; if(it.duracion) txt+=" - "+it.duracion; if(it.cantidad) txt+=" (cant. "+it.cantidad+")"; txt+="\n"; });
+    let txt="RECETA MÉDICA\nOrtoSistema · Ortopedia y Traumatología\n";
+    txt+="\nFecha: "+r.f+"\n";
+    if(incPac){ txt+="\nPaciente: "+p.n+"\n"; if(p.e)txt+="Edad: "+p.e+" años\n"; if(p.c)txt+="Cédula: "+p.c+"\n"; if(p.s)txt+="Seguro: "+p.s+"\n"; if(p.al)txt+="Alergias: "+p.al+"\n"; }
+    txt+="\n"+(r.t=="medicamento"?"MEDICAMENTOS ORTOPÉDICOS":"PRÓTESIS INDICADAS")+":\n";
+    sel.forEach((it,i)=>{ txt+=(i+1)+". "+it.nombre; if(it.dosis) txt+="  |  Dosis: "+it.dosis; if(it.forma) txt+="  |  Forma: "+it.forma; if(it.frecuencia) txt+="  |  Frecuencia: "+it.frecuencia+" veces/día"; if(it.duracion) txt+="  |  Duración: "+it.duracion; if(it.cantidad) txt+="  |  Cantidad: "+it.cantidad; txt+="\n"; });
     if(r.notas) txt+="\nNotas: "+r.notas+"\n";
-    if(incMed) txt+="\nMedico: "+(r.dr||"?")+"\nFecha: "+r.f+"\n";
+    if(incMed){ txt+="\nMédico: "+(r.dr||"")+"\nFirma: ____________________\n"; }
     return txt;
   };
   const buildHtml=()=>{
@@ -1180,11 +1181,35 @@ function rxPrint(idx){
     const incPac=o.querySelector("#rxck_pac").checked;
     const incMed=o.querySelector("#rxck_med").checked;
     const sel=selItems();
-    return "<!doctype html><html><head><meta charset='utf-8'><title>Receta</title><style>body{font-family:system-ui,sans-serif;padding:24px;max-width:720px;margin:0 auto;color:#14212e}h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:16px 0 6px;border-bottom:1px solid #dce4ec;padding-bottom:4px}.row{display:flex;justify-content:space-between;margin:2px 0;font-size:14px}.mu{color:#586a7c;font-size:13px}ul{margin:6px 0;padding-left:18px}li{margin:4px 0;font-size:14px}@media print{body{padding:12px}}</style></head><body><h1>Receta medica</h1><p class='mu'>OrtoSistema . Ortopedia y Traumatologia</p>"
-      +(incPac?"<h2>Paciente</h2><div class='row'><span><b>"+esc(p.n)+"</b></span><span>"+(p.e?p.e+" anos":"")+"</span></div><div class='row'><span>Cedula: "+esc(p.c||"?")+"</span><span>Seguro: "+esc(p.s||"?")+"</span></div>"+(p.al?"<div class='row'><span>Alergias: "+esc(p.al)+"</span></div>":""):"")
-      +"<h2>"+(r.t=="medicamento"?"Medicamentos ortopedicos":"Protesis indicadas")+"</h2><ul>"+sel.map(it=>"<li><b>"+esc(it.nombre)+"</b>"+(it.dosis?" - "+esc(it.dosis):"")+(it.frecuencia?" . "+esc(it.frecuencia):"")+(it.duracion?" . "+esc(it.duracion):"")+(it.cantidad?" (cant. "+it.cantidad+")":"")+"</li>").join("")+"</ul>"
-      +(r.notas?"<p class='mu'>Notas: "+esc(r.notas)+"</p>":"")
-      +(incMed?"<div style='margin-top:24px;border-top:1px solid #dce4ec;padding-top:8px'><div class='row'><span>Medico: "+esc(r.dr||"?")+"</span><span>Fecha: "+r.f+"</span></div><div class='row mu'><span>Firma: ____________________</span></div></div>":"")
+    const medico=r.dr||"";
+    return "<!doctype html><html lang='es'><head><meta charset='utf-8'><title>Receta médica</title><style>"
+      +"*{box-sizing:border-box}body{font-family:'Segoe UI',system-ui,Arial,sans-serif;margin:0;padding:32px;color:#1a2a3a;font-size:14px;line-height:1.5}"
+      +"@page{margin:18mm} @media print{body{padding:0}}"
+      +".hdr{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #0f6cbd;padding-bottom:10px;margin-bottom:16px}"
+      +".hdr h1{margin:0;font-size:22px;color:#0f6cbd;letter-spacing:.02em}.hdr .sub{font-size:12px;color:#586a7c;margin-top:2px}"
+      +".hdr .meta{text-align:right;font-size:12px;color:#586a7c}"
+      +".box{border:1px solid #dce4ec;border-radius:8px;padding:12px 14px;margin-bottom:16px;background:#f7fafd}"
+      +".box h3{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#0f6cbd}"
+      +".row{display:flex;gap:12px;flex-wrap:wrap}.row>div{flex:1;min-width:180px}"
+      +".lbl{font-size:11px;color:#586a7c;text-transform:uppercase;letter-spacing:.06em}.val{font-weight:600}"
+      +".sec{font-size:13px;font-weight:700;color:#0f6cbd;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid #dce4ec}"
+      +"table{width:100%;border-collapse:collapse;margin:6px 0 10px;font-size:13px}"
+      +"th{background:#0f6cbd;color:#fff;padding:7px 8px;text-align:left;font-weight:600}td{padding:7px 8px;border-bottom:1px solid #e6edf5;vertical-align:top}"
+      +"tr:last-child td{border-bottom:none}.num{text-align:center;width:34px}"
+      +".nota{background:#fff8e6;border-left:3px solid #f0a63c;padding:8px 12px;margin:10px 0;font-size:13px;border-radius:4px}"
+      +".firma{margin-top:40px;display:flex;justify-content:space-between;gap:20px}.firma>div{flex:1;text-align:center}"
+      +".firma .line{border-top:1px solid #1a2a3a;margin-top:36px;padding-top:6px;font-size:12px;color:#586a7c}"
+      +".foot{margin-top:24px;padding-top:8px;border-top:1px solid #e6edf5;font-size:11px;color:#9aa8b8;text-align:center}"
+      +"</style></head><body>"
+      +"<div class='hdr'><div><h1>RECETA MÉDICA</h1><div class='sub'>OrtoSistema · Ortopedia y Traumatología</div></div><div class='meta'><div><b>Fecha:</b> "+esc(r.f)+"</div><div><b>N.º:</b> RX-"+String(r.id||"").padStart(4,"0")+"</div></div></div>"
+      +(incPac?"<div class='box'><h3>Datos del paciente</h3><div class='row'><div><div class='lbl'>Nombre</div><div class='val'>"+esc(p.n)+"</div></div><div><div class='lbl'>Edad</div><div class='val'>"+(p.e?p.e+" años":"—")+"</div></div></div><div class='row'><div><div class='lbl'>Cédula</div><div class='val'>"+esc(p.c||"—")+"</div></div><div><div class='lbl'>Seguro</div><div class='val'>"+esc(p.s||"—")+"</div></div></div>"+(p.al?"<div class='row'><div><div class='lbl'>Alergias</div><div class='val' style='color:#c62828'>"+esc(p.al)+"</div></div></div>":"")+"</div>":"")
+      +"<div class='sec'>"+(r.t=="medicamento"?"Medicamentos ortopédicos":"Prótesis indicadas")+"</div>"
+      +"<table><thead><tr><th class='num'>#</th><th>"+(r.t=="medicamento"?"Medicamento":"Prótesis")+"</th>"+(r.t=="medicamento"?"<th>Dosis</th><th>Forma</th><th>Frecuencia</th><th>Duración</th>":"<th>Talla / medida</th>")+"<th style='text-align:center'>Cantidad</th></tr></thead><tbody>"
+      +sel.map((it,i)=>"<tr><td class='num'>"+(i+1)+"</td><td><b>"+esc(it.nombre)+"</b></td>"+(r.t=="medicamento"?"<td>"+esc(it.dosis||"—")+"</td><td>"+esc(it.forma||"—")+"</td><td>"+(it.frecuencia?esc(it.frecuencia)+" veces/día":"—")+"</td><td>"+esc(it.duracion||"—")+"</td>":"<td>"+esc(it.dosis||"—")+"</td>")+"<td style='text-align:center'>"+(it.cantidad||1)+"</td></tr>").join("")
+      +"</tbody></table>"
+      +(r.notas?"<div class='nota'><b>Notas:</b> "+esc(r.notas)+"</div>":"")
+      +(incMed?"<div class='firma'><div><div class='line'>Médico: "+esc(medico||"—")+"</div></div><div><div class='line'>Fecha: "+esc(r.f)+"</div></div></div>":"")
+      +"<div class='foot'>Documento generado por OrtoSistema · Ortopedia y Traumatología · "+new Date().toLocaleDateString("es-DO",{day:"2-digit",month:"long",year:"numeric"})+"</div>"
       +"</body></html>";
   };
   o.querySelector("#rxp_view").onclick=()=>{const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para ver");return}w.document.write(buildHtml());w.document.close();w.focus()};
