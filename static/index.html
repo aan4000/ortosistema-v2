@@ -241,7 +241,7 @@ tbody tr:nth-child(even):hover{background:var(--bg)}
 .b,.bd{border-radius:12px}
 .code{display:inline-block;background:var(--pri2);color:var(--pri);padding:2px 8px;border-radius:6px;font-size:9px;font-weight:600;letter-spacing:.02em}
 .avp{display:inline-grid;place-items:center;width:84px;height:84px;border-radius:50%;flex:0 0 auto;border:1px solid var(--bd);background:var(--hnb);color:var(--hn);overflow:hidden;transition:background .2s ease,color .2s ease}
-.avp img{width:100%;height:100%;object-fit:contain;display:block}
+.avp img{width:100%;height:100%;object-fit:cover;display:block}
 .avp.mas{background:var(--hmb);color:var(--hm)}
 .avp.fem{background:var(--hfb);color:var(--hf)}
 .avp.sm{width:56px;height:56px}
@@ -582,8 +582,8 @@ const pk=id=>DB.P.find(p=>p.id==id)||{};
 const pl=id=>pk(id).n?`<button class="pn" data-r="p-${id}">${esc(pk(id).n)}</button>`:"—";
 const tbl=(h,r)=>r.length?`<div class="tw"><table><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr>${r.map(x=>`<tr>${x.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`:`<div class="em">${ic("clip",28)}<p>Sin registros todavía.</p></div>`;
 const card=(t,b)=>`<div class="card"><h3>${t}</h3>${b}</div>`;
-const SILUETA_M='<img src="img/silueta_masculina.png?v=2" alt="" aria-hidden="true">';
-const SILUETA_F='<img src="img/silueta_femenina.png?v=2" alt="" aria-hidden="true">';
+const SILUETA_M='<img src="img/silueta_masculina.png?v=3" alt="" aria-hidden="true">';
+const SILUETA_F='<img src="img/silueta_femenina.png?v=3" alt="" aria-hidden="true">';
 const claseSexo=sx=>/^f/i.test(String(sx||""))?"fem":/^m/i.test(String(sx||""))?"mas":"neu";
 const silueta=sx=>claseSexo(sx)==="fem"?SILUETA_F:SILUETA_M;
 const avSexo=(sx,size)=>`<span class="avp ${claseSexo(sx)}${size?" "+size:""}" aria-hidden="true">${silueta(sx)}</span>`;
