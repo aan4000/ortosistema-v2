@@ -241,11 +241,11 @@ tbody tr:nth-child(even):hover{background:var(--bg)}
 .b,.bd{border-radius:12px}
 .code{display:inline-block;background:var(--pri2);color:var(--pri);padding:2px 8px;border-radius:6px;font-size:9px;font-weight:600;letter-spacing:.02em}
 .avp{display:inline-grid;place-items:center;width:84px;height:84px;border-radius:50%;flex:0 0 auto;border:1px solid var(--bd);background:var(--hnb);color:var(--hn);overflow:hidden;transition:background .2s ease,color .2s ease}
-.avp svg{width:54px;height:54px;fill:currentColor;display:block}
+.avp svg{width:60px;height:60px;fill:currentColor;display:block}
 .avp.mas{background:var(--hmb);color:var(--hm)}
 .avp.fem{background:var(--hfb);color:var(--hf)}
-.avp.sm{width:56px;height:56px}.avp.sm svg{width:38px;height:38px}
-.avp.xs{width:24px;height:24px;border-width:0}.avp.xs svg{width:18px;height:18px}
+.avp.sm{width:56px;height:56px}.avp.sm svg{width:42px;height:42px}
+.avp.xs{width:24px;height:24px;border-width:0}.avp.xs svg{width:20px;height:20px}
 .avrow{display:flex;align-items:center;gap:12px;margin:0 0 12px}
 .avrow .mu{font-size:12px;line-height:1.35}
 .phid{display:flex;align-items:center;gap:12px;min-width:0}
@@ -582,8 +582,8 @@ const pk=id=>DB.P.find(p=>p.id==id)||{};
 const pl=id=>pk(id).n?`<button class="pn" data-r="p-${id}">${esc(pk(id).n)}</button>`:"—";
 const tbl=(h,r)=>r.length?`<div class="tw"><table><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr>${r.map(x=>`<tr>${x.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`:`<div class="em">${ic("clip",28)}<p>Sin registros todavía.</p></div>`;
 const card=(t,b)=>`<div class="card"><h3>${t}</h3>${b}</div>`;
-const SILUETA_M='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4C40 4 47 10 47 19C47 25 45 30 41 33L41 42C41 44 39 46 37 46L27 46C25 46 23 44 23 42L23 33C19 30 17 25 17 19C17 10 24 4 32 4Z"/></svg>';
-const SILUETA_F='<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="21" r="11"/><path d="M14 19C14 9 22 1 32 1C42 1 50 9 50 19L50 46C50 50 47 53 44 53L44 32C44 24 40 18 32 18C24 18 20 24 20 32L20 53C17 53 14 50 14 46Z"/><rect x="27" y="31" width="10" height="14" rx="3"/></svg>';
+const SILUETA_M='<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="17" r="9"/><path d="M14 60 C14 44 21 32 32 32 C43 32 50 44 50 60 Z"/></svg>';
+const SILUETA_F='<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="15" r="8"/><path d="M21 24 C21 20 26 17 32 17 C38 17 43 20 43 24 L45 56 C45 58 43 60 41 60 L23 60 C21 60 19 58 19 56 Z"/></svg>';
 const claseSexo=sx=>/^f/i.test(String(sx||""))?"fem":/^m/i.test(String(sx||""))?"mas":"neu";
 const silueta=sx=>claseSexo(sx)==="fem"?SILUETA_F:SILUETA_M;
 const avSexo=(sx,size)=>`<span class="avp ${claseSexo(sx)}${size?" "+size:""}" aria-hidden="true">${silueta(sx)}</span>`;
