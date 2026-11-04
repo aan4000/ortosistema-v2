@@ -142,6 +142,26 @@ tr:hover td{background:var(--pri2)}
 .vzbar .lab input[type=range]{width:110px;min-height:0;padding:0}
 .acts .icb{width:34px;height:34px}
 @media(max-width:640px){.icb{width:34px;height:34px}.tb.grp{gap:3px}.icb[data-tip]::after{display:none}}
+.agbar{gap:8px}
+.agdate{position:relative}
+.agdate>.btn{min-height:38px}
+.calpop{position:absolute;top:calc(100% + 8px);left:0;z-index:35;width:296px;max-width:calc(100vw - 36px);background:var(--sf);border:1px solid var(--bd);border-radius:12px;box-shadow:0 14px 34px rgba(6,20,35,.22);padding:10px 10px 8px;animation:calin .14s ease}
+@keyframes calin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.calpop .ch{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.calpop .ch b{font-size:14px;text-transform:capitalize}
+.calpop .cw{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.calpop .cw span{font-size:11px;font-weight:600;color:var(--sec);text-align:center;padding:4px 0 2px}
+.calpop .cd{position:relative;min-height:36px;border:0;border-radius:8px;background:none;color:var(--tx);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer;padding:8px 0 10px;transition:background .12s,color .12s}
+.calpop .cd:hover{background:var(--pri2);color:var(--pri)}
+.calpop .cd:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+.calpop .cd.out{color:var(--sec);opacity:.5}
+.calpop .cd.today{box-shadow:inset 0 0 0 1px var(--pri)}
+.calpop .cd.sel,.calpop .cd.sel:hover{background:var(--pri);color:var(--onp);font-weight:700;box-shadow:none}
+.calpop .dot{position:absolute;left:50%;bottom:5px;translate:-50% 0;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.5}
+.calpop .sel .dot{opacity:.9}
+.calpop .cf{display:flex;align-items:center;justify-content:space-between;gap:6px;border-top:1px solid var(--bd);margin-top:8px;padding-top:8px}
+@media(max-width:640px){.calpop{width:280px}}
+@media(prefers-reduced-motion:reduce){.calpop{animation:none}}
 .ab{position:sticky;top:57px;z-index:4;display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:8px 16px;background:var(--pri2);border-bottom:1px solid var(--bd);border-left:5px solid var(--pri)}
 .ai{width:36px;height:36px;border-radius:50%;background:var(--pri);color:var(--onp);display:grid;place-items:center;font-weight:700;flex:none}
 .am{flex:1;min-width:200px}.ab .btn{min-height:34px;padding:0 10px;font-size:13px}.ph{position:static}
@@ -415,8 +435,8 @@ const hh=s=>s?String(s).slice(0,5):"";
 const hora12=()=>localStorage.getItem("fmtHora")!=="24";
 const fmtHora=s=>{if(!s||s=="—")return s||"—";const p=String(s).slice(0,5).split(":");let h=+p[0];const m=p[1]||"00";if(!hora12())return String(h).padStart(2,"0")+":"+m;const ap=h>=12?"PM":"AM";h=h%12||12;return h+":"+m+" "+ap};
 const splitTime=s=>{const p=String(s||"09:00").slice(0,5).split(":");const hi=+p[0];return{h12:hi%12||12,mm:p[1]||"00",ap:hi>=12?"PM":"AM"}};
-const ftime=(id,val)=>{const {h12,mm,ap}=splitTime(val);const hs=Array.from({length:12},(_,i)=>i+1);const ms=["00","15","30","45"];return `<div class="tb" style="gap:6px"><select id="${id}_h" style="width:68px">${hs.map(h=>`<option${h==h12?" selected":""}>${h}</option>`).join("")}</select><span>:</span><select id="${id}_m" style="width:68px">${ms.map(m=>`<option${m==mm?" selected":""}>${m}</option>`).join("")}</select><select id="${id}_ap" style="width:68px">${["AM","PM"].map(a=>`<option${a==ap?" selected":""}>${a}</option>`).join("")}</select></div>`};
-const readTime=id=>{const h=+document.getElementById(id+"_h").value;const m=document.getElementById(id+"_m").value;const ap=document.getElementById(id+"_ap").value;let h24=ap=="PM"?(h%12)+12:h%12;return String(h24).padStart(2,"0")+":"+m};
+const ftime=(id,val)=>{const {h12,mm,ap}=splitTime(val);const hs=Array.from({length:12},(_,i)=>i+1);const ms=Array.from({length:60},(_,i)=>String(i).padStart(2,"0"));return `<div class="tb" style="gap:6px"><select id="${id}_h" style="width:68px" aria-label="Hora">${hs.map(h=>`<option${h==h12?" selected":""}>${h}</option>`).join("")}</select><span aria-hidden="true">:</span><select id="${id}_m" style="width:68px" aria-label="Minutos">${ms.map(m=>`<option${m==mm?" selected":""}>${m}</option>`).join("")}</select><select id="${id}_ap" style="width:68px" aria-label="AM o PM">${["AM","PM"].map(a=>`<option${a==ap?" selected":""}>${a}</option>`).join("")}</select></div>`};
+const readTime=id=>{const he=document.getElementById(id+"_h"),me=document.getElementById(id+"_m"),ae=document.getElementById(id+"_ap");if(!he||!me||!ae)return"09:00";const h=Math.min(12,Math.max(1,parseInt(he.value,10)||12));const m=Math.min(59,Math.max(0,parseInt(me.value,10)||0));const ap=ae.value=="PM"?"PM":"AM";const h24=ap=="PM"?(h%12)+12:h%12;return String(h24).padStart(2,"0")+":"+String(m).padStart(2,"0")};
 const dias=v=>{if(!v)return 0;const d=new Date(String(v).slice(0,10)+"T00:00:00"),n=new Date();return Math.round((d-n)/86400000)};
 const masDias=n=>{const d=new Date();d.setDate(d.getDate()+(+n||0));return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const verif=r=>r.verificado_por?{u:r.verificado_por,f:r.verificado_en?f2d(String(r.verificado_en).slice(0,10)):""}:null;
@@ -1204,8 +1224,44 @@ function citaErr(c,i){if(!c.f||!c.h)return"Elige la fecha y la hora.";const j=DB
 async function crearCita(c){const e=citaErr(c,null);if(e)return e;const id=await crearK("Q",c);DB.Q.push({...c,id});const p=pk(c.p);if(!["Agendado","Confirmado","En sala de espera","En consulta"].includes(p.ea)&&cambiar(p,"ea","Agendado","Cita "+c.f+" "+c.h))await editarK("P",p);return""}
 const rowC=(q,i)=>{const p=pk(q.p),esH=q.f==hoy&&q.e!="Cancelada",n=esH?NEXT[p.ea]:null;return[fmtHora(q.h),pl(q.p),esc(q.ty||"—"),esc(q.t||"—"),esc(q.dr||"—"),q.e=="Cancelada"?bd("Cancelada"):(esH?chip(EA,p.ea):bd("Programada")),`<div class="acts">${n?`<button class="btn p" data-a="qe:${p.id}">${NL[n]}</button>`:""}<button class="btn" data-a="ci:${i}">Editar</button>${q.e=="Cancelada"?"":`<button class="btn d" data-a="cc:${i}">Cancelar cita</button>`}</div>`]};
 const vAgenda=()=>{const f=S.ag||(S.ag=iso(hoy)),fd=dmy(f),rows=DB.Q.map((q,i)=>[q,i]).filter(([q])=>q.f==fd&&(!S.ap||!S.only||q.p==S.ap)).sort((a,b)=>a[0].h.localeCompare(b[0].h));
-return sec("Agenda")+`<div class="tb" style="margin-bottom:12px"><button class="btn" data-a="ad:-1">Día anterior</button><input type="date" id="agd" data-ag value="${f}" style="width:170px"><button class="btn" data-a="ad:1">Día siguiente</button><button class="btn" data-a="ad:0">Hoy</button><button class="btn p" data-a="ci">Agendar cita</button></div>`+card(`Citas del ${fd}${fd==hoy?" (hoy)":""} · ${rows.length}`,tbl(["Hora","Paciente","Tipo","Motivo","Médico","Estado",""],rows.map(([q,i])=>rowC(q,i))))+"<br>"+card("Cirugías programadas",tbl(["Fecha","Hora","Paciente","Procedimiento","Sala","Estado"],fa(DB.C).map(x=>[x.f,x.h||"—",pl(x.p),esc(x.t),esc(x.sala||"—"),bd(x.e)])))};
+const fLarga=new Date(f+"T00:00:00").toLocaleDateString("es-DO",{weekday:"short",day:"numeric",month:"short",year:"numeric"}),fBtn=fLarga.charAt(0).toUpperCase()+fLarga.slice(1);
+return sec("Agenda")+`<div class="tb agbar" style="margin-bottom:12px"><div class="tb grp"><button class="icb" data-a="ad:-1" data-tip="Día anterior" aria-label="Día anterior">${ic("chevl",18)}</button><button class="icb" data-a="ad:1" data-tip="Día siguiente" aria-label="Día siguiente">${ic("chevr",18)}</button></div><div class="agdate" id="agwrap"><button class="btn" data-a="agcal" aria-haspopup="dialog" aria-expanded="false" aria-label="Elegir fecha en el calendario">${ic("cal",16)} ${fBtn}</button></div><button class="btn" data-a="ad:0">${ic("calcheck",16)} Hoy</button><button class="btn p" data-a="ci">${ic("plus",16)} Agendar cita</button></div>`+card(`Citas del ${fd}${fd==hoy?" (hoy)":""} · ${rows.length}`,tbl(["Hora","Paciente","Tipo","Motivo","Médico","Estado",""],rows.map(([q,i])=>rowC(q,i))))+"<br>"+card("Cirugías programadas",tbl(["Fecha","Hora","Paciente","Procedimiento","Sala","Estado"],fa(DB.C).map(x=>[x.f,x.h||"—",pl(x.p),esc(x.t),esc(x.sala||"—"),bd(x.e)])))};
 function agDia(n){const d=new Date((S.ag||iso(hoy))+"T00:00:00");if(n==0)S.ag=iso(hoy);else{d.setDate(d.getDate()+n);S.ag=isoD(d)}draw()}
+/* Calendario para elegir el día de la agenda */
+function agCal(){
+  const abierto=document.getElementById("agcal");if(abierto){abierto.remove();return}
+  const wrap=document.getElementById("agwrap");if(!wrap)return;
+  const base=new Date((S.ag||iso(hoy))+"T00:00:00"),hoyD=new Date();
+  let y=base.getFullYear(),mes=base.getMonth();
+  const pad=n=>String(n).padStart(2,"0"),clave=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  const kHoy=clave(hoyD),kSel=S.ag||iso(hoy),cupo={};
+  DB.Q.forEach(q=>{if(q.e!="Cancelada"){const k=d2f(q.f);cupo[k]=(cupo[k]||0)+1}});
+  const MESES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],DS=["L","M","M","J","V","S","D"];
+  const el=document.createElement("div");
+  el.id="agcal";el.className="calpop";el.setAttribute("role","dialog");el.setAttribute("aria-label","Calendario de la agenda");
+  wrap.appendChild(el);
+  const etq=(dt,n)=>`${n} de ${MESES[dt.getMonth()]} de ${dt.getFullYear()}`;
+  const pinta=()=>{
+    const ini=new Date(y,mes,1),desp=(ini.getDay()+6)%7,dias=new Date(y,mes+1,0).getDate(),prev=new Date(y,mes,0).getDate();
+    let c="";
+    for(let i=desp-1;i>=0;i--){const dt=new Date(y,mes-1,prev-i),k=clave(dt);c+=`<button type="button" class="cd out" data-d="${k}" aria-label="${etq(dt,dt.getDate())}">${dt.getDate()}</button>`}
+    for(let n=1;n<=dias;n++){const dt=new Date(y,mes,n),k=clave(dt);
+      c+=`<button type="button" class="cd${k==kHoy?" today":""}${k==kSel?" sel":""}" data-d="${k}" aria-label="${etq(dt,n)}${k==kHoy?" (hoy)":""}"${k==kSel?' aria-current="date"':""}>${n}${cupo[k]?'<i class="dot"></i>':""}</button>`}
+    const fin=(desp+dias)%7,rest=fin?7-fin:0;
+    for(let n=1;n<=rest;n++){const dt=new Date(y,mes+1,n),k=clave(dt);c+=`<button type="button" class="cd out" data-d="${k}" aria-label="${etq(dt,n)}">${n}</button>`}
+    el.innerHTML=`<div class="ch"><button type="button" class="icb" data-m="-1" data-tip="Mes anterior" aria-label="Mes anterior">${ic("chevl",16)}</button><b>${MESES[mes]} ${y}</b><button type="button" class="icb" data-m="1" data-tip="Mes siguiente" aria-label="Mes siguiente">${ic("chevr",16)}</button></div><div class="cw">${DS.map(d=>`<span aria-hidden="true">${d}</span>`).join("")}</div><div class="cw">${c}</div><div class="cf"><button type="button" class="btn" data-m="hoy">${ic("calcheck",15)} Hoy</button><span class="mu">${cupo[kSel]?(cupo[kSel]+" cita"+(cupo[kSel]>1?"s":"")+" ese día"):""}</span></div>`;
+  };
+  pinta();
+  el.onclick=e=>{
+    const mb=e.target.closest("[data-m]"),db=e.target.closest("[data-d]");
+    if(mb){const m=mb.dataset.m;if(m=="hoy"){y=hoyD.getFullYear();mes=hoyD.getMonth()}else{const d=new Date(y,mes+(+m),1);y=d.getFullYear();mes=d.getMonth()}pinta();return}
+    if(db&&db.dataset.d){cerrar();S.ag=db.dataset.d;draw()}
+  };
+  const cerrar=()=>{el.remove();document.removeEventListener("pointerdown",fuera,true);document.removeEventListener("keydown",tecla,true)};
+  const fuera=e=>{if(!el.contains(e.target)&&!e.target.closest('[data-a="agcal"]'))cerrar()};
+  const tecla=e=>{if(e.key=="Escape"){e.stopPropagation();cerrar()}};
+  setTimeout(()=>{document.addEventListener("pointerdown",fuera,true);document.addEventListener("keydown",tecla,true)},0);
+}
 function fCita(i){const nu=i==null,x=nu?{p:S.ap||(DB.P[0]&&DB.P[0].id),f:S.ag?dmy(S.ag):hoy,h:"09:00",du:30,ty:"Control",t:"",dr:dms()[0],e:"Programada"}:DB.Q[i];if(!nu&&!x)return;
 const hs=HORAS.includes(x.h)?HORAS:[x.h,...HORAS];
 const o=modal(`<h3>${nu?"Agendar cita":"Editar cita"}</h3><div class="fg">${fx("ci_p","Paciente *",`<select id="ci_p"${S.ap||!nu?" disabled":""}>${DB.P.map(p=>`<option value="${p.id}"${p.id==x.p?" selected":""}>${esc(p.n)}</option>`).join("")}</select>`)}${fx("ci_f","Fecha *",`<input id="ci_f" type="date" value="${iso(x.f)}">`)}${fx("ci_h","Hora *",ftime("cih",x.h))}${fx("ci_d","Duración",`<select id="ci_d">${["15","30","45","60","90"].map(m=>`<option value="${m}"${m==x.du?" selected":""}>${m} min</option>`).join("")}</select>`)}${fx("ci_t","Tipo de cita",fsel("ci_t",["Primera vez","Control","Posoperatorio","Procedimiento","Evaluación física","Urgencia"],x.ty))}${fx("ci_m","Médico",fsel("ci_m",dms(),x.dr))}</div><label class="mu" for="ci_r">Motivo o notas</label><input id="ci_r" value="${esc(x.t||"")}"><div class="er2" id="ci_e" role="alert"></div><button class="btn p" id="ci_g">Guardar cita</button>`,"w");
@@ -1446,7 +1502,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-r],[data-a
 const[a,v]=(t.dataset.a||"").split(":");
 if(t.dataset.r){ovx();return go(t.dataset.r)}
 if(["np","ci","ev","cx","pz","oz","nui","nud","ef"].includes(a))ovx();
-({adm:()=>{S.open=!S.open;draw()},nu:()=>fUs(),eu:()=>fUs(+v),ant:fAnt,rst,st:vStats,x:ovx,ef:()=>fFac(v?+v:undefined),ep:()=>fProc(v?+v:undefined),imp:fImp,sa:()=>{listaProc().r.forEach(([x,i])=>S.sel.add(i));draw()},sc:()=>{S.sel.clear();draw()},as:asignar,ap:()=>{S.pa.p=+v;go("procedimientos")},pr:async()=>{const x=DB.PP[v];x.e="Realizado";try{await editarK("PP",x);draw()}catch(e){toast(e.message)}},pq:async()=>{const x=DB.PP[v];try{await borrarK("PP",x);DB.PP.splice(v,1);draw()}catch(e){toast(e.message)}},ui:()=>{S.upP=+v;go("estudios-subir")},sv:guardarImg,vw:()=>verImg(+v),ac:()=>{S.ap=+v;S.pa.p=+v;draw()},ca:()=>{S.ap=null;if(S.route.split("-")[0]=="p")go("pacientes");else draw()},er:()=>{const[k,i]=v.split("."),x=DB[k][+i];k=="B"?fFac(+i):k=="C"?fCir(+i):k=="E"&&x&&x.d?(S.evi=+i,go("evaluacion-"+(x.tp=="Física"?"fis":"med"))):fReg(k,+i)},vf:async()=>{const[k,i]=v.split("."),x=DB[k][+i];try{await verificarK(k,x,!x.v);draw()}catch(e){toast(e.message)}},sd:subirDoc,dd:()=>bajarDoc(+v),dx:()=>{const x=DB.D[+v];conf("¿Eliminar el documento “"+x.t+"”?",async()=>{try{await borrarK("D",x);DB.D.splice(+v,1);draw()}catch(e){toast(e.message)}})},ud:()=>{S.ap=+v;go("documentos")},rp:()=>resetPw(+v),oa1:()=>{listaOrt().r.forEach(([x,i])=>S.os.add(i));draw()},oc:()=>{S.os.clear();S.ox={};draw()},oas:asignarOrt,ao:()=>{S.ap=+v;go("ortesis")},es:()=>fEst(+v),qe:async()=>{const p=pk(+v),n=NEXT[p.ea];if(n&&cambiar(p,"ea",n,"")){try{await editarK("P",p);draw()}catch(e){toast(e.message)}}},um,np:()=>go("nuevo"),gp,ev:()=>{S.evi=null;go("evaluacion-"+(v=="fis"?"fis":"med"))},ge:()=>guardarEval(v=="fis"?"Física":"Médica"),nm:menuNuevo,pickfile:()=>$("#dfile")?.click(),rxtab:()=>{S.rxTab=v;draw()},rxn:()=>fRx(),rxp:()=>rxPrint(+v),rxe:()=>fRx(+v),recp:()=>recPrint(+v),delp:()=>fDelP(+v),fmt:()=>{localStorage.setItem("fmtHora",hora12()?"24":"12");draw()},facp:()=>facPrint(+v),ci:()=>fCita(v===undefined||v===""?undefined:+v),cc:()=>cancelarCita(+v),ad:()=>agDia(+v),cx:()=>fCir(undefined,v?+v:undefined),pz:()=>go("procedimientos"),oz:()=>go("ortesis"),nui:()=>go("estudios-subir"),nud:()=>go("documentos"),pal,mn:()=>$("#side").classList.toggle("open"),
+({adm:()=>{S.open=!S.open;draw()},nu:()=>fUs(),eu:()=>fUs(+v),ant:fAnt,rst,st:vStats,x:ovx,ef:()=>fFac(v?+v:undefined),ep:()=>fProc(v?+v:undefined),imp:fImp,sa:()=>{listaProc().r.forEach(([x,i])=>S.sel.add(i));draw()},sc:()=>{S.sel.clear();draw()},as:asignar,ap:()=>{S.pa.p=+v;go("procedimientos")},pr:async()=>{const x=DB.PP[v];x.e="Realizado";try{await editarK("PP",x);draw()}catch(e){toast(e.message)}},pq:async()=>{const x=DB.PP[v];try{await borrarK("PP",x);DB.PP.splice(v,1);draw()}catch(e){toast(e.message)}},ui:()=>{S.upP=+v;go("estudios-subir")},sv:guardarImg,vw:()=>verImg(+v),ac:()=>{S.ap=+v;S.pa.p=+v;draw()},ca:()=>{S.ap=null;if(S.route.split("-")[0]=="p")go("pacientes");else draw()},er:()=>{const[k,i]=v.split("."),x=DB[k][+i];k=="B"?fFac(+i):k=="C"?fCir(+i):k=="E"&&x&&x.d?(S.evi=+i,go("evaluacion-"+(x.tp=="Física"?"fis":"med"))):fReg(k,+i)},vf:async()=>{const[k,i]=v.split("."),x=DB[k][+i];try{await verificarK(k,x,!x.v);draw()}catch(e){toast(e.message)}},sd:subirDoc,dd:()=>bajarDoc(+v),dx:()=>{const x=DB.D[+v];conf("¿Eliminar el documento “"+x.t+"”?",async()=>{try{await borrarK("D",x);DB.D.splice(+v,1);draw()}catch(e){toast(e.message)}})},ud:()=>{S.ap=+v;go("documentos")},rp:()=>resetPw(+v),oa1:()=>{listaOrt().r.forEach(([x,i])=>S.os.add(i));draw()},oc:()=>{S.os.clear();S.ox={};draw()},oas:asignarOrt,ao:()=>{S.ap=+v;go("ortesis")},es:()=>fEst(+v),qe:async()=>{const p=pk(+v),n=NEXT[p.ea];if(n&&cambiar(p,"ea",n,"")){try{await editarK("P",p);draw()}catch(e){toast(e.message)}}},um,np:()=>go("nuevo"),gp,ev:()=>{S.evi=null;go("evaluacion-"+(v=="fis"?"fis":"med"))},ge:()=>guardarEval(v=="fis"?"Física":"Médica"),nm:menuNuevo,pickfile:()=>$("#dfile")?.click(),rxtab:()=>{S.rxTab=v;draw()},rxn:()=>fRx(),rxp:()=>rxPrint(+v),rxe:()=>fRx(+v),recp:()=>recPrint(+v),delp:()=>fDelP(+v),fmt:()=>{localStorage.setItem("fmtHora",hora12()?"24":"12");draw()},facp:()=>facPrint(+v),ci:()=>fCita(v===undefined||v===""?undefined:+v),cc:()=>cancelarCita(+v),ad:()=>agDia(+v),agcal:()=>agCal(),cx:()=>fCir(undefined,v?+v:undefined),pz:()=>go("procedimientos"),oz:()=>go("ortesis"),nui:()=>go("estudios-subir"),nud:()=>go("documentos"),pal,mn:()=>$("#side").classList.toggle("open"),
 rev:async()=>{const x=DB.I[v];x.r="Revisado";try{await editarK("I",x);draw()}catch(e){toast(e.message)}},cob:async()=>{const x=DB.B[v];x.e="Cobrado";try{await editarK("B",x);draw()}catch(e){toast(e.message)}} })[a]?.()});
 document.addEventListener("click",e=>{const t=e.target.closest("[data-a]");if(!t)return;const[a,v]=(t.dataset.a||"").split(":");
 if(a=="rsec"){e.preventDefault();resetSeg(+v)}
