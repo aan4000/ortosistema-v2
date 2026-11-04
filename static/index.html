@@ -78,7 +78,7 @@ ul.l{list-style:none;margin:0;padding:0}ul.l li{padding:6px 0;border-bottom:1px 
 .tabs button{border:0;border-bottom:3px solid transparent;background:none;min-height:44px;padding:0 14px;color:var(--sec);font:inherit;cursor:pointer;white-space:nowrap}
 .tabs .on{color:var(--pri);border-color:var(--pri);font-weight:600}
 .kb{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.kb .card{margin-bottom:8px}
-.ov{position:fixed;inset:0;z-index:20;display:flex;justify-content:center;align-items:flex-start;padding:10vh 12px;background:rgba(0,0,0,.45)}
+.ov{position:fixed;inset:0;z-index:9999;display:flex;justify-content:center;align-items:flex-start;padding:10vh 12px;background:rgba(0,0,0,.45)}
 .ov.r{justify-content:flex-end;padding:0}.ov.r .md{border-radius:0;width:min(360px,100%);max-height:none}
 .md{width:min(480px,100%);max-height:80%;overflow:auto;background:var(--sf);border-radius:8px;padding:16px}
 .md label{display:block;margin:8px 0;font-size:13px;color:var(--sec)}
@@ -789,7 +789,7 @@ gestion:()=>card("Referimientos",tk("R",id,["Fecha","Detalle","Estado"],x=>[x.f,
 ortesis:()=>`<p><button class="btn p" data-a="ao:${id}">${ic("plus",16)} Asignar órtesis</button></p>`+card("Órtesis indicadas",tk("OP",id,["Fecha","Órtesis","Lado","Talla","Médico","Estado"],x=>[x.f,`<span class="ocell">${ortImg(x.n,"sm")}<span>${esc(x.n)}</span></span>`,esc(x.lado||"—"),esc(x.talla||"—"),esc(x.dr||"—"),bd(x.e)])),
 documentos:()=>`<p><button class="btn p" data-a="ud:${id}">${ic("up",16)} Subir documento</button></p>`+card("Documentos del paciente",tDocs(DB.D.map((x,i)=>[x,i]).filter(([x])=>x.p==id),false))
 };
-return `<div class="card ph"><div class="row"><div class="phid">${avSexo(p.sx,"sm")}<div><h2>${esc(p.n)}</h2><span class="mu">${p.cd?`<span class="code">${esc(p.cd)}</span> `:""}${p.e} años · Cédula ${esc(p.c)} · ${esc(p.s)}</span></div></div><div class="tb"><button class="btn p" data-a="ev:med">${ic("stethoscope",14)} Evaluación médica</button><button class="btn" data-a="ev:fis">Evaluación física</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
+return `<div class="card ph"><div class="row"><div class="phid">${avSexo(p.sx,"sm")}<div><h2>${esc(p.n)}</h2><span class="mu">${p.cd?`<span class="code">${esc(p.cd)}</span> `:""}${p.e} años · Cédula ${esc(p.c)} · ${esc(p.s)}</span></div></div><div class="tb"><button class="btn p" data-a="ev:med" data-ic="1">${ic(DB.E.some(e=>e.p==p.id&&e.tp=="Médica")?"usercheck":"stethoscope",14)} Evaluación médica</button><button class="btn" data-a="ev:fis">Evaluación física</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
 <div class="stp">${ST.map((s,i)=>`<span class="${i<p.st?"d":i==p.st?"c":""}">${s}</span>`).join("")}</div>
 <div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="p-${id}-${k}">${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p>${(B2[tab]||B2.resumen)()}`}
 
