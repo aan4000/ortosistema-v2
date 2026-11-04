@@ -4,6 +4,7 @@ import getpass
 import os
 import sys
 import time
+import unicodedata
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -80,9 +81,22 @@ GESTION = {"pacientes", "citas", "referimientos", "autorizaciones_preauth",
 PERMISOS = {  # los permisos se aplican aquí, en el servidor
     "admin": {"leer": "*", "escribir": "*"},
     "medico": {"leer": "*", "escribir": CLINICAS | {"autorizaciones_preauth"}},
-    "secretaria": {"leer": GESTION, "escribir": GESTION},
-    "fisio": {"leer": {"pacientes", "citas", "pt_sesiones", "formularios_proms", "ortesis_paciente"},
-              "escribir": {"pt_sesiones", "formularios_proms", "ortesis_paciente"}},
+    "enfermeria": {  # apoyo clínico: consulta el expediente y adjunta estudios/documentos
+        "leer": {"pacientes", "citas", "evaluaciones", "estudios_imagenes", "documentos",
+                 "procedimientos_paciente", "ortesis_paciente", "recetas", "referimientos"},
+        "escribir": {"estudios_imagenes", "documentos", "ortesis_paciente"}},
+    "secretaria": {  # recepción y gestión: consulta lo clínico, edita la gestión
+        "leer": GESTION | {"pacientes", "estudios_imagenes", "recetas",
+                           "procedimientos_paciente", "ortesis_paciente"},
+        "escribir": GESTION},
+    "fisio": {
+        "leer": {"pacientes", "citas", "pt_sesiones", "formularios_proms", "ortesis_paciente",
+                 "documentos", "estudios_imagenes"},
+        "escribir": {"pt_sesiones", "formularios_proms", "ortesis_paciente"}},
+    "facturacion": {  # cobros y autorizaciones, sin editar la historia clínica
+        "leer": {"pacientes", "citas", "cargos_facturacion", "tarifario",
+                 "autorizaciones_preauth", "procedimientos_paciente", "referimientos"},
+        "escribir": {"cargos_facturacion", "tarifario", "autorizaciones_preauth"}},
 }
 
 
@@ -103,9 +117,12 @@ MODULOS = {  # función del menú -> tablas que gobierna
 TABLA_MODULO = {t: m for m, ts in MODULOS.items() for t in ts}
 FUNC_INICIAL = {
     "medico": set(MODULOS),
-    "secretaria": {"agenda", "pacientes", "documentos", "referimientos", "autorizaciones",
-                   "facturacion", "recetas"},
-    "fisio": {"agenda", "pacientes", "rehab", "ortesis"},
+    "enfermeria": {"agenda", "pacientes", "estudios", "documentos", "ortesis", "recetas"},
+    "secretaria": {"agenda", "pacientes", "procedimientos", "estudios", "documentos",
+                   "ortesis", "referimientos", "autorizaciones", "facturacion", "recetas"},
+    "fisio": {"agenda", "pacientes", "rehab", "ortesis", "estudios", "documentos"},
+    "facturacion": {"agenda", "pacientes", "procedimientos", "autorizaciones",
+                    "facturacion", "referimientos"},
 }
 FUNC: dict = {}  # rol -> funciones activas (el administrador siempre tiene todas)
 
@@ -150,6 +167,19 @@ def cargar_funciones():
                 c.execute("insert into funciones_rol(rol,modulo) values (%s,'recetas') "
                           "on conflict do nothing", (r,))
             c.execute("insert into funciones_rol(rol,modulo) values ('_up_recetas','_') "
+                      "on conflict do nothing")
+            filas = c.execute("select rol, modulo from funciones_rol").fetchall()
+        if not any(f["rol"] == "_up_perfiles_2026" for f in filas):
+            # Protocolo de mejora de perfiles: agrega los accesos recomendados que falten
+            # sin quitar las funciones que el administrador ya haya personalizado.
+            for r, ms in FUNC_INICIAL.items():
+                for mod in ms:
+                    c.execute("insert into funciones_rol(rol,modulo) values (%s,%s) "
+                              "on conflict do nothing", (r, mod))
+            for mod in ("estudios", "recetas"):
+                c.execute("insert into funciones_rol(rol,modulo) values ('secretaria',%s) "
+                          "on conflict do nothing", (mod,))
+            c.execute("insert into funciones_rol(rol,modulo) values ('_up_perfiles_2026','_') "
                       "on conflict do nothing")
             filas = c.execute("select rol, modulo from funciones_rol").fetchall()
     FUNC.clear()
@@ -203,9 +233,12 @@ def usuario_actual(req: Request, cred: HTTPAuthorizationCredentials = Depends(be
     except jwt.PyJWTError:
         raise HTTPException(401, "Tu sesión venció. Inicia sesión de nuevo")
     with pool.connection() as c:
-        r = c.execute("select rol, activo, debe_cambiar_clave from usuarios where usuario=%s", (u["sub"],)).fetchone()
+        r = c.execute("select rol, activo, debe_cambiar_clave, token_version from usuarios "
+                      "where usuario=%s", (u["sub"],)).fetchone()
     if not r or not r["activo"]:
         raise HTTPException(401, "Tu usuario está desactivado")
+    if int(u.get("ver", 0)) != int(r["token_version"]):
+        raise HTTPException(401, "Tu sesión cambió. Inicia sesión de nuevo")
     if r["debe_cambiar_clave"] and req.url.path not in ("/api/cambiar-clave", "/api/yo"):
         raise HTTPException(403, "Debes cambiar tu contraseña antes de continuar")
     u["rol"] = r["rol"]
@@ -238,15 +271,26 @@ def login(d: Login, req: Request):
         raise HTTPException(401, "Usuario o contraseña incorrectos")
     INTENTOS.pop(k, None)
     exp = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=JWT_HORAS)
-    token = jwt.encode({"sub": u["usuario"], "rol": u["rol"], "nombre": u["nombre"], "exp": exp},
+    token = jwt.encode({"sub": u["usuario"], "rol": u["rol"], "nombre": u["nombre"],
+                        "ver": int(u["token_version"]), "exp": exp},
                        JWT_SECRET, algorithm="HS256")
+    with pool.connection() as c:
+        c.execute("update usuarios set ultimo_ingreso=now() where id=%s", (u["id"],))
     return {"token": token, "rol": u["rol"], "nombre": u["nombre"],
             "debe_cambiar_clave": bool(u.get("debe_cambiar_clave"))}
 
 
 @app.get("/api/yo")
 def yo(u=Depends(usuario_actual)):
+    with pool.connection() as c:
+        p = c.execute("select correo, cargo, telefono, ultimo_ingreso, preguntas_config_en "
+                      "from usuarios where usuario=%s", (u["sub"],)).fetchone()
     return {"usuario": u["sub"], "rol": u["rol"], "nombre": u["nombre"],
+            "correo": p["correo"] if p else None,
+            "cargo": p["cargo"] if p else None,
+            "telefono": p["telefono"] if p else None,
+            "ultimo_ingreso": p["ultimo_ingreso"] if p else None,
+            "preguntas_config": bool(p and p["preguntas_config_en"]),
             "modulos": sorted(MODULOS) if u["rol"] == "admin" else sorted(FUNC.get(u["rol"], set())),
             "es_admin": u["rol"] == "admin"}
 
@@ -362,6 +406,21 @@ def imagen_ver(iid: int, u=Depends(usuario_actual)):
     return Response(bytes(r["datos"]), media_type=r["mime"])
 
 
+@app.delete("/api/imagenes/{iid}")
+def imagen_borrar(iid: int, u=Depends(usuario_actual)):
+    """Elimina una imagen del estudio. El estudio y su informe se conservan."""
+    exigir(u, "escribir", "estudios_imagenes")
+    with pool.connection() as c:
+        r = c.execute("delete from imagenes_estudio where id=%s returning estudio_id", (iid,)).fetchone()
+        if not r:
+            raise HTTPException(404, "Imagen no encontrada")
+        c.execute("update estudios_imagenes set miniatura=null where id=%s "
+                  "and not exists (select 1 from imagenes_estudio where estudio_id=%s)",
+                  (r["estudio_id"], r["estudio_id"]))
+        auditar(c, u, "eliminar-imagen", "imagenes_estudio", iid)
+    return {"ok": True, "estudio_id": r["estudio_id"]}
+
+
 # ---------- Primer uso: registro del administrador ----------
 class RegistroInicial(BaseModel):
     usuario: str
@@ -405,6 +464,9 @@ class NuevoUsuario(BaseModel):
     nombre: str
     rol: str
     password: str
+    correo: str | None = None
+    telefono: str | None = None
+    cargo: str | None = None
 
 
 class CambioUsuario(BaseModel):
@@ -413,6 +475,9 @@ class CambioUsuario(BaseModel):
     activo: bool | None = None
     password: str | None = None
     debe_cambiar_clave: bool | None = None
+    correo: str | None = None
+    telefono: str | None = None
+    cargo: str | None = None
 
 
 def _validar(rol=None, password=None):
@@ -426,8 +491,10 @@ def _validar(rol=None, password=None):
 def usuarios(u=Depends(solo_admin)):
     with pool.connection() as c:
         return {"usuarios": c.execute(
-            "select id,usuario,nombre,rol,activo,debe_cambiar_clave from usuarios "
-            "order by usuario").fetchall()}
+            "select u.id,u.usuario,u.nombre,u.rol,u.activo,u.debe_cambiar_clave,"
+            "u.correo,u.telefono,u.cargo,u.ultimo_ingreso,"
+            "(select count(*) from preguntas_seguridad p where p.usuario_id=u.id) preguntas "
+            "from usuarios u order by u.usuario").fetchall()}
 
 
 @app.post("/api/usuarios")
@@ -437,8 +504,9 @@ def usuario_nuevo(d: NuevoUsuario, u=Depends(solo_admin)):
     with pool.connection() as c:
         if c.execute("select 1 from usuarios where lower(usuario)=%s", (d.usuario.lower(),)).fetchone():
             raise HTTPException(409, "Ese usuario ya existe")
-        r = c.execute("insert into usuarios(usuario,nombre,rol,password_hash) values (%s,%s,%s,%s) returning id",
-                      (d.usuario.lower(), d.nombre, d.rol, h)).fetchone()
+        r = c.execute("insert into usuarios(usuario,nombre,rol,password_hash,correo,telefono,cargo,"
+                      "debe_cambiar_clave) values (%s,%s,%s,%s,%s,%s,%s,true) returning id",
+                      (d.usuario.lower(), d.nombre, d.rol, h, d.correo, d.telefono, d.cargo)).fetchone()
         auditar(c, u, "crear", "usuarios", r["id"])
     return {"ok": True, "id": r["id"]}
 
@@ -455,6 +523,12 @@ def usuario_editar(uid: int, d: CambioUsuario, u=Depends(solo_admin)):
         campos["activo"] = d.activo
     if d.debe_cambiar_clave is not None:
         campos["debe_cambiar_clave"] = d.debe_cambiar_clave
+    if d.correo is not None:
+        campos["correo"] = d.correo.strip() or None
+    if d.telefono is not None:
+        campos["telefono"] = d.telefono.strip() or None
+    if d.cargo is not None:
+        campos["cargo"] = d.cargo.strip() or None
     if d.password is not None:
         campos["password_hash"] = bcrypt.hashpw(d.password.encode(), bcrypt.gensalt()).decode()
         campos["debe_cambiar_clave"] = True
@@ -469,9 +543,32 @@ def usuario_editar(uid: int, d: CambioUsuario, u=Depends(solo_admin)):
                           (uid,)).fetchone()["n"]
         if not sigue_admin and not otros:
             raise HTTPException(400, "Debe quedar al menos un administrador activo")
-        c.execute(f"update usuarios set {','.join(k + '=%s' for k in campos)} where id=%s",
+        sql = [k + "=%s" for k in campos]
+        # Cambiar la clave o desactivar invalida las sesiones abiertas.
+        if d.password is not None or d.activo is False:
+            sql.append("token_version=token_version+1")
+        c.execute(f"update usuarios set {','.join(sql)} where id=%s",
                   list(campos.values()) + [uid])
         auditar(c, u, "editar", "usuarios", uid)
+    return {"ok": True}
+
+
+@app.delete("/api/usuarios/{uid}")
+def usuario_borrar(uid: int, u=Depends(solo_admin)):
+    """Elimina una cuenta. Nunca permite borrar la propia ni al último administrador activo."""
+    with pool.connection() as c:
+        a = c.execute("select usuario,rol,activo from usuarios where id=%s", (uid,)).fetchone()
+        if not a:
+            raise HTTPException(404, "Usuario no encontrado")
+        if a["usuario"] == u["sub"]:
+            raise HTTPException(400, "No puedes eliminar tu propia cuenta")
+        if a["rol"] == "admin" and a["activo"]:
+            otros = c.execute("select count(*) n from usuarios where rol='admin' and activo and id<>%s",
+                              (uid,)).fetchone()["n"]
+            if not otros:
+                raise HTTPException(400, "Debe quedar al menos un administrador activo")
+        c.execute("delete from usuarios where id=%s", (uid,))
+        auditar(c, u, "eliminar", "usuarios", uid)
     return {"ok": True}
 
 
@@ -481,12 +578,74 @@ def restablecer_clave(uid: int, u=Depends(solo_admin)):
     temporal = secrets.token_urlsafe(9)
     h = bcrypt.hashpw(temporal.encode(), bcrypt.gensalt()).decode()
     with pool.connection() as c:
-        r = c.execute("update usuarios set password_hash=%s, debe_cambiar_clave=true where id=%s returning id",
+        r = c.execute("update usuarios set password_hash=%s, debe_cambiar_clave=true, "
+                      "token_version=token_version+1 where id=%s returning id",
                       (h, uid)).fetchone()
         if not r:
             raise HTTPException(404, "Usuario no encontrado")
         auditar(c, u, "restablecer-clave", "usuarios", uid)
     return {"ok": True, "clave_temporal": temporal}
+
+
+@app.post("/api/usuarios/{uid}/desbloquear")
+def usuario_desbloquear(uid: int, u=Depends(solo_admin)):
+    """Libera los intentos fallidos de inicio de sesión de una cuenta."""
+    with pool.connection() as c:
+        a = c.execute("select usuario from usuarios where id=%s", (uid,)).fetchone()
+        if not a:
+            raise HTTPException(404, "Usuario no encontrado")
+        c.execute("update usuarios set bloqueado_hasta=null where id=%s", (uid,))
+        auditar(c, u, "desbloquear", "usuarios", uid)
+    liberados = 0
+    for k in list(INTENTOS):
+        if k[0] == a["usuario"].lower():
+            INTENTOS.pop(k, None)
+            liberados += 1
+    return {"ok": True, "liberados": liberados}
+
+
+@app.post("/api/usuarios/{uid}/reset-seguridad")
+def usuario_reset_seguridad(uid: int, u=Depends(solo_admin)):
+    """Borra las preguntas de seguridad de un usuario para que las configure de nuevo."""
+    with pool.connection() as c:
+        r = c.execute("select id from usuarios where id=%s", (uid,)).fetchone()
+        if not r:
+            raise HTTPException(404, "Usuario no encontrado")
+        c.execute("delete from preguntas_seguridad where usuario_id=%s", (uid,))
+        c.execute("update usuarios set preguntas_config_en=null where id=%s", (uid,))
+        auditar(c, u, "reset-preguntas", "usuarios", uid)
+    return {"ok": True}
+
+
+@app.get("/api/auditoria")
+def ver_auditoria(limite: int = Query(60, ge=1, le=300), u=Depends(solo_admin)):
+    with pool.connection() as c:
+        filas = c.execute("select id,usuario,accion,tabla,registro_id,fecha from auditoria "
+                          "order by id desc limit %s", (limite,)).fetchall()
+    return {"eventos": filas}
+
+
+@app.get("/api/admin/resumen")
+def admin_resumen(u=Depends(solo_admin)):
+    """Panel rápido del administrador: cuentas, seguridad y actividad reciente."""
+    with pool.connection() as c:
+        total = c.execute("select count(*) n from usuarios").fetchone()["n"]
+        activos = c.execute("select count(*) n from usuarios where activo").fetchone()["n"]
+        roles = {r["rol"]: r["n"] for r in c.execute(
+            "select rol,count(*) n from usuarios group by rol order by rol").fetchall()}
+        sin_preguntas = c.execute(
+            "select count(*) n from usuarios u where u.activo and not exists "
+            "(select 1 from preguntas_seguridad p where p.usuario_id=u.id)").fetchone()["n"]
+        pendientes = c.execute("select count(*) n from usuarios where debe_cambiar_clave").fetchone()["n"]
+        recup = c.execute("select count(*) n from recuperaciones where creado_en > now() - interval '7 days'"
+                          ).fetchone()["n"]
+        ultimos = c.execute("select id,usuario,accion,tabla,registro_id,fecha from auditoria "
+                            "order by id desc limit 8").fetchall()
+        datos = {t: c.execute(f"select count(*) n from {t}").fetchone()["n"]
+                 for t in ("pacientes", "citas", "cirugias", "estudios_imagenes")}
+    return {"usuarios": total, "activos": activos, "roles": roles,
+            "sin_preguntas": sin_preguntas, "deben_cambiar": pendientes,
+            "recuperaciones_7d": recup, "ultimos": ultimos, "datos": datos}
 
 
 class CambioClave(BaseModel):
@@ -501,13 +660,199 @@ def cambiar_clave(d: CambioClave, u=Depends(usuario_actual)):
     if d.actual == d.nueva:
         raise HTTPException(400, "Elige una contraseña distinta a la actual")
     with pool.connection() as c:
-        r = c.execute("select password_hash from usuarios where usuario=%s", (u["sub"],)).fetchone()
+        r = c.execute("select nombre,rol,password_hash,token_version from usuarios where usuario=%s",
+                      (u["sub"],)).fetchone()
         if not bcrypt.checkpw(d.actual.encode(), r["password_hash"].encode()):
             raise HTTPException(400, "La contraseña actual no es correcta")
-        c.execute("update usuarios set password_hash=%s, debe_cambiar_clave=false where usuario=%s",
-                  (bcrypt.hashpw(d.nueva.encode(), bcrypt.gensalt()).decode(), u["sub"]))
+        ver = int(r["token_version"]) + 1
+        c.execute("update usuarios set password_hash=%s, debe_cambiar_clave=false, token_version=%s "
+                  "where usuario=%s", (bcrypt.hashpw(d.nueva.encode(), bcrypt.gensalt()).decode(),
+                                       ver, u["sub"]))
         auditar(c, u, "cambiar-clave", "usuarios")
+    exp = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=JWT_HORAS)
+    token = jwt.encode({"sub": u["sub"], "rol": r["rol"], "nombre": r["nombre"], "ver": ver, "exp": exp},
+                       JWT_SECRET, algorithm="HS256")
+    return {"ok": True, "token": token}
+
+
+# ---------- Preguntas de seguridad y recuperación de contraseña ----------
+PREGUNTAS_SEGURIDAD = [
+    "¿Cuál es el nombre de tu primera mascota?",
+    "¿En qué ciudad naciste?",
+    "¿Cuál es el nombre de tu madre?",
+    "¿Cuál fue el nombre de tu primer colegio?",
+    "¿Cuál es tu comida favorita?",
+    "¿Cuál es el nombre de tu mejor amigo de la infancia?",
+    "¿Cuál fue el modelo de tu primer vehículo?",
+    "¿En qué hospital o clínica trabajaste por primera vez?",
+    "¿Cuál es el nombre de tu abuelo o abuela favorito?",
+    "¿Cuál es tu equipo deportivo favorito?",
+]
+
+
+def normalizar_respuesta(t: str) -> str:
+    """Compara respuestas sin importar mayúsculas, tildes ni espacios repetidos."""
+    t = unicodedata.normalize("NFKD", str(t or ""))
+    t = "".join(c for c in t if not unicodedata.combining(c))
+    return " ".join(t.lower().strip().split())
+
+
+class PreguntaSeguridad(BaseModel):
+    pregunta: str
+    respuesta: str
+
+
+class GuardarSeguridad(BaseModel):
+    actual: str
+    preguntas: list[PreguntaSeguridad]
+
+
+class RecuperarInicio(BaseModel):
+    usuario: str
+
+
+class RespuestaRecuperacion(BaseModel):
+    id: int
+    respuesta: str
+
+
+class RecuperarVerificar(BaseModel):
+    token: str
+    respuestas: list[RespuestaRecuperacion]
+
+
+class RecuperarClave(BaseModel):
+    token: str
+    nueva: str
+
+
+RECUPERACION: dict = {}  # (usuario, ip) -> (fallos, último_intento)
+
+
+def _limitar_recuperacion(k) -> int:
+    fallos, t = RECUPERACION.get(k, (0, 0))
+    if time.time() - t > 900:
+        fallos = 0
+    if fallos >= 6:
+        raise HTTPException(429, "Demasiados intentos. Espera 15 minutos")
+    return fallos
+
+
+@app.get("/api/seguridad")
+def seguridad_ver(u=Depends(usuario_actual)):
+    with pool.connection() as c:
+        uid = c.execute("select id from usuarios where usuario=%s", (u["sub"],)).fetchone()["id"]
+        filas = c.execute("select id,orden,pregunta from preguntas_seguridad "
+                          "where usuario_id=%s order by orden", (uid,)).fetchall()
+    return {"configurado": len(filas) >= 3, "preguntas": filas,
+            "catalogo": PREGUNTAS_SEGURIDAD}
+
+
+@app.put("/api/seguridad")
+def seguridad_guardar(d: GuardarSeguridad, u=Depends(usuario_actual)):
+    """Configura 3 preguntas de seguridad. Las respuestas se guardan con bcrypt."""
+    if len(d.preguntas) < 3:
+        raise HTTPException(400, "Elige al menos 3 preguntas de seguridad")
+    preguntas = [p.pregunta.strip() for p in d.preguntas]
+    if len(set(preguntas)) != len(preguntas):
+        raise HTTPException(400, "No repitas la misma pregunta")
+    if any(len(normalizar_respuesta(p.respuesta)) < 3 for p in d.preguntas):
+        raise HTTPException(400, "Las respuestas deben tener al menos 3 caracteres")
+    with pool.connection() as c:
+        r = c.execute("select id,password_hash from usuarios where usuario=%s", (u["sub"],)).fetchone()
+        if not bcrypt.checkpw(d.actual.encode(), r["password_hash"].encode()):
+            raise HTTPException(400, "La contraseña actual no es correcta")
+        c.execute("delete from preguntas_seguridad where usuario_id=%s", (r["id"],))
+        for i, p in enumerate(d.preguntas, 1):
+            h = bcrypt.hashpw(normalizar_respuesta(p.respuesta).encode(), bcrypt.gensalt()).decode()
+            c.execute("insert into preguntas_seguridad(usuario_id,orden,pregunta,respuesta_hash) "
+                      "values (%s,%s,%s,%s)", (r["id"], i, p.pregunta.strip(), h))
+        c.execute("update usuarios set preguntas_config_en=now() where id=%s", (r["id"],))
+        auditar(c, u, "configurar-preguntas", "usuarios", r["id"])
     return {"ok": True}
+
+
+@app.post("/api/recuperar/iniciar")
+def recuperar_iniciar(d: RecuperarInicio, req: Request):
+    ip = req.client.host if req.client else ""
+    usuario = d.usuario.lower().strip()
+    k = (usuario, ip)
+    fallos = _limitar_recuperacion(k)
+    with pool.connection() as c:
+        usr = c.execute("select id,usuario,activo,token_version from usuarios "
+                        "where lower(usuario)=%s", (usuario,)).fetchone()
+        filas = c.execute("select id,orden,pregunta from preguntas_seguridad "
+                          "where usuario_id=%s order by orden", (usr["id"],)).fetchall() if usr else []
+    if not usr or not usr["activo"] or len(filas) < 3:
+        RECUPERACION[k] = (fallos + 1, time.time())
+        with pool.connection() as c:
+            c.execute("insert into recuperaciones(usuario,ip,exito) values (%s,%s,false)", (usuario, ip))
+        raise HTTPException(400, "No pudimos iniciar la recuperación. Verifica el usuario o pide ayuda al administrador")
+    exp = dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=10)
+    token = jwt.encode({"sub": usr["usuario"], "purpose": "recuperar",
+                        "ids": [f["id"] for f in filas], "ver": int(usr["token_version"]), "exp": exp},
+                       JWT_SECRET, algorithm="HS256")
+    return {"token": token, "usuario": usr["usuario"],
+            "preguntas": [{"id": f["id"], "pregunta": f["pregunta"]} for f in filas]}
+
+
+@app.post("/api/recuperar/verificar")
+def recuperar_verificar(d: RecuperarVerificar, req: Request):
+    ip = req.client.host if req.client else ""
+    try:
+        p = jwt.decode(d.token, JWT_SECRET, algorithms=["HS256"])
+    except jwt.PyJWTError:
+        raise HTTPException(400, "La recuperación venció. Empieza de nuevo")
+    if p.get("purpose") != "recuperar":
+        raise HTTPException(400, "Enlace de recuperación inválido")
+    k = (p["sub"].lower(), ip)
+    fallos = _limitar_recuperacion(k)
+    with pool.connection() as c:
+        usr = c.execute("select id,activo,token_version from usuarios where usuario=%s",
+                        (p["sub"],)).fetchone()
+        if not usr or not usr["activo"] or int(usr["token_version"]) != int(p.get("ver", -1)):
+            raise HTTPException(400, "La recuperación ya no es válida. Empieza de nuevo")
+        filas = c.execute("select id,respuesta_hash from preguntas_seguridad "
+                          "where usuario_id=%s and id = any(%s)",
+                          (usr["id"], p.get("ids") or [])).fetchall()
+    respuestas = {int(r.id): r.respuesta for r in d.respuestas}
+    ok = len(filas) >= 3 and all(
+        int(f["id"]) in respuestas and bcrypt.checkpw(
+            normalizar_respuesta(respuestas[int(f["id"])]).encode(), f["respuesta_hash"].encode())
+        for f in filas)
+    if not ok:
+        RECUPERACION[k] = (fallos + 1, time.time())
+        with pool.connection() as c:
+            c.execute("insert into recuperaciones(usuario,ip,exito) values (%s,%s,false)", (p["sub"], ip))
+        raise HTTPException(400, "Alguna respuesta no coincide. Revisa e intenta de nuevo")
+    RECUPERACION.pop(k, None)
+    with pool.connection() as c:
+        c.execute("insert into recuperaciones(usuario,ip,exito) values (%s,%s,true)", (p["sub"], ip))
+    exp = dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=15)
+    token = jwt.encode({"sub": p["sub"], "purpose": "restablecer",
+                        "ver": int(usr["token_version"]), "exp": exp}, JWT_SECRET, algorithm="HS256")
+    return {"ok": True, "token": token}
+
+
+@app.post("/api/recuperar/restablecer")
+def recuperar_restablecer(d: RecuperarClave):
+    _validar(None, d.nueva)
+    try:
+        p = jwt.decode(d.token, JWT_SECRET, algorithms=["HS256"])
+    except jwt.PyJWTError:
+        raise HTTPException(400, "La recuperación venció. Empieza de nuevo")
+    if p.get("purpose") != "restablecer":
+        raise HTTPException(400, "Enlace de recuperación inválido")
+    with pool.connection() as c:
+        usr = c.execute("select id,activo,token_version from usuarios where usuario=%s",
+                        (p["sub"],)).fetchone()
+        if not usr or not usr["activo"] or int(usr["token_version"]) != int(p.get("ver", -1)):
+            raise HTTPException(400, "La recuperación ya no es válida. Empieza de nuevo")
+        c.execute("update usuarios set password_hash=%s, debe_cambiar_clave=false, "
+                  "token_version=token_version+1 where id=%s",
+                  (bcrypt.hashpw(d.nueva.encode(), bcrypt.gensalt()).decode(), usr["id"]))
+        auditar(c, {"sub": p["sub"]}, "recuperar-clave", "usuarios", usr["id"])
+    return {"ok": True, "usuario": p["sub"]}
 
 
 class Funciones(BaseModel):
@@ -515,10 +860,22 @@ class Funciones(BaseModel):
     modulos: list[str]
 
 
+ROLES_DESC = {
+    "admin": "Control total: usuarios, perfiles, seguridad, auditoría y todas las secciones clínicas.",
+    "medico": "Historia clínica completa: evaluaciones, cirugías, estudios, recetas y autorizaciones.",
+    "enfermeria": "Apoyo clínico: consulta el expediente y adjunta estudios, documentos y órtesis.",
+    "secretaria": "Recepción y gestión: agenda, pacientes, documentos, referimientos, cobros y recetas.",
+    "fisio": "Rehabilitación: sesiones, PROMs, órtesis y consulta de documentos y estudios.",
+    "facturacion": "Cobros y autorizaciones: cargos, tarifario y preautorizaciones, sin editar la clínica.",
+}
+
+
 @app.get("/api/funciones")
 def funciones(u=Depends(solo_admin)):
     return {"modulos": list(MODULOS),
-            "roles": {r: sorted(FUNC.get(r, set())) for r in PERMISOS if r != "admin"}}
+            "roles": {r: sorted(FUNC.get(r, set())) for r in PERMISOS if r != "admin"},
+            "descripciones": ROLES_DESC,
+            "recomendados": {r: sorted(ms) for r, ms in FUNC_INICIAL.items()}}
 
 
 @app.put("/api/funciones")
@@ -535,6 +892,21 @@ def funciones_guardar(d: Funciones, u=Depends(solo_admin)):
         auditar(c, u, "funciones", "funciones_rol")
     FUNC[d.rol] = set(d.modulos)
     return {"ok": True}
+
+
+@app.post("/api/funciones/restaurar")
+def funciones_restaurar(u=Depends(solo_admin)):
+    """Restaura los accesos recomendados de cada rol (no toca al administrador)."""
+    with pool.connection() as c:
+        for r, ms in FUNC_INICIAL.items():
+            c.execute("delete from funciones_rol where rol=%s", (r,))
+            for mod in sorted(ms):
+                c.execute("insert into funciones_rol(rol,modulo) values (%s,%s)", (r, mod))
+        auditar(c, u, "restaurar-funciones", "funciones_rol")
+    FUNC.clear()
+    for r, ms in FUNC_INICIAL.items():
+        FUNC[r] = set(ms)
+    return {"ok": True, "roles": {r: sorted(ms) for r, ms in FUNC_INICIAL.items()}}
 
 
 # ---------- Datos ----------

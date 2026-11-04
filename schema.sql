@@ -213,3 +213,50 @@ create index if not exists ix_recetas_pac on recetas(paciente_id);
 -- Codigo de paciente: rellenar los que no lo tengan y sincronizar la secuencia.
 update pacientes set codigo = 'P-' || lpad(id::text, 4, '0') where codigo is null;
 select setval('paciente_codigo_seq', coalesce((select max(id) from pacientes), 1));
+
+-- ============================================================
+-- Perfiles, seguridad y recuperacion de acceso (actualizacion 2026)
+-- ============================================================
+
+-- Roles nuevos: enfermeria (apoyo clinico) y facturacion (gestion de cobros).
+-- El bloque solo cambia la restriccion si aun no incluye los roles nuevos.
+do $$
+declare def text;
+begin
+  select pg_get_constraintdef(oid) into def
+    from pg_constraint where conname = 'usuarios_rol_check';
+  if def is null or def not like '%enfermeria%' then
+    alter table usuarios drop constraint if exists usuarios_rol_check;
+    alter table usuarios add constraint usuarios_rol_check
+      check (rol in ('admin','medico','enfermeria','secretaria','fisio','facturacion'));
+  end if;
+end $$;
+
+-- Datos de perfil y control de sesiones.
+alter table usuarios add column if not exists correo text;
+alter table usuarios add column if not exists telefono text;
+alter table usuarios add column if not exists cargo text;
+alter table usuarios add column if not exists ultimo_ingreso timestamptz;
+alter table usuarios add column if not exists token_version int not null default 0;
+alter table usuarios add column if not exists preguntas_config_en timestamptz;
+alter table usuarios add column if not exists bloqueado_hasta timestamptz;
+
+-- Preguntas de seguridad: 3 respuestas por usuario, guardadas como hash bcrypt.
+create table if not exists preguntas_seguridad(
+  id serial primary key,
+  usuario_id int not null references usuarios(id) on delete cascade,
+  orden int not null,
+  pregunta text not null,
+  respuesta_hash text not null,
+  creado_en timestamptz not null default now(),
+  unique (usuario_id, orden));
+create index if not exists ix_preg_usr on preguntas_seguridad(usuario_id);
+
+-- Bitacora de intentos de recuperacion (nunca guarda respuestas ni claves).
+create table if not exists recuperaciones(
+  id bigserial primary key,
+  usuario text not null,
+  ip text,
+  exito boolean not null default false,
+  creado_en timestamptz not null default now());
+create index if not exists ix_recup_fecha on recuperaciones(creado_en);
