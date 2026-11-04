@@ -1073,6 +1073,7 @@ function vRecetas(){
          lista.map((x)=>[x.f,esc(x.ti||"?"),x.it.length+" item(s)",vb(x),`<button class="btn" data-a="rxp:${DB.X.indexOf(x)}">${ic("doc",14)} Ver/Imprimir</button> <button class="btn" data-a="rxe:${DB.X.indexOf(x)}">${ic("edit",14)} Editar</button>`])))
     +(lista.length?"":`<p class="mu">Sin ${tab=="medicamento"?"recetas":"ordenes"} registradas.</p>`);
 }
+const formaDe=s=>{const m=String(s||"").match(/\(([^)]+)\)/);if(!m)return"";const f=m[1].toLowerCase();if(/tableta/.test(f))return"Tableta";if(/cápsula|capsula/.test(f))return"Cápsula";if(/inyectable|soluci[oó]n inyectable/.test(f))return"Inyectable";if(/jarabe/.test(f))return"Jarabe";if(/suspensi[oó]n/.test(f))return"Suspensión";if(/ungüento|unguento/.test(f))return"Ungüento";if(/gel/.test(f))return"Gel";if(/crema/.test(f))return"Crema";if(/soluci[oó]n/.test(f))return"Solución";if(/gotas/.test(f))return"Gotas";if(/supositorio/.test(f))return"Supositorio";if(/parche/.test(f))return"Parche";if(/pluma|vial|jeringa/.test(f))return"Inyectable";return""};
 function fRx(i){
   const nu=i==null,x=nu?{p:S.ap,f:hoy,t:S.rxTab||"medicamento",ti:"",it:[],n:"",dr:dms()[0]}:DB.X[i];
   S.rxItems=(x.it||[]).map(o=>({...o}));
@@ -1102,7 +1103,7 @@ function fRx(i){
         <input class="rx-nombre" data-i="${idx}" value="${otros?esc(it.nombre):""}" placeholder="Escribe el nombre" aria-label="Nombre" style="margin-bottom:8px;${otros?"":"display:none"}">
         <div class="fg">
           <div><label class="mu" for="rxd_${idx}">${esP?"Talla / medida":"Dosis"}</label><input class="rx-dosis" id="rxd_${idx}" data-i="${idx}" value="${esc(it.dosis||"")}" placeholder="${esP?"Ej. talla 3, 52 mm":"Ej. 1 tableta, 500 mg"}"></div>
-          ${esP?"":`<div><label class="mu" for="rxf_${idx}">Frecuencia (veces/día)</label><input class="rx-frec" id="rxf_${idx}" data-i="${idx}" type="number" min="1" value="${esc(it.frecuencia===""||it.frecuencia==null?"":it.frecuencia)}" placeholder="Ej. 3"></div><div><label class="mu" for="rxdur_${idx}">Duración</label><div class="tb" style="gap:6px"><input class="rx-dur-n" id="rxdur_${idx}" data-i="${idx}" type="number" min="1" value="${esc((String(it.duracion||"").match(/^(\d+)/)||[])[1]||"")}" placeholder="Nº" style="width:70px"><select class="rx-dur-u" data-i="${idx}" aria-label="Unidad de duración" style="width:110px">${["Días","Semanas","Meses","Horas"].map(u=>`<option${u==(String(it.duracion||"").match(/^\d+\s*(.*)$/)||[])[2]?" selected":""|| (u=="Días"&&!String(it.duracion||"").match(/^\d/))?" selected":""}>${u}</option>`).join("")}</select></div></div>`}
+          ${esP?"":`<div><label class="mu" for="rxforma_${idx}">Forma</label><select class="rx-forma" id="rxforma_${idx}" data-i="${idx}" style="width:100%"><option value="">Selecciona...</option>${["Tableta","Cápsula","Inyectable","Jarabe","Suspensión","Ungüento","Gel","Crema","Solución","Gotas","Supositorio","Parche","Otro"].map(u=>`<option${u==(it.forma||"")?" selected":""}>${u}</option>`).join("")}</select></div><div><label class="mu" for="rxf_${idx}">Frecuencia (veces/día)</label><input class="rx-frec" id="rxf_${idx}" data-i="${idx}" type="number" min="1" value="${esc(it.frecuencia===""||it.frecuencia==null?"":it.frecuencia)}" placeholder="Ej. 3"></div><div><label class="mu" for="rxdur_${idx}">Duración</label><div class="tb" style="gap:6px"><input class="rx-dur-n" id="rxdur_${idx}" data-i="${idx}" type="number" min="1" value="${esc((String(it.duracion||"").match(/^(\d+)/)||[])[1]||"")}" placeholder="Nº" style="width:70px"><select class="rx-dur-u" data-i="${idx}" aria-label="Unidad de duración" style="width:110px">${["Días","Semanas","Meses","Horas"].map(u=>`<option${u==(String(it.duracion||"").match(/^\d+\s*(.*)$/)||[])[2]?" selected":""|| (u=="Días"&&!String(it.duracion||"").match(/^\d/))?" selected":""}>${u}</option>`).join("")}</select></div></div>`}
           <div><label class="mu" for="rxc_${idx}">Cantidad</label><input class="rx-cant" id="rxc_${idx}" data-i="${idx}" type="number" min="1" value="${it.cantidad||1}"></div>
         </div>
       </div>`;
@@ -1118,23 +1119,25 @@ function fRx(i){
         const name=i>0?s.slice(0,i).trim():s.split(" · ")[0].trim();
         const rest=i>0?s.slice(i):"";
         const dose=rest.split(" · ")[0].trim();
-        it.nombre=name; it.dosis=dose;
+        it.nombre=name; it.dosis=dose; it.forma=formaDe(s);
         const ni=c.querySelector('.rx-nombre[data-i="'+idx+'"]'); if(ni) ni.value=name;
         const di=c.querySelector('.rx-dosis[data-i="'+idx+'"]'); if(di) di.value=dose;
+        const fi=c.querySelector('.rx-forma[data-i="'+idx+'"]'); if(fi) fi.value=it.forma;
         tx.style.display="none";
       } else { it.catalogo=""; }
     });
     c.querySelectorAll("input").forEach(inp=>{inp.oninput=()=>{const idx=+inp.dataset.i;const it=S.rxItems[idx];if(!it)return;if(inp.classList.contains("rx-nombre"))it.nombre=inp.value;if(inp.classList.contains("rx-dosis"))it.dosis=inp.value;if(inp.classList.contains("rx-frec"))it.frecuencia=inp.value===""?"":(+inp.value||0);if(inp.classList.contains("rx-cant"))it.cantidad=+inp.value||1;}});
+    c.querySelectorAll(".rx-forma").forEach(sel=>sel.onchange=()=>{const idx=+sel.dataset.i;const it=S.rxItems[idx];if(it)it.forma=sel.value;});
     c.querySelectorAll(".rx-dur-n,.rx-dur-u").forEach(el=>{el.oninput=el.onchange=()=>{const idx=+el.dataset.i;const it=S.rxItems[idx];if(!it)return;const n=c.querySelector('.rx-dur-n[data-i="'+idx+'"]')?.value||"";const u=c.querySelector('.rx-dur-u[data-i="'+idx+'"]')?.value||"Días";it.duracion=n? (n+" "+u) : "";}});
     c.querySelectorAll("[data-rxrm]").forEach(b=>b.onclick=()=>{S.rxItems.splice(+b.dataset.rxrm,1);renderItems()});
   };
   renderItems();
   o.querySelector("#rx_t").onchange=()=>renderItems();
-  o.querySelector("#rx_add").onclick=()=>{S.rxItems.push({nombre:"",dosis:"",frecuencia:"",duracion:"",cantidad:1,catalogo:""});renderItems()};
+  o.querySelector("#rx_add").onclick=()=>{S.rxItems.push({nombre:"",dosis:"",forma:"",frecuencia:"",duracion:"",cantidad:1,catalogo:""});renderItems()};
   const v=s=>o.querySelector(s).value.trim();
   o.querySelector("#rx_g").onclick=async()=>{
     const er=m=>o.querySelector("#rx_er").textContent=m;
-    const items=S.rxItems.filter(it=>(it.nombre||"").trim()).map(it=>v("#rx_t")=="protesis"?{nombre:it.nombre,dosis:it.dosis||"",cantidad:it.cantidad||1}:it);
+    const items=S.rxItems.filter(it=>(it.nombre||"").trim()).map(it=>v("#rx_t")=="protesis"?{nombre:it.nombre,dosis:it.dosis||"",cantidad:it.cantidad||1}:{nombre:it.nombre,dosis:it.dosis||"",forma:it.forma||"",frecuencia:it.frecuencia,duracion:it.duracion,cantidad:it.cantidad||1});
     if(!items.length) return er("Agrega al menos un item.");
     const rec={id:x.id,p:S.ap,f:v("#rx_f"),t:v("#rx_t"),ti:v("#rx_ti"),it:items,n:v("#rx_n"),dr:v("#rx_dr")};
     try{if(nu){const id=await crearK("X",rec);DB.X.push({...rec,id});toast("Receta guardada")}else{Object.assign(x,rec);await editarK("X",x);toast("Receta actualizada")} o.remove();draw()}catch(e){er(e.message)}};
@@ -1146,7 +1149,7 @@ function rxPrint(idx){
   const o=modal(`<h3>Imprimir / Enviar receta</h3>
     <p class="mu">Paciente: <b>${esc(pk(r.p).n)}</b> . ${r.f} . ${r.t=="medicamento"?"Medicamentos ortopedicos":"Protesis"}</p>
     <p class="mu">Selecciona los items a incluir:</p>
-    <div style="margin:8px 0">${items.map((it,i)=>`<label class="ck" style="display:flex;align-items:center;gap:8px;margin:4px 0"><input type="checkbox" class="rxck" data-i="${i}" checked> <span>${esc(it.nombre)}${it.dosis?" . "+esc(it.dosis):""}${it.frecuencia?" . "+esc(it.frecuencia):""}${it.duracion?" . "+esc(it.duracion):""}${it.cantidad?" (cant. "+it.cantidad+")":""}</span></label>`).join("") || "<p class='mu'>Sin items.</p>"}</div>
+    <div style="margin:8px 0">${items.map((it,i)=>`<label class="ck" style="display:flex;align-items:center;gap:8px;margin:4px 0"><input type="checkbox" class="rxck" data-i="${i}" checked> <span>${esc(it.nombre)}${it.dosis?" · "+esc(it.dosis):""}${it.forma?" · "+esc(it.forma):""}${it.frecuencia?" · "+esc(it.frecuencia)+" veces/día":""}${it.duracion?" · "+esc(it.duracion):""}${it.cantidad?" (cant. "+it.cantidad+")":""}</span></label>`).join("") || "<p class='mu'>Sin items.</p>"}</div>
     <label class="ck" style="display:block;margin:8px 0"><input type="checkbox" id="rxck_pac" checked> Incluir datos del paciente</label>
     <label class="ck" style="display:block;margin:8px 0"><input type="checkbox" id="rxck_med" checked> Incluir medico y fecha</label>
     <div class="er2" id="rxp_er" role="alert"></div>
