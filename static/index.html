@@ -1655,8 +1655,9 @@ const so=modal(`<div class="row"><h3>Estadísticas</h3><div class="tb"><button c
 <div class="grid g2">${card("Pacientes por seguro",pie(cnt(P,p=>p.s)))}${card("Pacientes por etapa del episodio",pie(cnt(P,p=>ST[Math.min(p.st,6)])))}${card("Cirugías por estado",pie(cnt(C,x=>x.e)))}${card("Pacientes por estado de atención",pie(cnt(P,p=>p.ea)))}${card("Pacientes por autorización",pie(cnt(P,p=>effAu(p))))}${fin?card("Facturación por estado (monto)",pie(["Pendiente","Cobrado"].map(e=>[e,sum(B.filter(x=>x.e==e))]),mon)):""}</div>
 ${card("Avance del episodio por paciente",tbl(["Paciente","Etapa actual","Avance",""],P.map(p=>{const pc=Math.round(Math.min(p.st,7)/7*100);return[pl(p.id),bd(ST[Math.min(p.st,6)]),`<div class="bar"><i style="width:${pc}%"></i></div>`,pc+"%"]})))}<br>
 ${card("Evolución del dolor (promedio por fecha, escala 0 a 10)",line(pts))}<br>
-${card("Registro de pacientes",tbl(["Paciente","Edad","Seguro","Diagnóstico","Evaluaciones","Cirugías"],P.map(p=>[pl(p.id),p.e,esc(p.s||"—"),esc(p.dx||"—"),E.filter(x=>x.p==p.id).length,C.filter(x=>x.p==p.id).length])))}`,"w")}
+${card("Registro de pacientes",tbl(["Paciente","Edad","Seguro","Diagnóstico","Evaluaciones","Cirugías"],P.map(p=>[pl(p.id),p.e,esc(p.s||"—"),esc(p.dx||"—"),E.filter(x=>x.p==p.id).length,C.filter(x=>x.p==p.id).length])))}`,"w")
 so.querySelector("#st_print").onclick=()=>{const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para imprimir");return}w.document.write(buildStatsHtml());w.document.close();w.focus();setTimeout(()=>w.print(),250)};
+}
 function fEv(){const[a,id]=S.route.split("-");if(a!="p"||!pk(id).n)return toast("Abre un expediente primero");
 const o=modal(`<h3>Nueva evaluación</h3><label>Motivo y hallazgos<textarea id="et" rows="5"></textarea></label><button class="btn p" id="es">Guardar evaluación</button>`);
 o.querySelector("#es").onclick=async()=>{const t=o.querySelector("#et").value.trim();if(!t)return toast("Escribe los hallazgos");
