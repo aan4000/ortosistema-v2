@@ -875,7 +875,7 @@ function recPrint(id){
     if(inc("proc")&&PP.length)sec("PROCEDIMIENTOS",PP.map(x=>x.f+" · "+x.t+(x.g?" · "+x.g:"")+(x.dr?" · "+x.dr:"")+(x.pr?" · "+mon(+x.pr||0):"")+(x.e?" · "+x.e:"")));
     if(inc("cx")&&C.length)sec("CIRUGÍAS E IMPLANTES",C.map(x=>x.f+" · "+x.t+(x.i?" · implante "+x.i:"")+(x.e?" · "+x.e:"")));
     if(inc("ort")&&OP.length)sec("ÓRTESIS",OP.map(x=>x.f+" · "+x.n+(x.lado?" · "+x.lado:"")+(x.talla?" · talla "+x.talla:"")+(x.dr?" · "+x.dr:"")+(x.e?" · "+x.e:"")));
-    if(inc("rx")&&X.length)sec("RECETAS Y PRÓTESIS",X.map(x=>x.f+" · "+(x.ti||(x.t=="protesis"?"Orden de prótesis":"Receta"))+(x.dr?" · "+x.dr:"")+": "+(((x.it||[]).map(it=>it.nombre+(it.dosis?" ("+it.dosis+")":"")+(it.cantidad?" x"+it.cantidad:"")).join(", "))||"sin ítems")));
+    if(inc("rx")&&X.length)sec("RECETAS Y PRÓTESIS",X.map(x=>x.f+" · "+(x.t=="protesis"?"Orden de prótesis":"Receta")+(x.dr?" · "+x.dr:"")+": "+(((x.it||[]).map(it=>it.nombre+(it.dosis?" ("+it.dosis+")":"")+(it.cantidad?" x"+it.cantidad:"")).join(", "))||"sin ítems")));
     if(inc("rehab")){
       if(F.length)sec("FISIOTERAPIA",F.map(x=>x.f+" · "+x.t+" · dolor "+x.d+"/10"));
       if(M.length)sec("CUESTIONARIOS (PROMs)",M.map(x=>x.f+" · "+x.t+" · "+x.s+"%"));
@@ -1082,8 +1082,8 @@ function vRecetas(){
     +`<div class="tabs">${[["medicamento","Medicamentos ortopedicos"],["protesis","Protesis"]].map(([k,l])=>`<button class="${k==tab?"on":""}" data-a="rxtab:${k}">${ic(k=="medicamento"?"rx":"ort",16)} ${l}</button>`).join("")}</div>`
     +`<p><button class="btn p" data-a="rxn">${ic("plus",16)} Nueva ${tab=="medicamento"?"receta":"orden de protesis"}</button></p>`
     +card(tab=="medicamento"?"Medicamentos recetados":"Protesis indicadas",
-       tbl(["Fecha","Titulo","Items","Verificacion",""],
-         lista.map((x)=>[x.f,esc(x.ti||"?"),x.it.length+" item(s)",vb(x),`<button class="btn" data-a="rxp:${DB.X.indexOf(x)}">${ic("doc",14)} Ver/Imprimir</button> <button class="btn" data-a="rxe:${DB.X.indexOf(x)}">${ic("edit",14)} Editar</button>`])))
+       tbl(["Fecha","Tipo","Items","Verificacion",""],
+         lista.map((x)=>[x.f,x.t=="medicamento"?"Medicamento":"Protesis",x.it.length+" item(s)",vb(x),`<button class="btn" data-a="rxp:${DB.X.indexOf(x)}">${ic("doc",14)} Ver/Imprimir</button> <button class="btn" data-a="rxe:${DB.X.indexOf(x)}">${ic("edit",14)} Editar</button>`])))
     +(lista.length?"":`<p class="mu">Sin ${tab=="medicamento"?"recetas":"ordenes"} registradas.</p>`);
 }
 const formaDe=s=>{const m=String(s||"").match(/\(([^)]+)\)/);if(!m)return"";const f=m[1].toLowerCase();if(/tableta/.test(f))return"Tableta";if(/cápsula|capsula/.test(f))return"Cápsula";if(/inyectable|soluci[oó]n inyectable/.test(f))return"Inyectable";if(/jarabe/.test(f))return"Jarabe";if(/suspensi[oó]n/.test(f))return"Suspensión";if(/ungüento|unguento/.test(f))return"Ungüento";if(/gel/.test(f))return"Gel";if(/crema/.test(f))return"Crema";if(/soluci[oó]n/.test(f))return"Solución";if(/gotas/.test(f))return"Gotas";if(/supositorio/.test(f))return"Supositorio";if(/parche/.test(f))return"Parche";if(/pluma|vial|jeringa/.test(f))return"Inyectable";return""};
@@ -1091,7 +1091,7 @@ function fRx(i){
   const nu=i==null,x=nu?{p:S.ap,f:hoy,t:S.rxTab||"medicamento",ti:"",it:[],n:"",dr:dms()[0]}:DB.X[i];
   S.rxItems=(x.it||[]).map(o=>({...o}));
   const o=modal(`<h3>${nu?"Nueva receta":"Editar receta"}</h3>
-    <div class="fg">${fx("rx_t","Tipo",`<select id="rx_t"><option value="medicamento"${x.t=="medicamento"?" selected":""}>Medicamento ortopedico</option><option value="protesis"${x.t=="protesis"?" selected":""}>Protesis</option></select>`)}${fx("rx_ti","Titulo (opcional)",`<input id="rx_ti" value="${esc(x.ti||"")}">`)}${fx("rx_f","Fecha",`<input id="rx_f" type="date" value="${iso(x.f)}">`)}${fx("rx_dr","Medico",fsel("rx_dr",dms(),x.dr))}</div>
+    <div class="fg">${fx("rx_t","Tipo",`<select id="rx_t"><option value="medicamento"${x.t=="medicamento"?" selected":""}>Medicamento ortopedico</option><option value="protesis"${x.t=="protesis"?" selected":""}>Protesis</option></select>`)}${fx("rx_f","Fecha",`<input id="rx_f" type="date" value="${iso(x.f)}">`)}${fx("rx_dr","Medico",fsel("rx_dr",dms(),x.dr))}</div>
     <p class="mu" style="margin:10px 0 4px">Items</p><div id="rx_items"></div>
     <p><button class="btn" id="rx_add">${ic("plus",14)} Agregar item</button></p>
     <label class="mu" style="display:block;margin:8px 0">Notas<textarea id="rx_n" rows="2">${esc(x.n||"")}</textarea></label>
@@ -1153,7 +1153,7 @@ function fRx(i){
     const er=m=>o.querySelector("#rx_er").textContent=m;
     const items=S.rxItems.filter(it=>(it.nombre||"").trim()).map(it=>v("#rx_t")=="protesis"?{nombre:it.nombre,dosis:it.dosis||"",cantidad:it.cantidad||1}:{nombre:it.nombre,dosis:it.dosis||"",forma:it.forma||"",frecuencia:it.frecuencia,duracion:it.duracion,cantidad:it.cantidad||1});
     if(!items.length) return er("Agrega al menos un item.");
-    const rec={id:x.id,p:S.ap,f:v("#rx_f"),t:v("#rx_t"),ti:v("#rx_ti"),it:items,n:v("#rx_n"),dr:v("#rx_dr")};
+    const rec={id:x.id,p:S.ap,f:v("#rx_f"),t:v("#rx_t"),it:items,n:v("#rx_n"),dr:v("#rx_dr")};
     try{if(nu){const id=await crearK("X",rec);DB.X.push({...rec,id});toast("Receta guardada")}else{Object.assign(x,rec);await editarK("X",x);toast("Receta actualizada")} o.remove();draw()}catch(e){er(e.message)}};
   if(!nu){const d=o.querySelector("#rx_d");if(d)d.onclick=()=>conf("Eliminar esta receta?",async()=>{try{await borrarK("X",x.id);DB.X=DB.X.filter(r=>r.id!=x.id);o.remove();draw();toast("Eliminada")}catch(e){toast(e.message)}})}
 }
