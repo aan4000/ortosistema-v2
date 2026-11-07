@@ -1705,7 +1705,7 @@ addEventListener("keydown",e=>{if(!S.user)return;const g=/INPUT|TEXTAREA|SELECT/
 if((e.ctrlKey||e.metaKey)&&e.key=="k"){e.preventDefault();pal()}
 else if(e.key=="Escape")ovx();
 else if(e.key=="/"&&!g){e.preventDefault();pal()}
-else if(e.key.toLowerCase()=="n"&&!g&&!e.ctrlKey&&!e.metaKey){e.preventDefault();go("nuevo")}});
+else if(e.key&&e.key.toLowerCase()=="n"&&!g&&!e.ctrlKey&&!e.metaKey){e.preventDefault();go("nuevo")}});
 document.addEventListener("change",e=>{const g=e.target,d=g.dataset;
 if(d.pm){const[r,k]=d.pm.split(":"),l=DB.PM[r];DB.PM[r]=g.checked?[...new Set([...l,k])]:l.filter(x=>x!=k);api("/api/funciones",{method:"PUT",body:{rol:r,modulos:DB.PM[r]}}).catch(e=>{toast(e.message);draw()})}
 else if(d.ant){const id=d.ant,sel=document.getElementById(id+"_sel"),ta=document.getElementById(id+"_other"),hid=document.getElementById(id);if(sel.value==="__otros__"){ta.style.display="";hid.value=ta.value}else{ta.style.display="none";hid.value=sel.value}}
