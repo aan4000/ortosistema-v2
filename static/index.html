@@ -1063,6 +1063,7 @@ if (dups.length) {
     for(const k of campos){ if(rec[k]!==undefined && rec[k]!=="" && rec[k]!==null && (dup[k]===undefined || dup[k]==="" || dup[k]===null)){ dup[k]=rec[k] } }
     // also set codigo stays
     try{ await editarK("P",dup); const idx=DB.P.findIndex(x=>x.id==dup.id); if(idx>=0) DB.P[idx]=dup; toast("Informacion actualizada en el paciente existente"); go("pacientes") }catch(e){er(e.message)} };
+  return;
   }
 try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}}
 
