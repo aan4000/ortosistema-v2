@@ -1067,7 +1067,7 @@ const FAMH=["Diabetes mellitus","Hipertension arterial","Cardiopatia isquemica",
 const antField=(id,label,catalog,groups,hint)=>`<div class="af"><label class="mu">${label}</label><select id="${id}_sel" data-ant="${id}" class="ant-sel"><option value="">Selecciona...</option>${groups?groups.map(([g,items])=>`<optgroup label="${esc(g)}">${items.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}</optgroup>`).join(""):catalog.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}<option value="__otros__">Otros</option></select><textarea id="${id}_other" rows="2" style="display:none;margin-top:6px" placeholder="Especifica..."></textarea><input type="hidden" id="${id}">${hint?`<p class="mu" style="margin:6px 0 0">${hint}</p>`:""}</div>`;
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
-${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",'<input id="nf" type="date" max="'+new Date().toISOString().slice(0,10)+'">')}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0">')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
+${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",'<input id="nf" type="date" max="'+new Date().toISOString().slice(0,10)+'">')}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <button type="button" class="btn" data-a="buscarpadron" title="Buscar en padrón electoral (JCE)" style="padding:2px 8px;font-size:12px">Buscar padrón</button> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
 <br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",'<select id="ns">'+opt(SEG)+"</select>")}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
 <br>${card("Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}</div>`)}
 <br>${card("Antecedentes",`${mbSel([])}
@@ -1076,6 +1076,22 @@ ${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><s
 <br><div class="fg">${f("nb","Tabaquismo",'<select id="nb">'+opt(["No fuma","Exfumador","Fumador"])+"</select>")}${f("nal","Alcohol",'<select id="nal">'+opt(["No consume","Ocasional","Frecuente"])+"</select>")}${f("nac","Actividad física",'<select id="nac">'+opt(["Sedentario","Moderada","Alta"])+"</select>")}</div>
 <br>${tx("no","Otros antecedentes morbidos (texto libre)")}`)}`+
 `<br><div class="er2" id="nr" role="alert"></div><div class="tb"><button class="btn" data-r="pacientes">${ic("x",16)} Cancelar</button><button class="btn p" data-a="gp">${ic("save",16)} Guardar paciente</button></div>`}
+async function cedulaLookup(){
+  const inp=document.getElementById("nc"); if(!inp) return;
+  const st=document.getElementById("nc_status");
+  const num=inp.value.replace(/\D/g,"");
+  if(num.length<9){ if(st) st.textContent=""; return; }
+  if(st) st.textContent="Consultando...";
+  try{
+    const r=await api("/api/cedula/"+num);
+    if(r && r.nombre){ const nn=document.getElementById("nn"); if(nn && !nn.value.trim()) nn.value=r.nombre; if(st) st.textContent="✓ "+(r.fuente||"")+" "; }
+    else if(r && r.valid===false){ if(st) st.textContent="✗ No encontrada"; }
+    else if(r && r.valid===true){ if(st) st.textContent="✓ Válida"; }
+    else { if(st) st.textContent=r && r.mensaje ? r.mensaje : ""; }
+  }catch(e){ if(st) st.textContent=""; }
+}
+document.addEventListener("blur", e=>{ if(e.target && e.target.id==="nc") cedulaLookup(); }, true);
+
 async function gp(){const v=i=>$("#"+i).value.trim(),er=m=>{$("#nr").textContent=m},n=v("nn"),fn0=v("nf");
 let fn=fn0;
 if(!fn){const a=+v("ne").replace(/\D/g,"");if(a&&a>0&&a<=130){const d=new Date();d.setFullYear(d.getFullYear()-a);fn=d.toISOString().slice(0,10)}}
@@ -1756,6 +1772,7 @@ else if(a=="restaurar"){e.preventDefault();restaurarFunciones()}
 else if(a=="adminsec"){e.preventDefault();api("/api/admin/resumen").then(r=>{S.adm=r;draw()}).catch(x=>toast(x.message))}
 else if(a=="delimg"){e.preventDefault();borrarImagen(+v)}
 else if(a=="cx_cancel"||a=="ci_cancel"||a=="es_cancel"||a=="rx_cancel"){e.preventDefault();const o=document.querySelector(".ov");if(o)o.remove()}
+else if(a=="buscarpadron"){e.preventDefault();const c=(document.getElementById("nc")||{}).value||"";const num=c.replace(/\D/g,"");window.open("https://www.pai.do/padron","_blank","noopener")}
 });
 addEventListener("keydown",e=>{if(!S.user)return;const g=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
 if((e.ctrlKey||e.metaKey)&&e.key=="k"){e.preventDefault();pal()}

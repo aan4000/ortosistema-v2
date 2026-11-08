@@ -2,6 +2,9 @@
 import datetime as dt
 import getpass
 import os
+import json
+import urllib.error
+import urllib.request
 import sys
 import time
 import unicodedata
@@ -966,6 +969,50 @@ def borrar(tabla: str, rid: int, u=Depends(usuario_actual)):
             raise HTTPException(404, "Registro no encontrado")
         auditar(c, u, "eliminar", tabla, rid)
     return {"ok": True}
+
+
+@app.get("/api/cedula/{cedula}")
+def cedula_lookup(cedula: str, u=Depends(usuario_actual)):
+    """Consulta opcional de cedula. Devuelve validacion y, si el proveedor lo soporta, el nombre."""
+    num = "".join(ch for ch in (cedula or "") if ch.isdigit())
+    if len(num) < 9:
+        raise HTTPException(400, "Cedula invalida")
+    provider = os.getenv("CEDULA_API_PROVIDER", "").strip().lower()
+    if provider == "verifik":
+        token = os.getenv("VERIFIK_TOKEN", "").strip()
+        if not token:
+            return {"valid": None, "nombre": None, "fuente": "verifik", "mensaje": "Falta VERIFIK_TOKEN"}
+        url = "https://api.verifik.co/v2/do/cedula?documentType=CIE&documentNumber=" + num
+        req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token, "Accept": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            d = data.get("data") or {}
+            nombre = d.get("fullName") or " ".join(filter(None, [d.get("firstName"), d.get("lastName")]))
+            return {"valid": True, "nombre": nombre, "fuente": "verifik"}
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return {"valid": False, "nombre": None, "fuente": "verifik", "mensaje": "No encontrada"}
+            return {"valid": None, "nombre": None, "fuente": "verifik", "mensaje": "Error " + str(e.code)}
+        except Exception as e:
+            return {"valid": None, "nombre": None, "fuente": "verifik", "mensaje": str(e)}
+    if provider == "ogtic":
+        key = os.getenv("OGTIC_API_KEY", "").strip()
+        if not key:
+            return {"valid": None, "nombre": None, "fuente": "ogtic", "mensaje": "Falta OGTIC_API_KEY"}
+        url = "https://api.digital.gob.do/v3/citizens/" + num + "/validate"
+        req = urllib.request.Request(url, headers={"Authorization": "Bearer " + key, "Accept": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            return {"valid": bool(data.get("valid")), "nombre": None, "fuente": "ogtic"}
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return {"valid": False, "nombre": None, "fuente": "ogtic", "mensaje": "No encontrada"}
+            return {"valid": None, "nombre": None, "fuente": "ogtic", "mensaje": "Error " + str(e.code)}
+        except Exception as e:
+            return {"valid": None, "nombre": None, "fuente": "ogtic", "mensaje": str(e)}
+    return {"valid": None, "nombre": None, "fuente": "none", "mensaje": "Sin proveedor configurado. Define CEDULA_API_PROVIDER y el token correspondiente."}
 
 
 @app.get("/api/paciente/{pid}")
