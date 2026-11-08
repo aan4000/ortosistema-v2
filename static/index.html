@@ -1786,7 +1786,8 @@ async function boot(){
 try{
   const e=await api("/api/estado");
   S.nuevo=!!e.requiere_registro;
-  return vLanding();
+  if(!token()) return vLanding();
+  await cargar();
   await cargar();
 }catch(err){
   if(/sesi[oó]n|token|credencial/i.test(err.message)){localStorage.removeItem(TK);return vLogin()}
