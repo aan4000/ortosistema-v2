@@ -1062,7 +1062,7 @@ if (dups.length) {
     const campos=["e","c","s","al","dx","fn","sx","tl","em","na","am","aq","me","af","ha","ea","eu"];
     for(const k of campos){ if(rec[k]!==undefined && rec[k]!=="" && rec[k]!==null && (dup[k]===undefined || dup[k]==="" || dup[k]===null)){ dup[k]=rec[k] } }
     // also set codigo stays
-    try{ await editarK("P",dup); const idx=DB.P.findIndex(x=>x.id==dup.id); if(idx>=0) DB.P[idx]=dup; S.ap=dup.id; S.pa.p=dup.id; toast("Informacion actualizada en el paciente existente"); go("p-"+dup.id) }catch(e){er(e.message)} };
+    try{ await editarK("P",dup); const idx=DB.P.findIndex(x=>x.id==dup.id); if(idx>=0) DB.P[idx]=dup; toast("Informacion actualizada en el paciente existente"); go("p-"+dup.id) }catch(e){er(e.message)} };
   }
 try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}}
 
