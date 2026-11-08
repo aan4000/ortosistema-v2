@@ -647,6 +647,25 @@ function rst(){
       }catch(ex){b.disabled=false;e(ex.message)}}};
   paso1();
 }
+function vLanding(){
+  $("#main").innerHTML=`<div class="lg"><div class="card lc" style="max-width:560px;text-align:center">
+    <div class="lb">${ic("shield",44)}</div>
+    <h1 style="font-size:26px;margin:10px 0 4px">OrtoSistema</h1>
+    <p class="mu" style="font-size:15px">Sistema de gestión clínica para ortopedia: expedientes de pacientes, agenda de citas y cirugías, evaluaciones médicas, recetas, procedimientos, facturación y más.</p>
+    <ul class="mu" style="text-align:left;margin:14px 0 18px;line-height:1.7">
+      <li>Gestión de pacientes y expedientes clínicos</li>
+      <li>Agenda de citas y cirugías programadas</li>
+      <li>Evaluaciones médicas y examen físico</li>
+      <li>Recetas, procedimientos y órtesis</li>
+      <li>Facturación y cargos por paciente</li>
+      <li>Estudios de imagen y documentos</li>
+    </ul>
+    <button class="btn p" id="landing_reg" style="width:100%">${ic("userplus",16)} Registrarse</button>
+    <p class="mu" style="margin-top:10px;font-size:12px">Al registrarte crearás tu perfil de acceso y entrarás al sistema.</p>
+  </div></div>`;
+  const b=$("#landing_reg");
+  if(b) b.onclick=()=>{localStorage.setItem("orto_landing_done","1"); vLogin()};
+}
 function vLogin(){if(S.nuevo)return vSetup();$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb">${ic("shield",28)}<b style="font-size:20px">OrtoSistema</b></div><h1>Iniciar sesión</h1><p class="mu">Entra con tu usuario y contraseña.</p><label class="mu">Usuario<input id="lu" autocomplete="username"></label><label class="mu">Contraseña<input id="lp" type="password" autocomplete="current-password"></label><div class="er2" id="le" role="alert"></div><button class="btn p" id="lb2" style="width:100%">${ic("unlock",16)} Entrar</button><button class="btn" data-a="rst">${ic("key",16)} ¿Olvidaste tu contraseña?</button></div></div>`;
 const go2=async()=>{const b=$("#lb2"),er=m=>{$("#le").textContent=m};
 const u=$("#lu").value.trim().toLowerCase(),p=$("#lp").value;
@@ -1740,6 +1759,8 @@ async function boot(){
 try{
   const e=await api("/api/estado");
   S.nuevo=!!e.requiere_registro;
+  const seen=localStorage.getItem("orto_landing_done")==="1";
+  if(!seen && !token() && S.nuevo) return vLanding();
   if(S.nuevo||!token())return vLogin();
   await cargar();
 }catch(err){
