@@ -674,19 +674,19 @@ function vLanding(){
   <div class="landing-root" id="landingRoot">
     <header class="landing-header">
       <div class="landing-logo">${ic("shield",26)} OrtoSistema</div>
-      <button class="btn landing-login" id="landing_login">${ic("unlock",16)} Iniciar sesi�n</button>
+      <button class="btn landing-login" id="landing_login">${ic("unlock",16)} Iniciar sesión</button>
     </header>
     <section class="landing-hero">
-      <h1>Gesti�n cl�nica para ortopedia</h1>
-      <p>Expedientes de pacientes, agenda de citas y cirug�as, evaluaciones m�dicas, recetas, procedimientos, facturaci�n y m�s � todo en un solo lugar.</p>
+      <h1>Gestión clínica para ortopedia</h1>
+      <p>Expedientes de pacientes, agenda de citas y cirugías, evaluaciones médicas, recetas, procedimientos, facturación y más, todo en un solo lugar.</p>
       <button class="btn landing-cta" id="landing_reg">${ic("userplus",18)} Registrarse</button>
     </section>
     <section class="landing-features">
       <div class="landing-grid">
-        ${[["users","Pacientes","Expedientes cl�nicos completos con estados de atenci�n y autorizaci�n."],["cal","Agenda","Citas y cirug�as programadas por d�a."],["stethoscope","Evaluaciones","Evaluaci�n m�dica y examen f�sico."],["rx","Recetas","Medicamentos y pr�tesis ortop�dicas."],["act","Procedimientos","Cat�logo y asignaci�n por paciente."],["shieldcheck","Facturaci�n","Cargos y cobros por paciente."]].map(([icn,t,d])=>`<div class="landing-card"><div class="landing-icon">${ic(icn,24)}</div><b style="font-size:17px">${t}</b><p style="margin:8px 0 0;font-size:13.5px;opacity:.88;line-height:1.55">${d}</p></div>`).join("")}
+        ${[["users","Pacientes","Expedientes clínicos completos con estados de atención y autorización."],["cal","Agenda","Citas y cirugías programadas por día."],["stethoscope","Evaluaciones","Evaluación médica y examen físico."],["rx","Recetas","Medicamentos y prótesis ortopédicas."],["act","Procedimientos","Catálogo y asignación por paciente."],["shieldcheck","Facturación","Cargos y cobros por paciente."]].map(([icn,t,d])=>`<div class="landing-card"><div class="landing-icon">${ic(icn,24)}</div><b style="font-size:17px">${t}</b><p style="margin:8px 0 0;font-size:13.5px;opacity:.88;line-height:1.55">${d}</p></div>`).join("")}
       </div>
     </section>
-    <footer class="landing-footer">OrtoSistema � Gesti�n Ortop�dica</footer>
+    <footer class="landing-footer">OrtoSistema - Gestión Ortopédica</footer>
   </div>`;
   const goLogin=()=>{const root=$("#landingRoot"); if(root) root.classList.add("fade-out"); setTimeout(()=>{localStorage.setItem("orto_landing_done","1"); vLogin()},420)};
   const reg=$("#landing_reg"), log=$("#landing_login");
