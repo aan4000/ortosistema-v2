@@ -651,7 +651,7 @@ function rst(){
 function vLanding(){
   const side=$("#side"); if(side) side.style.display="none";
   const main=$("#main"); if(main){ main.style.maxWidth="100%"; main.style.padding="0"; main.style.margin="0"; }
-  main.innerHTML=`<div style="position:fixed;inset:0;overflow:auto;background:linear-gradient(135deg,#0b1220 0%,#1e3a8a 45%,#0ea5e9 100%);color:#fff">
+  main.innerHTML=`<div style="position:fixed;inset:0;overflow:auto;background:linear-gradient(135deg,#1a1033 0%,#6d28d9 45%,#ec4899 100%);color:#fff">
     <header style="display:flex;justify-content:space-between;align-items:center;padding:20px 44px">
       <div style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px">${ic("shield",26)} OrtoSistema</div>
       <button class="btn" id="landing_login" style="background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)">${ic("unlock",16)} Iniciar sesión</button>
@@ -659,7 +659,7 @@ function vLanding(){
     <section style="text-align:center;padding:70px 20px 40px">
       <h1 style="font-size:46px;margin:0 0 16px;font-weight:800;letter-spacing:-.5px">Gestión clínica para ortopedia</h1>
       <p style="font-size:18px;max-width:700px;margin:0 auto 30px;opacity:.92;line-height:1.6">Expedientes de pacientes, agenda de citas y cirugías, evaluaciones médicas, recetas, procedimientos, facturación y más — todo en un solo lugar.</p>
-      <button class="btn p" id="landing_reg" style="font-size:16px;padding:13px 32px">${ic("userplus",18)} Registrarse</button>
+      <button class="btn" id="landing_reg" style="font-size:16px;padding:13px 32px;background:#fff;color:#6d28d9;border:0;font-weight:700">${ic("userplus",18)} Registrarse</button>
     </section>
     <section style="padding:20px 20px 90px">
       <div style="max-width:1120px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px">
@@ -670,7 +670,7 @@ function vLanding(){
   </div>`;
   const reg=$("#landing_reg"), log=$("#landing_login");
   if(reg) reg.onclick=()=>{localStorage.setItem("orto_landing_done","1"); vLogin()};
-  if(log) log.onclick=()=>{localStorage.setItem("orto_landing_done","1"); vLogin()};
+  if(log) log.onclick=()=>{localStorage.setItem("orto_landing_done","1"); if(token()){cargar().then(()=>draw()).catch(()=>vLogin())} else vLogin()};
 }
 function vLogin(){if(S.nuevo)return vSetup();$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb">${ic("shield",28)}<b style="font-size:20px">OrtoSistema</b></div><h1>Iniciar sesión</h1><p class="mu">Entra con tu usuario y contraseña.</p><label class="mu">Usuario<input id="lu" autocomplete="username"></label><label class="mu">Contraseña<input id="lp" type="password" autocomplete="current-password"></label><div class="er2" id="le" role="alert"></div><button class="btn p" id="lb2" style="width:100%">${ic("unlock",16)} Entrar</button><button class="btn" data-a="rst">${ic("key",16)} ¿Olvidaste tu contraseña?</button></div></div>`;
 const go2=async()=>{const b=$("#lb2"),er=m=>{$("#le").textContent=m};
@@ -1765,9 +1765,7 @@ async function boot(){
 try{
   const e=await api("/api/estado");
   S.nuevo=!!e.requiere_registro;
-  const seen=localStorage.getItem("orto_landing_done")==="1";
-  if(!seen && !token()) return vLanding();
-  if(S.nuevo||!token())return vLogin();
+  return vLanding();
   await cargar();
 }catch(err){
   if(/sesi[oó]n|token|credencial/i.test(err.message)){localStorage.removeItem(TK);return vLogin()}
