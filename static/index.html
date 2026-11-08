@@ -608,6 +608,7 @@ const can=k=>k=="inicio"||!!(S.user&&(S.user.rol=="admin"||(DB.PM[S.user.rol]||[
 async function entrar(usuario,password){
   const r=await api("/api/login",{method:"POST",body:{usuario,password}});
   localStorage.setItem(TK,r.token);
+  localStorage.setItem("orto_landing_done","1");
   if(r.debe_cambiar_clave){S.tmp=password;S.user={u:usuario,nombre:r.nombre,rol:r.rol};return vForzar()}
   await cargar();
   S.route="inicio";
@@ -1760,7 +1761,7 @@ try{
   const e=await api("/api/estado");
   S.nuevo=!!e.requiere_registro;
   const seen=localStorage.getItem("orto_landing_done")==="1";
-  if(!seen && !token() && S.nuevo) return vLanding();
+  if(!seen && !token()) return vLanding();
   if(S.nuevo||!token())return vLogin();
   await cargar();
 }catch(err){
