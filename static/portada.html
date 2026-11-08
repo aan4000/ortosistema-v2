@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ortosistema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF2F5;--surface:#fff;--ink:#0F2233;--muted:#4F6272;--line:#CCD8E0;--accent:#0B7F86;--on-accent:#fff;--warm:#E2A13A;--xr:#08141D;--xr2:#102635;--xr-ink:#C9DCE6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1620;--surface:#13232F;--ink:#E6EEF3;--muted:#9DB0BF;--line:#24394A;--accent:#38B6BC;--on-accent:#06222A;--xr:#050D13;--xr2:#0E2230;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B1620;--surface:#13232F;--ink:#E6EEF3;--muted:#9DB0BF;--line:#24394A;--accent:#38B6BC;--on-accent:#06222A;--xr:#050D13;--xr2:#0E2230;color-scheme:dark}
+html{scroll-padding-top:calc(76px + env(safe-area-inset-top,0px));scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 "Instrument Sans",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;line-height:1.05;margin:0;letter-spacing:-.03em}
+:focus-visible{outline:3px solid var(--warm);outline-offset:3px;border-radius:8px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{max-width:1180px;margin:auto;padding:14px 28px;display:flex;align-items:center;gap:28px}
+.brand{display:flex;align-items:center;gap:10px;font:800 22px "Bricolage Grotesque",sans-serif;letter-spacing:-.03em;color:inherit;text-decoration:none}
+.brand svg{width:32px;height:32px}
+nav{display:flex;gap:26px;margin-left:12px;flex:1}
+nav a{color:var(--muted);text-decoration:none;font-weight:500;font-size:15.5px;padding:4px 0;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+nav a:hover{color:var(--ink);border-color:var(--accent)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{font:600 16px "Instrument Sans",sans-serif;padding:11px 20px;border-radius:999px;border:1.5px solid var(--ink);background:none;color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px -8px var(--ink)}
+.btn.fill{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.wrap{max-width:1180px;margin:auto;padding:0 28px}
+.hero{display:grid;grid-template-columns:1fr 1.02fr;gap:56px;align-items:center;padding:72px 0 88px}
+h1{font-size:clamp(42px,6vw,76px);font-weight:800}
+.lead{font-size:20px;color:var(--muted);max-width:44ch;margin:26px 0 34px}
+.hero .btn{padding:15px 30px;font-size:17px}
+.scope{background:radial-gradient(120% 90% at 50% 0,var(--xr2),var(--xr));border-radius:28px;padding:20px;box-shadow:0 30px 60px -30px rgba(8,20,29,.7);border:1px solid #1d3547;color:var(--xr-ink)}
+.fh{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid #22394b}
+.av{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:700 16px "Bricolage Grotesque",sans-serif}
+.fh b{display:block;color:#fff;font:700 18px "Bricolage Grotesque",sans-serif;line-height:1.2}
+.fh small{font-size:14px;color:#8FA9B8}
+.live{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:14px}
+.live i{width:9px;height:9px;border-radius:50%;background:var(--warm);animation:blink 1.8s ease-in-out infinite}
+@keyframes blink{50%{transform:scale(1.7);opacity:.45}}
+.rows{list-style:none;margin:10px 0 4px;padding:0}
+.row{position:relative;display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;cursor:pointer;overflow:hidden;transition:background .3s}
+.row svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.row .n{font-weight:500;flex:1}
+.row .st{font-size:14px;color:#7F9AAA;transition:color .3s}
+.row::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--warm)}
+.row.on{background:#143045}.row.on::after{animation:fill 2.4s linear forwards}
+@keyframes fill{to{width:100%}}
+.row.done .st,.row.on .st{color:var(--warm)}
+.cap{min-height:3.4em;margin:8px 4px 0;font-size:15.5px;border-top:1px solid #22394b;padding-top:14px}
+.cap b{color:#fff;font-weight:600}
+section.blk{padding:88px 0;border-top:1px solid var(--line)}
+.head{max-width:620px;margin-bottom:48px}
+.head h2,.split h2{font-size:clamp(34px,4.4vw,56px);font-weight:800}
+.head p,.split>div>p{color:var(--muted);margin:18px 0 0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.fe{padding:32px 28px 36px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transition:background .25s}
+.fe:hover{background:var(--surface)}
+.fe .ib{width:48px;height:48px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;margin-bottom:20px;transition:background .25s,transform .25s}
+.fe:hover .ib{background:var(--accent);transform:rotate(-6deg)}
+.fe svg{width:24px;height:24px;fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .25s}
+.fe:hover svg{stroke:var(--on-accent)}
+.fe h3{font-size:24px;margin-bottom:8px}
+.fe p{margin:0;color:var(--muted)}
+.split{display:grid;grid-template-columns:1fr 1.5fr;gap:64px}
+.split.rev{grid-template-columns:1.1fr 1fr;align-items:center}
+.split>div:first-child h2{position:sticky;top:100px}
+.split.rev>div:first-child h2{position:static}
+ol{list-style:none;margin:0;padding:0}
+li.step{position:relative;padding:0 0 52px 76px}
+li.step:last-child{padding-bottom:0}
+.mk{position:absolute;left:0;top:0;width:50px;height:50px;border-radius:50%;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center;font:700 20px "Bricolage Grotesque",sans-serif;color:var(--muted);transition:all .5s}
+li.step::before{content:"";position:absolute;left:24px;top:54px;bottom:4px;width:2px;background:var(--accent);transform:scaleY(0);transform-origin:top;transition:transform .8s .25s}
+li.step:last-child::before{display:none}
+li.step.on .mk{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+li.step.on::before{transform:scaleY(1)}
+.step h3{font-size:28px;margin:6px 0 10px}
+.step p{margin:0;color:var(--muted);max-width:50ch}
+.chip{display:inline-flex;align-items:center;gap:9px;margin-top:16px;padding:7px 16px;border-radius:99px;background:var(--xr);color:var(--xr-ink);font-size:14.5px;font-weight:500}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--warm);display:block}
+.perm{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:24px 26px}
+.perm h3{font-size:22px}
+.perm small{color:var(--muted);font-size:14.5px}
+.pr{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);font-weight:500}
+.pr:last-of-type{border-bottom:0}
+.sw{width:46px;height:26px;border-radius:99px;background:var(--line);position:relative;transition:background .35s;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .35s}
+.pr.on .sw{background:var(--accent)}.pr.on .sw::after{transform:translateX(20px)}
+.pw{margin-top:14px;padding-top:18px;border-top:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap}
+.pw span{font-size:14.5px;font-weight:600;padding:7px 14px;border-radius:99px;border:1.5px solid var(--line);color:var(--muted)}
+.faq{max-width:780px}
+details{border-bottom:1px solid var(--line)}
+details:first-of-type{border-top:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font:700 21px "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:28px;font-weight:500;color:var(--accent);transition:transform .3s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{margin:0 0 24px;color:var(--muted);max-width:60ch;animation:show .4s}
+@keyframes show{from{opacity:0;transform:translateY(-6px)}}
+.cta{background:radial-gradient(100% 140% at 85% 0,var(--xr2),var(--xr));color:#fff;border-radius:34px;padding:72px 36px;text-align:center;margin:0 0 88px}
+.cta h2{font-size:clamp(30px,4.2vw,52px);font-weight:800;max-width:16ch;margin:auto}
+.cta p{color:var(--xr-ink);margin:16px auto 30px;max-width:42ch}
+.cta .actions{justify-content:center}
+.cta .btn{border-color:#fff;color:#fff}.cta .btn.fill{background:var(--warm);border-color:var(--warm);color:#1B1405}
+footer{border-top:1px solid var(--line);padding:40px 0 48px;color:var(--muted);font-size:15px}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
+footer nav{margin:0;flex:none}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:12px;font-size:15px;opacity:0;pointer-events:none;transition:all .3s;max-width:90vw;text-align:center;z-index:20}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:900px){nav.top{display:none}.bar{justify-content:space-between}.hero,.split,.split.rev{grid-template-columns:1fr;gap:40px}.hero{padding:44px 0 56px}.grid{grid-template-columns:1fr 1fr}.split>div:first-child h2{position:static}section.blk{padding:64px 0}.bar .btn{padding:9px 15px;font-size:15px}.brand span{display:none}}
+@media (max-width:560px){.grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}.row.on::after{width:100%}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <a class="brand" href="#inicio"><svg viewBox="0 0 32 32" fill="none" stroke="var(--accent)" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M7 25 25 7"/><circle cx="7" cy="25" r="3.6" fill="var(--bg)"/><circle cx="25" cy="7" r="3.6" fill="var(--bg)"/></svg><span>Ortosistema</span></a>
+  <nav class="top" aria-label="Principal"><a href="#funciones">Funciones</a><a href="#como-funciona">Cómo funciona</a><a href="#administracion">Administración</a><a href="#preguntas">Preguntas</a></nav>
+  <div class="actions"><a class="btn go" data-go="login" href="#">Iniciar sesión</a><a class="btn fill go" data-go="registro" href="#">Registrarse</a></div>
+</div></header>
+
+<main id="inicio">
+<div class="wrap">
+<section class="hero">
+  <div>
+    <h1>Todo el expediente, alrededor de un solo paciente.</h1>
+    <p class="lead">Abre un paciente y cada imagen, procedimiento, documento, órtesis, antecedente y registro se guarda en su ficha. Nada queda suelto.</p>
+    <div class="actions"><a class="btn fill go" data-go="registro" href="#">Registrarse</a><a class="btn go" data-go="login" href="#">Iniciar sesión</a></div>
+  </div>
+  <div class="scope" aria-label="Ejemplo animado de la ficha del paciente">
+    <div class="fh"><span class="av">PA</span><div><b>Paciente activo</b><small>Ficha abierta</small></div><span class="live"><i></i>Conectado</span></div>
+    <ul class="rows" id="rows"></ul>
+    <p class="cap" id="cap" aria-live="polite"></p>
+  </div>
+</section>
+</div>
+
+<div class="wrap"><section class="blk" id="funciones">
+  <div class="head"><h2>Seis secciones, un solo paciente</h2><p>Todo lo que registras en cualquier sección se guarda en la ficha del paciente activo.</p></div>
+  <div class="grid" id="feat"></div>
+</section></div>
+
+<div class="wrap"><section class="blk split" id="como-funciona">
+  <div><h2>Cómo funciona</h2><p>De la cuenta de administrador al trabajo diario con el paciente, en cuatro pasos.</p></div>
+  <ol>
+    <li class="step"><span class="mk">1</span><h3>Crea la cuenta de administrador</h3><p>El primer registro es el del administrador. Desde esa cuenta controlas todo el sistema.</p></li>
+    <li class="step"><span class="mk">2</span><h3>Agrega a tu equipo</h3><p>Crea usuarios y activa o quita funciones a cada uno. Si alguien olvida su contraseña, tú la cambias o la recuperas.</p></li>
+    <li class="step"><span class="mk">3</span><h3>Abre un paciente</h3><p>Busca o registra al paciente. Queda como paciente activo en todas las secciones hasta que abras otro.</p><span class="chip"><i></i>Paciente activo</span></li>
+    <li class="step"><span class="mk">4</span><h3>Trabaja con todo conectado</h3><p>Lo que subas o anotes se guarda en la ficha del paciente activo.</p></li>
+  </ol>
+</section></div>
+
+<div class="wrap"><section class="blk split rev" id="administracion">
+  <div><h2>Tú decides quién usa qué</h2><p>El administrador crea los usuarios y activa o quita funciones para cada uno. También puede cambiar y recuperar contraseñas, sin depender de nadie más.</p></div>
+  <div class="perm" aria-label="Ejemplo animado de funciones por usuario">
+    <h3>Funciones del usuario</h3><small>Ejemplo de cómo se ajustan los permisos</small>
+    <div id="perm"></div>
+    <div class="pw"><span>Cambiar contraseña</span><span>Recuperar contraseña</span></div>
+  </div>
+</section></div>
+
+<div class="wrap"><section class="blk" id="preguntas">
+  <div class="head"><h2>Preguntas frecuentes</h2></div>
+  <div class="faq">
+    <details><summary>¿Qué es el paciente activo?</summary><p>Es el paciente que tienes abierto. Mientras esté activo, todo lo que subas o registres en cualquier sección se guarda en su ficha.</p></details>
+    <details><summary>¿Quién crea los usuarios?</summary><p>El administrador. Se registra la primera vez y desde su cuenta crea a cada usuario del equipo.</p></details>
+    <details><summary>¿Puedo limitar lo que ve cada usuario?</summary><p>Sí. El administrador agrega o quita funciones para cada usuario cuando lo necesite.</p></details>
+    <details><summary>¿Qué pasa si alguien olvida su contraseña?</summary><p>El administrador puede cambiarla o recuperarla desde el sistema.</p></details>
+    <details><summary>¿Cómo empiezo?</summary><p>Presiona Registrarse para crear la cuenta de administrador. Después agrega a tu equipo y abre tu primer paciente.</p></details>
+  </div>
+</section></div>
+
+<div class="wrap"><section class="cta">
+  <h2>Empieza con tu cuenta de administrador</h2>
+  <p>Regístrate, crea a tu equipo y abre tu primer paciente.</p>
+  <div class="actions"><a class="btn fill go" data-go="registro" href="#">Registrarse</a><a class="btn go" data-go="login" href="#">Iniciar sesión</a></div>
+</section></div>
+</main>
+
+<footer><div class="wrap">
+  <div><b style="font:800 20px 'Bricolage Grotesque',sans-serif;color:var(--ink)">Ortosistema</b><br>Gestión ortopédica centrada en el paciente.</div>
+  <nav aria-label="Pie"><a href="#funciones">Funciones</a><a href="#como-funciona">Cómo funciona</a><a href="#preguntas">Preguntas</a></nav>
+</div></footer>
+<div id="toast" role="status"></div>
+
+<script>
+// Pon aquí las rutas reales de tu sistema, por ejemplo "login.html" y "registro.html".
+const URLS = { login: "index.html?enter=1", registro: "index.html?enter=1" };
+
+const items = [
+ {n:"Imágenes", d:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/>', f:"Radiografías y estudios de imagen, siempre dentro de la ficha del paciente.", t:"Cada radiografía y estudio de imagen queda en la ficha del paciente activo."},
+ {n:"Procedimientos", d:'<path d="M12 4v16M4 12h16"/>', f:"Registra cirugías y procedimientos directamente sobre el paciente activo.", t:"Las cirugías y procedimientos se registran directamente en el paciente."},
+ {n:"Documentos", d:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>', f:"Consentimientos, informes y autorizaciones en un solo lugar.", t:"Consentimientos, informes y autorizaciones se guardan junto al paciente."},
+ {n:"Órtesis", d:'<path d="M5 19 19 5"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/>', f:"Las órtesis indicadas y entregadas quedan ligadas a su historial.", t:"Las órtesis indicadas y entregadas quedan ligadas a su historial."},
+ {n:"Antecedentes", d:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', f:"Consulta los antecedentes sin salir de la ficha.", t:"Los antecedentes se consultan en la misma ficha, sin buscar en otro lado."},
+ {n:"Registros", d:'<path d="M5 6h14M5 12h14M5 18h9"/>', f:"Evaluaciones y notas clínicas en orden y a la vista.", t:"Cada evaluación y nota clínica se suma al registro del paciente."}
+];
+const ic = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+document.getElementById("feat").innerHTML = items.map(i => `<div class="fe"><div class="ib">${ic(i.d)}</div><h3>${i.n}</h3><p>${i.f}</p></div>`).join("");
+
+// Ficha del paciente: las secciones se van guardando una por una
+const rowsEl = document.getElementById("rows"), cap = document.getElementById("cap");
+rowsEl.innerHTML = items.map((i, k) => `<li class="row" data-i="${k}" tabindex="0" role="button">${ic(i.d)}<span class="n">${i.n}</span><span class="st">Pendiente</span></li>`).join("");
+const rows = [...rowsEl.children];
+let cur = -1, pause = 0;
+function show(i) {
+  cur = i;
+  rows.forEach((r, k) => {
+    r.classList.toggle("on", k === i);
+    r.classList.toggle("done", k < i);
+    r.querySelector(".st").textContent = k < i ? "Guardado" : k === i ? "Guardando…" : "Pendiente";
+  });
+  cap.innerHTML = i < 0 ? "" : "<b>" + items[i].n + ".</b> " + items[i].t;
+}
+function allDone() { cur = items.length; rows.forEach(r => { r.classList.remove("on"); r.classList.add("done"); r.querySelector(".st").textContent = "Guardado"; }); cap.innerHTML = "<b>Todo conectado.</b> Cada dato quedó en la ficha del paciente activo."; }
+rows.forEach(r => {
+  const pick = () => { show(+r.dataset.i); pause = Date.now() + 9000; };
+  r.addEventListener("click", pick);
+  r.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+});
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+show(0);
+if (!still) setInterval(() => {
+  if (Date.now() < pause) return;
+  if (cur < items.length - 1) show(cur + 1); else if (cur === items.length - 1) allDone(); else show(0);
+}, 2600);
+else allDone();
+
+// Permisos: los interruptores cambian solos
+const names = ["Imágenes","Procedimientos","Documentos","Órtesis","Antecedentes","Registros"], state = [1,1,1,0,1,0];
+const perm = document.getElementById("perm");
+perm.innerHTML = names.map((n, k) => `<div class="pr${state[k] ? " on" : ""}"><span>${n}</span><span class="sw"></span></div>`).join("");
+const prs = [...perm.children];
+let seq = [3,5,0,2,3,5,0,2], p = 0;
+if (!still) setInterval(() => { const k = seq[p++ % seq.length]; prs[k].classList.toggle("on"); }, 1700);
+
+// Pasos al hacer scroll
+const steps = document.querySelectorAll(".step");
+if ("IntersectionObserver" in window && !still) {
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } }), {threshold:.6});
+  steps.forEach(x => io.observe(x));
+} else steps.forEach(x => x.classList.add("on"));
+
+// Botones de acceso
+const toast = document.getElementById("toast");
+document.querySelectorAll(".go").forEach(b => b.addEventListener("click", e => {
+  const url = URLS[b.dataset.go];
+  if (url) { b.href = url; return; }
+  e.preventDefault();
+  toast.textContent = "Conecta este botón con tu pantalla de " + (b.dataset.go === "login" ? "inicio de sesión" : "registro") + " en URLS, dentro del script.";
+  toast.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => toast.classList.remove("show"), 3800);
+}));
+</script>
+</body>
+</html>

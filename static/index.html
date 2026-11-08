@@ -1800,11 +1800,14 @@ else if(g.id=="nx"){const row=document.getElementById("nvrow"),a=document.getEle
 else if(g.classList&&g.classList.contains("mb")){mbUpd(g)}});
 document.addEventListener("input",e=>{const d=e.target.dataset;if(e.target.type=="range"&&e.target.id){const o=document.getElementById(e.target.id+"o");if(o)o.textContent=e.target.value+"/10"}if(d.pf=="q"){S.pf.q=e.target.value;$("#pcl").innerHTML=listaProc().html}else if(e.target.id&&e.target.id.endsWith("_other")){const id=e.target.id.replace("_other","");const hid=document.getElementById(id);if(hid)hid.value=e.target.value}else if(d.pa=="dr")S.pa.dr=e.target.value;else if(d.of=="q"){S.of.q=e.target.value;$("#ocl").innerHTML=listaOrt().html}else if(d.oa=="dr"||d.oa=="ind")S.oa[d.oa]=e.target.value});
 async function boot(){
+const params=new URLSearchParams(location.search);
+const enter=params.has("enter")||params.has("login")||params.has("registro");
+if(enter){ try{history.replaceState(null,"",location.pathname)}catch(e){} }
 try{
   const e=await api("/api/estado");
   S.nuevo=!!e.requiere_registro;
-  if(!token()) return vLanding();
-  await cargar();
+  if(enter) return vLogin();
+  if(!token()) { location.href="portada.html"; return; }
   await cargar();
 }catch(err){
   if(/sesi[oó]n|token|credencial/i.test(err.message)){localStorage.removeItem(TK);return vLogin()}
