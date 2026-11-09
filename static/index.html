@@ -454,7 +454,7 @@ function fromK(k,r){
   let o;
   if(k=="P")o={id:r.id,cd:r.codigo||"",n:r.nombre||"",e:r.edad??"",c:r.cedula||"",s:r.seguro||"",al:r.alergias||"",
     dx:r.diagnostico||"",fn:r.fecha_nacimiento?String(r.fecha_nacimiento).slice(0,10):"",
-    sx:r.sexo||"",tl:r.telefono||"",em:r.correo||"",na:r.numero_afiliado||"",
+    sx:r.sexo||"",tl:r.telefono||"",em:r.correo||"",na:r.numero_afiliado||"",oc:r.ocupacion||"",
     am:r.antecedentes_morbidos||"",aq:r.antecedentes_quirurgicos||"",
     me:r.medicamentos||"",af:r.antecedentes_familiares||"",ha:r.habitos||"",
     ea:r.estado_atencion||"Por agendar",eu:r.estado_autorizacion||"Por solicitar",
@@ -494,7 +494,7 @@ function fromK(k,r){
 function toK(k,o){
   if(k=="P")return{nombre:o.n,edad:o.e===""||o.e==null?null:+o.e,cedula:o.c||null,seguro:o.s||null,
     alergias:o.al||null,diagnostico:o.dx||null,fecha_nacimiento:o.fn||null,sexo:o.sx||null,
-    telefono:o.tl||null,correo:o.em||null,numero_afiliado:o.na||null,
+    telefono:o.tl||null,correo:o.em||null,numero_afiliado:o.na||null,ocupacion:o.oc||null,
     antecedentes_morbidos:o.am||null,antecedentes_quirurgicos:o.aq||null,
     medicamentos:o.me||null,antecedentes_familiares:o.af||null,habitos:o.ha||null,
     estado_atencion:o.ea||"Por agendar",estado_autorizacion:o.eu||"Por solicitar",
@@ -842,7 +842,7 @@ gestion:()=>card("Referimientos",tk("R",id,["Fecha","Detalle","Estado"],x=>[x.f,
 ortesis:()=>`<p><button class="btn p" data-a="ao:${id}">${ic("plus",16)} Asignar órtesis</button></p>`+card("Órtesis indicadas",tk("OP",id,["Fecha","Órtesis","Lado","Talla","Médico","Estado"],x=>[x.f,`<span class="ocell">${ortImg(x.n,"sm")}<span>${esc(x.n)}</span></span>`,esc(x.lado||"—"),esc(x.talla||"—"),esc(x.dr||"—"),bd(x.e)])),
 documentos:()=>`<p><button class="btn p" data-a="ud:${id}">${ic("up",16)} Subir documento</button></p>`+card("Documentos del paciente",tDocs(DB.D.map((x,i)=>[x,i]).filter(([x])=>x.p==id),false))
 };
-return `<div class="card ph"><div class="ph-head"><div class="ph-id">${avSexo(p.sx,"lg")}<div class="ph-info"><div class="ph-name-row"><h2>${esc(p.n)}</h2>${p.cd?`<span class="code">${esc(p.cd)}</span>`:""}</div><div class="ph-meta">${p.e} años · Cédula ${esc(p.c||"—")} · ${esc(p.s||"Sin seguro")}</div><div class="ph-chips">${chip(EA,p.ea)}${chip(EU,effAu(p))}${p.al?`<span class="b er">${ic("alert",13)} Alergia</span>`:""}</div></div></div><div class="ph-actions"><button class="btn p" data-a="ev:med" data-ic="1">${ic(DB.E.some(e=>e.p==p.id&&e.tp=="Médica")?"usercheck":"stethoscope",14)} Evaluación médica</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
+return `<div class="card ph"><div class="ph-head"><div class="ph-id">${avSexo(p.sx,"lg")}<div class="ph-info"><div class="ph-name-row"><h2>${esc(p.n)}</h2>${p.cd?`<span class="code">${esc(p.cd)}</span>`:""}</div><div class="ph-meta">${p.e} años · Cédula ${esc(p.c||"—")} · ${p.oc?p.oc+" · ":""}${esc(p.s||"Sin seguro")}</div><div class="ph-chips">${chip(EA,p.ea)}${chip(EU,effAu(p))}${p.al?`<span class="b er">${ic("alert",13)} Alergia</span>`:""}</div></div></div><div class="ph-actions"><button class="btn p" data-a="ev:med" data-ic="1">${ic(DB.E.some(e=>e.p==p.id&&e.tp=="Médica")?"usercheck":"stethoscope",14)} Evaluación médica</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
 <div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="p-${id}-${k}">${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p>${(B2[tab]||B2.resumen)()}`}
 function fDelP(id){
   const p=pk(id);if(!p||!p.n)return;
@@ -1067,9 +1067,28 @@ const PROTS=[
 const SURGS=[["Cirugias ortopedicas",["Artroscopia de rodilla","Artroscopia de hombro","Reemplazo total de rodilla","Reemplazo total de cadera","Reduccion abierta y fijacion interna (RAFI)","Osteosintesis de fractura","Fijacion de fractura de radio distal","Cirugia de hallux valgus","Discectomia lumbar","Fusion lumbar","Laminectomia","Cirugia de tunel carpiano","Reparacion de manguito rotador","Reconstruccion de LCA","Meniscectomia","Osteotomia","Extraccion de material de osteosintesis"]],["Cirugias generales",["Apendicectomia","Colecistectomia","Hernioplastia inguinal","Histerectomia","Cesarea","Prostatectomia","Tiroidectomia","Amigdalectomia","Septoplastia","Liberacion de Dupuytren"]],["Cirugias de columna",["Discectomia cervical","Discectomia lumbar","Fusion lumbar","Laminectomia","Artroplastia de facet"]],["Otras cirugias",["Cirugia cardiovascular","Cirugia vascular","Cirugia oncologica","Cirugia bariatri","Trasplante de organo"]]];
 const FAMH=["Diabetes mellitus","Hipertension arterial","Cardiopatia isquemica","Accidente cerebrovascular","Cancer (mama)","Cancer (prostata)","Cancer (colon)","Artritis reumatoide","Artrosis","Osteoporosis","Gota","Asma","EPOC","Epilepsia","Enfermedad de Alzheimer","Enfermedad renal cronica","Hepatopatia","Trastorno de coagulacion","Obesidad","Dislipidemia","Enfermedad tiroidea","Tuberculosis","Anemia","Migraña","SIDA","Fibrosis quistica","Enfermedad de Parkinson","Sarcoidosis","Lupus eritematoso sistemico"];
 const antField=(id,label,catalog,groups,hint)=>`<div class="af"><label class="mu">${label}</label><select id="${id}_sel" data-ant="${id}" class="ant-sel"><option value="">Selecciona...</option>${groups?groups.map(([g,items])=>`<optgroup label="${esc(g)}">${items.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}</optgroup>`).join(""):catalog.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}<option value="__otros__">Otros</option></select><textarea id="${id}_other" rows="2" style="display:none;margin-top:6px" placeholder="Especifica..."></textarea><input type="hidden" id="${id}">${hint?`<p class="mu" style="margin:6px 0 0">${hint}</p>`:""}</div>`;
+const OCUPACIONES={
+"Hogar y personal":["Ama de casa","Estudiante","Desempleado/a","Jubilado/a","Pensionado/a","Nino/a"],
+"Salud":["Medico/a","Enfermero/a","Farmaceutico/a","Odontologo/a","Fisioterapeuta","Psicologo/a","Nutricionista","Veterinario/a","Tecnico de laboratorio"],
+"Educacion":["Profesor/a","Maestro/a","Educador/a","Investigador/a"],
+"Ingenieria y tecnologia":["Ingeniero/a","Arquitecto/a","Informatico/a","Programador/a","Tecnico/a"],
+"Legal y administracion":["Abogado/a","Contador/a","Administrador/a","Secretario/a","Gerente","Empresario/a","Funcionario/a publico"],
+"Comercio y servicios":["Comerciante","Vendedor/a","Cajero/a","Mesero/a","Peluquero/a","Conductor/a","Mecanico/a","Electricista","Plomero/a"],
+"Construccion e industria":["Albanil","Carpintero/a","Soldador/a","Obrero/a","Tecnico industrial"],
+"Agricultura":["Agricultor/a","Ganadero/a","Pescador/a"],
+"Arte y comunicacion":["Artista","Disenador/a","Periodista","Fotografo/a","Musico/a"]
+};
+function occSelect(id, val){
+  const isOther = val && !Object.values(OCUPACIONES).flat().includes(val);
+  let h='<select id="'+id+'">';
+  for(const g in OCUPACIONES){ h+='<optgroup label="'+g+'">'; for(const o of OCUPACIONES[g]) h+='<option value="'+o+'"'+(o===val?' selected':'')+'>'+o+'</option>'; h+='</optgroup>'; }
+  h+='<option value="__otro__"'+(isOther?' selected':'')+'>Otro (escribir)</option></select>';
+  h+='<input id="'+id+'_other" placeholder="Escribe la ocupacion" style="margin-top:4px;display:'+(isOther?'':'none')+'" value="'+(isOther?val:'')+'">';
+  return h;
+}
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
-${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",'<input id="nf" type="date" max="'+new Date().toISOString().slice(0,10)+'">')}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <button type="button" class="btn" data-a="buscarpadron" title="Buscar en padrón electoral (JCE)" style="padding:2px 8px;font-size:12px">Buscar padrón</button> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
+${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",'<input id="nf" type="date" max="'+new Date().toISOString().slice(0,10)+'">')}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <button type="button" class="btn" data-a="buscarpadron" title="Buscar en padrón electoral (JCE)" style="padding:2px 8px;font-size:12px">Buscar padrón</button> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
 <br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",'<select id="ns">'+opt(SEG)+"</select>")}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
 <br>${card("Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}</div>`)}
 <br>${card("Antecedentes",`${mbSel([])}
@@ -1094,6 +1113,8 @@ async function cedulaLookup(){
 }
 document.addEventListener("blur", e=>{ if(e.target && e.target.id==="nc") cedulaLookup(); }, true);
 
+document.addEventListener("change", e=>{ if(e.target && e.target.id==="oc"){ const o=document.getElementById("oc_other"); if(o) o.style.display = e.target.value==="__otro__" ? "" : "none"; } });
+
 async function gp(){const v=i=>$("#"+i).value.trim(),er=m=>{$("#nr").textContent=m},n=v("nn"),fn0=v("nf");
 let fn=fn0;
 if(!fn){const a=+v("ne").replace(/\D/g,"");if(a&&a>0&&a<=130){const d=new Date();d.setFullYear(d.getFullYear()-a);fn=d.toISOString().slice(0,10)}}
@@ -1101,7 +1122,8 @@ if(!n)return er("Escribe el nombre completo.");
 if(!fn)return er("Elige la fecha de nacimiento en el calendario.");
 if(!v("nx"))return er("Selecciona el sexo.");
 const mb=[...document.querySelectorAll(".mb")].filter(x=>x.checked).map(x=>x.value).concat(v("no")?[v("no")]:[]);
-const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),em:v("nm"),s:v("ns"),na:v("na"),al:v("nl"),dx:v("ni"),am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,ea:"Por agendar",eu:/Privado/i.test(v("ns"))?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
+const ocVal=v("oc")==="__otro__"?v("oc_other"):v("oc");
+const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),em:v("nm"),s:v("ns"),na:v("na"),al:v("nl"),dx:v("ni"),oc:ocVal,am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,ea:"Por agendar",eu:/Privado/i.test(v("ns"))?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
 const dupByCode = rec.c?null: (rec.cd ? DB.P.find(x=>x.cd && x.cd===rec.cd) : null);
 const dupByCed = rec.c ? DB.P.find(x=>x.c && x.c===rec.c) : null;
 const dupByName = DB.P.filter(x=>(x.n||"").toLowerCase()===(rec.n||"").toLowerCase());
@@ -1123,7 +1145,7 @@ if (dups.length) {
   o.querySelector("#dup_cancel").onclick=()=>o.remove();
   o.querySelector("#dup_nuevo").onclick=async()=>{o.remove();try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}};
   o.querySelector("#dup_add").onclick=async()=>{o.remove();
-    const campos=["e","c","s","al","dx","fn","sx","tl","em","na","am","aq","me","af","ha","ea","eu"];
+    const campos=["e","c","s","al","dx","fn","sx","tl","em","na","oc","am","aq","me","af","ha","ea","eu"];
     for(const k of campos){ if(rec[k]!==undefined && rec[k]!=="" && rec[k]!==null && (dup[k]===undefined || dup[k]==="" || dup[k]===null)){ dup[k]=rec[k] } }
     // also set codigo stays
     try{ await editarK("P",dup); const idx=DB.P.findIndex(x=>x.id==dup.id); if(idx>=0) DB.P[idx]=dup; toast("Informacion actualizada en el paciente existente"); go("pacientes") }catch(e){er(e.message)} };

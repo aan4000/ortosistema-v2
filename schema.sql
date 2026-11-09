@@ -16,10 +16,11 @@ create table if not exists pacientes(
   id serial primary key,
   codigo text unique,
   nombre text not null, edad int, cedula text, seguro text,
-  alergias text, diagnostico text,
+  alergias text, diagnostico text, ocupacion text,
   etapa int not null default 0,
   creado_en timestamptz not null default now());
 alter table pacientes add column if not exists codigo text unique;
+alter table pacientes add column if not exists ocupacion text;
 alter table pacientes alter column codigo set default ('P-' || lpad(nextval('paciente_codigo_seq')::text, 4, '0'));
 alter table pacientes add column if not exists antecedentes_morbidos text;
 alter table pacientes add column if not exists antecedentes_quirurgicos text;
