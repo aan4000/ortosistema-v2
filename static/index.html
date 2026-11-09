@@ -1142,7 +1142,7 @@ function vRecetas(){
     +`<p><button class="btn p" data-a="rxn">${ic("plus",16)} Nueva ${tab=="medicamento"?"receta":"orden de protesis"}</button></p>`
     +card(tab=="medicamento"?"Medicamentos recetados":"Protesis indicadas",
        tbl(["Fecha","Tipo","Items","Verificacion",""],
-         lista.map((x)=>[x.f,x.t=="medicamento"?"Medicamento":"Protesis",x.it.length+" item(s)",vb(x),`<button class="btn" data-a="rxp:${DB.X.indexOf(x)}">${ic("doc",14)} Ver/Imprimir</button> <button class="btn" data-a="rxe:${DB.X.indexOf(x)}">${ic("edit",14)} Editar</button>`])))
+         lista.map((x)=>[x.f,x.t=="medicamento"?"Medicamento":"Protesis",x.it.length+" item(s)",vb(x),`<button class="btn" data-a="rxp:${DB.X.indexOf(x)}">${ic("doc",14)} Ver/Imprimir</button> <button class="btn" data-a="rxe:${DB.X.indexOf(x)}">${ic("edit",14)} Editar</button> <button class="btn" data-a="vf:X.${DB.X.indexOf(x)}">${ic("shieldcheck",14)} ${x.v?"Quitar verificacion":"Verificar"}</button>`])))
     +(lista.length?"":`<p class="mu">Sin ${tab=="medicamento"?"recetas":"ordenes"} registradas.</p>`);
 }
 const formaDe=s=>{const m=String(s||"").match(/\(([^)]+)\)/);if(!m)return"";const f=m[1].toLowerCase();if(/tableta/.test(f))return"Tableta";if(/cápsula|capsula/.test(f))return"Cápsula";if(/inyectable|soluci[oó]n inyectable/.test(f))return"Inyectable";if(/jarabe/.test(f))return"Jarabe";if(/suspensi[oó]n/.test(f))return"Suspensión";if(/ungüento|unguento/.test(f))return"Ungüento";if(/gel/.test(f))return"Gel";if(/crema/.test(f))return"Crema";if(/soluci[oó]n/.test(f))return"Solución";if(/gotas/.test(f))return"Gotas";if(/supositorio/.test(f))return"Supositorio";if(/parche/.test(f))return"Parche";if(/pluma|vial|jeringa/.test(f))return"Inyectable";return""};
