@@ -43,7 +43,7 @@ nav a:hover{color:var(--ink);border-color:var(--accent)}
 h1{font-family:"Instrument Sans","Bricolage Grotesque",system-ui,sans-serif;font-size:clamp(44px,7vw,84px);font-weight:700;letter-spacing:-.04em}
 .lead{font-size:20px;color:var(--muted);max-width:44ch;margin:26px 0 34px}
 .hero .btn{padding:15px 30px;font-size:17px}
-.scope{background:radial-gradient(120% 90% at 50% 0,var(--xr2),var(--xr));border-radius:28px;padding:20px;box-shadow:0 30px 60px -30px rgba(8,20,29,.7);border:1px solid #1d3547;color:var(--xr-ink)}
+.scope{background:radial-gradient(120% 90% at 50% 0,var(--xr2),var(--xr));border-radius:32px;padding:20px;box-shadow:0 30px 60px -30px rgba(8,20,29,.7);border:1px solid #1d3547;color:var(--xr-ink)}
 .fh{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid #22394b}
 .av{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:700 16px "Bricolage Grotesque",sans-serif}
 .fh b{display:block;color:#fff;font:700 18px "Bricolage Grotesque",sans-serif;line-height:1.2}
@@ -67,9 +67,9 @@ section.blk{padding:88px 0;border-top:1px solid var(--line)}
 .head h2,.split h2{font-size:clamp(34px,4.4vw,56px);font-weight:800}
 .head p,.split>div>p{color:var(--muted);margin:18px 0 0}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
-.fe{padding:32px 28px 36px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transition:background .25s}
+.fe{padding:32px 28px 36px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transition:background .25s;border-radius:0}
 .fe:hover{background:var(--surface)}
-.fe .ib{width:48px;height:48px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;margin-bottom:20px;transition:background .25s,transform .25s}
+.fe .ib{width:48px;height:48px;border-radius:16px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;margin-bottom:20px;transition:background .25s,transform .25s}
 .fe:hover .ib{background:var(--accent);transform:rotate(-6deg)}
 .fe svg{width:24px;height:24px;fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .25s}
 .fe:hover svg{stroke:var(--on-accent)}
@@ -91,7 +91,7 @@ li.step.on::before{transform:scaleY(1)}
 .step p{margin:0;color:var(--muted);max-width:50ch}
 .chip{display:inline-flex;align-items:center;gap:9px;margin-top:16px;padding:7px 16px;border-radius:99px;background:var(--xr);color:var(--xr-ink);font-size:14.5px;font-weight:500}
 .chip i{width:9px;height:9px;border-radius:50%;background:var(--warm);display:block}
-.perm{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:24px 26px}
+.perm{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:24px 26px;transition:transform .25s,box-shadow .25s}.perm:hover{transform:translateY(-4px);box-shadow:0 16px 36px -20px rgba(0,0,0,.2)}
 .perm h3{font-size:22px}
 .perm small{color:var(--muted);font-size:14.5px}
 .pr{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);font-weight:500}
@@ -110,7 +110,7 @@ summary::after{content:"+";font-size:28px;font-weight:500;color:var(--accent);tr
 details[open] summary::after{transform:rotate(45deg)}
 details p{margin:0 0 24px;color:var(--muted);max-width:60ch;animation:show .4s}
 @keyframes show{from{opacity:0;transform:translateY(-6px)}}
-.cta{background:radial-gradient(100% 140% at 85% 0,var(--xr2),var(--xr));color:#fff;border-radius:34px;padding:72px 36px;text-align:center;margin:0 0 88px}
+.cta{background:radial-gradient(100% 140% at 85% 0,var(--xr2),var(--xr));color:#fff;border-radius:36px;padding:72px 36px;text-align:center;margin:0 0 88px;transition:transform .25s}.cta:hover{transform:scale(1.01)}
 .cta h2{font-size:clamp(30px,4.2vw,52px);font-weight:800;max-width:16ch;margin:auto}
 .cta p{color:var(--xr-ink);margin:16px auto 30px;max-width:42ch}
 .cta .actions{justify-content:center}
@@ -128,11 +128,11 @@ footer nav{margin:0;flex:none}
 <body>
 <div class="bg-anim" aria-hidden="true">
 <span><svg viewBox="0 0 24 24"><path d="M6 4c-1.5 0-2.5 1-2.5 2.5S4.5 9 6 9h2v6H6c-1.5 0-2.5 1-2.5 2.5S4.5 20 6 20s2.5-1 2.5-2.5V16h7v1.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5-1-2.5-2.5-2.5h-2V9h2c1.5 0 2.5-1 2.5-2.5S19.5 4 18 4s-2.5 1-2.5 2.5V8h-7V6.5C8.5 5 7.5 4 6 4z"/></svg></span>
-<span><svg viewBox="0 0 24 24"><path d="M6 4c-1.5 0-2.5 1-2.5 2.5S4.5 9 6 9h2v6H6c-1.5 0-2.5 1-2.5 2.5S4.5 20 6 20s2.5-1 2.5-2.5V16h7v1.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5-1-2.5-2.5-2.5h-2V9h2c1.5 0 2.5-1 2.5-2.5S19.5 4 18 4s-2.5 1-2.5 2.5V8h-7V6.5C8.5 5 7.5 4 6 4z"/></svg></span>
-<span><svg viewBox="0 0 24 24"><path d="M6 4c-1.5 0-2.5 1-2.5 2.5S4.5 9 6 9h2v6H6c-1.5 0-2.5 1-2.5 2.5S4.5 20 6 20s2.5-1 2.5-2.5V16h7v1.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5-1-2.5-2.5-2.5h-2V9h2c1.5 0 2.5-1 2.5-2.5S19.5 4 18 4s-2.5 1-2.5 2.5V8h-7V6.5C8.5 5 7.5 4 6 4z"/></svg></span>
-<span><svg viewBox="0 0 24 24"><path d="M6 4c-1.5 0-2.5 1-2.5 2.5S4.5 9 6 9h2v6H6c-1.5 0-2.5 1-2.5 2.5S4.5 20 6 20s2.5-1 2.5-2.5V16h7v1.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5-1-2.5-2.5-2.5h-2V9h2c1.5 0 2.5-1 2.5-2.5S19.5 4 18 4s-2.5 1-2.5 2.5V8h-7V6.5C8.5 5 7.5 4 6 4z"/></svg></span>
-<span><svg viewBox="0 0 24 24"><path d="M6 4c-1.5 0-2.5 1-2.5 2.5S4.5 9 6 9h2v6H6c-1.5 0-2.5 1-2.5 2.5S4.5 20 6 20s2.5-1 2.5-2.5V16h7v1.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5-1-2.5-2.5-2.5h-2V9h2c1.5 0 2.5-1 2.5-2.5S19.5 4 18 4s-2.5 1-2.5 2.5V8h-7V6.5C8.5 5 7.5 4 6 4z"/></svg></span>
-<span><svg viewBox="0 0 24 24"><path d="M6 4c-1.5 0-2.5 1-2.5 2.5S4.5 9 6 9h2v6H6c-1.5 0-2.5 1-2.5 2.5S4.5 20 6 20s2.5-1 2.5-2.5V16h7v1.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5-1-2.5-2.5-2.5h-2V9h2c1.5 0 2.5-1 2.5-2.5S19.5 4 18 4s-2.5 1-2.5 2.5V8h-7V6.5C8.5 5 7.5 4 6 4z"/></svg></span>
+<span><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="3"/><path d="M12 8v10M9 18h6M10 12h4"/></svg></span>
+<span><svg viewBox="0 0 24 24"><path d="M8 3v18M16 3v18M5 7h6M5 11h6M5 15h6M13 9h6M13 13h6M13 17h6"/></svg></span>
+<span><svg viewBox="0 0 24 24"><path d="M4 4c4 0 6 4 6 8s-2 8-6 8M20 4c-4 0-6 4-6 8s2 8 6 8"/></svg></span>
+<span><svg viewBox="0 0 24 24"><path d="M2 12c2-3 4-3 6 0s4 3 6 0s4-3 6 0"/></svg></span>
+<span><svg viewBox="0 0 24 24"><path d="M4 4l6 8-6 8M20 4l-6 8 6 8"/></svg></span>
 </div>
 <header><div class="bar">
   <a class="brand" href="#inicio"><svg viewBox="0 0 32 32" fill="none" stroke="var(--accent)" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M7 25 25 7"/><circle cx="7" cy="25" r="3.6" fill="var(--bg)"/><circle cx="25" cy="7" r="3.6" fill="var(--bg)"/></svg><span>Ortosistema</span></a>
@@ -209,12 +209,14 @@ footer nav{margin:0;flex:none}
 const URLS = { login: "index.html?enter=1", registro: "index.html?enter=1" };
 
 const items = [
- {n:"Imágenes", d:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/>', f:"Radiografías y estudios de imagen, siempre dentro de la ficha del paciente.", t:"Cada radiografía y estudio de imagen queda en la ficha del paciente activo."},
- {n:"Procedimientos", d:'<path d="M12 4v16M4 12h16"/>', f:"Registra cirugías y procedimientos directamente sobre el paciente activo.", t:"Las cirugías y procedimientos se registran directamente en el paciente."},
- {n:"Documentos", d:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>', f:"Consentimientos, informes y autorizaciones en un solo lugar.", t:"Consentimientos, informes y autorizaciones se guardan junto al paciente."},
- {n:"Órtesis", d:'<path d="M5 19 19 5"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/>', f:"Las órtesis indicadas y entregadas quedan ligadas a su historial.", t:"Las órtesis indicadas y entregadas quedan ligadas a su historial."},
- {n:"Antecedentes", d:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', f:"Consulta los antecedentes sin salir de la ficha.", t:"Los antecedentes se consultan en la misma ficha, sin buscar en otro lado."},
- {n:"Registros", d:'<path d="M5 6h14M5 12h14M5 18h9"/>', f:"Evaluaciones y notas clínicas en orden y a la vista.", t:"Cada evaluación y nota clínica se suma al registro del paciente."}
+ {n:"Pacientes", d:'<path d="M8.6 11.6a3.6 3.6 0 1 0 0-7.2 3.6 3.6 0 0 0 0 7.2"/><path d="M2.6 20.4v-.9a4.9 4.9 0 0 1 4.9-4.9h2.2a4.9 4.9 0 0 1 4.9 4.9v.9"/>', f:"Expedientes clínicos completos con datos personales, antecedentes y evaluaciones.", t:"Todo el expediente del paciente en una sola ficha."},
+ {n:"Agenda", d:'<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9.6h18M8 3v3.6M16 3v3.6"/>', f:"Citas y cirugías programadas por día, con el paciente activo.", t:"La agenda se filtra por el paciente que estás atendiendo."},
+ {n:"Evaluaciones", d:'<path d="M12 4v16M4 12h16"/>', f:"Evaluación médica y examen físico con hallazgos estructurados.", t:"Cada evaluación queda en el registro del paciente activo."},
+ {n:"Imágenes", d:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/>', f:"Radiografías y estudios de imagen dentro de la ficha.", t:"Cada estudio de imagen queda en la ficha del paciente activo."},
+ {n:"Recetas", d:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>', f:"Medicamentos y prótesis ortopédicas recetadas al paciente.", t:"Las recetas se guardan en el registro del paciente activo."},
+ {n:"Procedimientos", d:'<path d="M12 2v20M8 6h8M8 10h8M8 14h8M8 18h8"/>', f:"Catálogo de procedimientos y asignación por paciente.", t:"Los procedimientos se asignan al paciente activo."},
+ {n:"Órtesis", d:'<path d="M5 19 19 5"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/>', f:"Órtesis indicadas y entregadas ligadas al historial.", t:"Las órtesis quedan ligadas al historial del paciente."},
+ {n:"Facturación", d:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>', f:"Cargos y cobros por paciente con procedimientos.", t:"La facturación se genera a partir del paciente activo."}
 ];
 const ic = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
 document.getElementById("feat").innerHTML = items.map(i => `<div class="fe"><div class="ib">${ic(i.d)}</div><h3>${i.n}</h3><p>${i.f}</p></div>`).join("");
