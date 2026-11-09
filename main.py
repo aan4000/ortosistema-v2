@@ -308,7 +308,7 @@ def salud():
 # ---------- Verificación de registros y documentos ----------
 VERIFICABLES = {"evaluaciones", "estudios_imagenes", "cirugias", "pt_sesiones", "formularios_proms",
                 "referimientos", "autorizaciones_preauth", "procedimientos_paciente",
-                "cargos_facturacion", "documentos", "ortesis_paciente"}
+                "cargos_facturacion", "documentos", "ortesis_paciente", "recetas"}
 
 
 class Verificar(BaseModel):
