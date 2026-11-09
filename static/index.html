@@ -612,6 +612,7 @@ async function entrar(usuario,password){
   localStorage.setItem("orto_landing_done","1");
   if(r.debe_cambiar_clave){S.tmp=password;S.user={u:usuario,nombre:r.nombre,rol:r.rol};return vForzar()}
   await cargar();
+  aplicarTema();
   S.route="inicio";
   draw();
 }
@@ -1751,7 +1752,7 @@ try{const rec={p:+id,f:hoy,t,tp:"Médica",dr:S.user.nombre,d:{}};const nid=await
 o.remove();draw();toast("Evaluación guardada")}catch(e){toast(e.message)}}}
 function um(){const u=S.user||{},o=modal(`<div class="row"><div><h3 style="margin:0">${esc(u.nombre||"Mi perfil")}</h3><p class="mu" style="margin:2px 0 0">${RL[u.rol]||u.rol} · ${esc(u.u||"")}${u.cargo?" · "+esc(u.cargo):""}</p></div><button class="icb" data-tip="Cerrar" aria-label="Cerrar" id="umx">${ic("x",18)}</button></div>${u.correo?`<p class="mu">${ic("mail",14)} ${esc(u.correo)}</p>`:""}<p>${u.preguntas?`<span class="b ok">${ic("shieldcheck",13)} Recuperación con preguntas activa</span>`:`<span class="b wa">${ic("shieldx",13)} Configura tus preguntas de seguridad</span>`}</p><div class="tb" style="margin-top:10px"><button class="btn" id="ucw">${ic("key",16)} Cambiar contraseña</button><button class="btn" id="usq">${ic("shieldq",16)} Preguntas de seguridad</button><button class="btn" id="ut">${ic("contrast",16)} Cambiar tema</button><button class="btn d" id="uo">${ic("out",16)} Cerrar sesión</button></div>`);
 o.querySelector("#umx").onclick=()=>o.remove();
-o.querySelector("#ut").onclick=()=>{const r=document.documentElement,dk=matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=(r.dataset.theme||(dk?"dark":"light"))=="dark"?"light":"dark"};
+o.querySelector("#ut").onclick=()=>{const r=document.documentElement,dk=matchMedia("(prefers-color-scheme: dark)").matches;const cur=r.dataset.theme||(dk?"dark":"light");const next=cur=="dark"?"light":"dark";r.dataset.theme=next;localStorage.setItem("orto_theme",next)};
 o.querySelector("#ucw").onclick=()=>{o.remove();miClave()};
 o.querySelector("#usq").onclick=()=>{o.remove();miSeguridad()};
 o.querySelector("#uo").onclick=()=>{localStorage.removeItem(TK);S.user=null;S.route="inicio";ovx();draw()}}
@@ -1800,7 +1801,9 @@ else if(d.oa){S.oa[d.oa]=g.value}
 else if(g.id=="nx"){const row=document.getElementById("nvrow"),a=document.getElementById("nvav"),t=document.getElementById("nvaT");if(!g.value){if(row)row.style.display="none";return}if(row)row.style.display="";if(a){a.className="avp "+claseSexo(g.value);a.innerHTML=silueta(g.value)}if(t)t.textContent=g.value==="Femenino"?"Paciente femenina":g.value==="Masculino"?"Paciente masculino":""}
 else if(g.classList&&g.classList.contains("mb")){mbUpd(g)}});
 document.addEventListener("input",e=>{const d=e.target.dataset;if(e.target.type=="range"&&e.target.id){const o=document.getElementById(e.target.id+"o");if(o)o.textContent=e.target.value+"/10"}if(d.pf=="q"){S.pf.q=e.target.value;$("#pcl").innerHTML=listaProc().html}else if(e.target.id&&e.target.id.endsWith("_other")){const id=e.target.id.replace("_other","");const hid=document.getElementById(id);if(hid)hid.value=e.target.value}else if(d.pa=="dr")S.pa.dr=e.target.value;else if(d.of=="q"){S.of.q=e.target.value;$("#ocl").innerHTML=listaOrt().html}else if(d.oa=="dr"||d.oa=="ind")S.oa[d.oa]=e.target.value});
+function aplicarTema(){const t=localStorage.getItem("orto_theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}
 async function boot(){
+aplicarTema();
 const params=new URLSearchParams(location.search);
 const enter=params.has("enter")||params.has("login")||params.has("registro");
 if(enter){ try{history.replaceState(null,"",location.pathname)}catch(e){} }
@@ -1810,6 +1813,7 @@ try{
   if(enter) return vLogin();
   if(!token()) { location.href="portada.html"; return; }
   await cargar();
+  aplicarTema();
 }catch(err){
   if(/sesi[oó]n|token|credencial/i.test(err.message)){localStorage.removeItem(TK);return vLogin()}
   $("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb">${ic("shield",28)}<b style="font-size:20px">OrtoSistema</b></div><h1>No se pudo conectar</h1><p class="mu">${esc(err.message)}</p><p class="mu">Revisa que la API esté encendida y vuelve a intentarlo.</p><button class="btn p" id="rbt" style="width:100%">Reintentar</button></div></div>`;
