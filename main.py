@@ -43,6 +43,8 @@ CORS = [o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()
 AQUI = Path(__file__).parent
 
 pool = ConnectionPool(DATABASE_URL, min_size=1, max_size=5, open=False,
+                      max_lifetime=300, max_idle=60,
+                      check=ConnectionPool.check_connection,
                       kwargs={"row_factory": dict_row})
 
 # Tablas y columnas permitidas. Es la única lista que toca SQL dinámico:
