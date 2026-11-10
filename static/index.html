@@ -1164,7 +1164,7 @@ function fRx(i){
   const o=modal(`<h3>${nu?"Nueva receta":"Editar receta"}</h3>
     <div class="fg">${fx("rx_t","Tipo",`<select id="rx_t"><option value="medicamento"${x.t=="medicamento"?" selected":""}>Medicamento ortopedico</option><option value="protesis"${x.t=="protesis"?" selected":""}>Protesis</option></select>`)}${fx("rx_f","Fecha",`<input id="rx_f" type="date" value="${iso(x.f)}">`)}${fx("rx_dr","Medico",fsel("rx_dr",dms(),x.dr))}</div>
     <p class="mu" style="margin:10px 0 4px">Items</p><div id="rx_items"></div>
-    <p><button class="btn" id="rx_add">${ic("plus",14)} Agregar item</button></p>
+    <p><button class="btn" id="rx_add">${ic("plus",14)} Agregar</button></p>
     <label class="mu" style="display:block;margin:8px 0">Notas<textarea id="rx_n" rows="2">${esc(x.n||"")}</textarea></label>
     <div class="er2" id="rx_er" role="alert"></div>
     <div class="tb"><button class="btn" id="rx_cancel" data-a="rx_cancel">Cancelar</button><button class="btn p" id="rx_g">Guardar</button>${nu?"":' <button class="btn d" id="rx_d">Eliminar</button>'}</div>`, "w");
