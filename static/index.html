@@ -821,6 +821,7 @@ function fPreauth(i){
 function verPreauth(i){
   const x=DB.A[i]; if(!x) return;
   const p=pk(x.p)||{}, hoy2=hoy;
+  const mailto="mailto:?subject="+encodeURIComponent("Pre-autorización - "+(p.n||"")+" - "+(x.t||""))+"&body="+encodeURIComponent("Adjunto la pre-autorización médica.\n\nPaciente: "+(p.n||"")+"\nCédula: "+(p.c||"")+"\nARS: "+(x.s||"")+"\nDiagnóstico: "+(x.dx||"")+"\nProcedimiento: "+(x.t||"")+"\nJustificación: "+(x.ju||"")+"\nMonto estimado: "+(x.mo==null?"":x.mo)+"\nVigencia: "+(x.d||"")+" días\nMédico: "+(x.mc||"")+"\nCentro: "+(x.ce||""));
   const win=window.open("","_blank");
   if(!win) return toast("Permite ventanas emergentes para ver la autorización.");
   const html=`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Pre-autorización</title>
@@ -833,9 +834,6 @@ function verPreauth(i){
     .row>div{flex:1;min-width:200px}
     .lbl{font-weight:700;font-size:11px;text-transform:uppercase;color:#444}
     .val{font-size:13px}
-    table{width:100%;border-collapse:collapse;margin:6px 0}
-    th,td{border:1px solid #333;padding:4px 6px;font-size:12px}
-    th{background:#eee}
     .sig{margin-top:40px;display:flex;gap:40px;justify-content:space-between}
     .sig div{flex:1;text-align:center;border-top:1px solid #333;padding-top:6px;font-size:11px}
     .actions{margin:12px 0;text-align:center}
@@ -849,12 +847,11 @@ function verPreauth(i){
     <div class="row"><div><span class="lbl">Nombre completo:</span> <span class="val">${esc(p.n||"")}</span></div><div><span class="lbl">Cédula:</span> <span class="val">${esc(p.c||"")}</span></div></div>
     <div class="row"><div><span class="lbl">Fecha de nacimiento:</span> <span class="val">${esc(p.fn||"")}</span></div><div><span class="lbl">Edad:</span> <span class="val">${esc(p.e||"")}</span></div><div><span class="lbl">Sexo:</span> <span class="val">${esc(p.sx||"")}</span></div></div>
     <div class="row"><div><span class="lbl">Teléfono:</span> <span class="val">${esc(p.tl||"")}</span></div><div><span class="lbl">Correo:</span> <span class="val">${esc(p.em||"")}</span></div></div>
-    <div class="row"><div><span class="lbl">ARS / Seguro:</span> <span class="val">${esc(x.s||"")}</span></div><div><span class="lbl">N° de afiliado:</span> <span class="val">${esc(p.na||"")}</span></div><div><span class="lbl">Plan:</span> <span class="val">${esc(p.s||"")}</span></div></div>
+    <div class="row"><div><span class="lbl">ARS / Seguro:</span> <span class="val">${esc(x.s||"")}</span></div><div><span class="lbl">N° de afiliado:</span> <span class="val">${esc(p.na||"")}</span></div></div>
   </div>
   <h2>2. Datos del prestador</h2>
   <div class="box">
     <div class="row"><div><span class="lbl">Médico solicitante:</span> <span class="val">${esc(x.mc||"")}</span></div><div><span class="lbl">Centro médico:</span> <span class="val">${esc(x.ce||"")}</span></div></div>
-    <div class="row"><div><span class="lbl">Especialidad:</span> <span class="val"></span></div><div><span class="lbl">Teléfono:</span> <span class="val"></span></div></div>
   </div>
   <h2>3. Datos clínicos</h2>
   <div class="box">
@@ -866,7 +863,7 @@ function verPreauth(i){
   </div>
   <h2>4. Documentos adjuntos</h2>
   <div class="box">
-    <p style="margin:2px 0;font-size:12px">☐ Informe médico ☐ Resultados de laboratorio ☐ Imágenes diagnósticas ☐ Receta médica ☐ Otros: ___________</p>
+    <p style="margin:2px 0;font-size:12px">&#9744; Informe médico &#9744; Resultados de laboratorio &#9744; Imágenes diagnósticas &#9744; Receta médica &#9744; Otros: ___________</p>
   </div>
   <h2>5. Declaración y firma</h2>
   <p style="font-size:12px">Declaro que la información proporcionada es veraz y que el procedimiento solicitado es médicamente necesario. Autorizo a la ARS a verificar la información con el prestador.</p>
@@ -877,15 +874,8 @@ function verPreauth(i){
   </div>
   <div class="actions">
     <button class="btn" onclick="window.print()">Imprimir</button>
-    <button class="btn" onclick="enviarCorreo()">Enviar por correo</button>
+    <button class="btn" onclick="window.location.href=${JSON.stringify(mailto)}">Enviar por correo</button>
   </div>
-  <script>
-    function enviarCorreo(){
-      const subj=encodeURIComponent("Pre-autorización - "+${JSON.stringify(p.n||"")}+" - "+${JSON.stringify(x.t||"")});
-      const body=encodeURIComponent("Adjunto la pre-autorización médica.\n\nPaciente: "+${JSON.stringify(p.n||"")}+"\nCédula: "+${JSON.stringify(p.c||"")}+"\nARS: "+${JSON.stringify(x.s||"")}+"\nDiagnóstico: "+${JSON.stringify(x.dx||"")}+"\nProcedimiento: "+${JSON.stringify(x.t||"")}+"\nJustificación: "+${JSON.stringify(x.ju||"")}+"\nMonto estimado: "+${JSON.stringify(String(x.mo==null?"":x.mo))}+"\nVigencia: "+${JSON.stringify(String(x.d||""))}+" días\nMédico: "+${JSON.stringify(x.mc||"")}+"\nCentro: "+${JSON.stringify(x.ce||"")});
-      window.location.href="mailto:?subject="+subj+"&body="+body;
-    }
-  <\/script>
   </body></html>`;
   win.document.write(html);
   win.document.close();
