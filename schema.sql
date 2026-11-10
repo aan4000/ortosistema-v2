@@ -12,15 +12,20 @@ create table if not exists usuarios(
 alter table usuarios add column if not exists debe_cambiar_clave boolean not null default false;
 
 create sequence if not exists paciente_codigo_seq start 1;
+create sequence if not exists paciente_expediente_seq start 1;
+select setval('paciente_expediente_seq', coalesce((select max(id) from pacientes), 1));
 create table if not exists pacientes(
   id serial primary key,
   codigo text unique,
+  expediente text unique,
   nombre text not null, edad int, cedula text, seguro text,
   alergias text, diagnostico text, ocupacion text,
   etapa int not null default 0,
   creado_en timestamptz not null default now());
 alter table pacientes add column if not exists codigo text unique;
 alter table pacientes add column if not exists ocupacion text;
+alter table pacientes add column if not exists expediente text unique;
+alter table pacientes alter column expediente set default ('EXP-' || lpad(nextval('paciente_expediente_seq')::text, 4, '0'));
 alter table pacientes alter column codigo set default ('P-' || lpad(nextval('paciente_codigo_seq')::text, 4, '0'));
 alter table pacientes add column if not exists antecedentes_morbidos text;
 alter table pacientes add column if not exists antecedentes_quirurgicos text;
@@ -266,3 +271,5 @@ create table if not exists recuperaciones(
   exito boolean not null default false,
   creado_en timestamptz not null default now());
 create index if not exists ix_recup_fecha on recuperaciones(creado_en);
+-- backfill expediente para pacientes existentes
+update pacientes set expediente='EXP-'||lpad(id::text,4,'0') where expediente is null;
