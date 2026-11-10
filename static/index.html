@@ -824,57 +824,101 @@ function verPreauth(i){
   const mailto="mailto:?subject="+encodeURIComponent("Pre-autorización - "+(p.n||"")+" - "+(x.t||""))+"&body="+encodeURIComponent("Adjunto la pre-autorización médica.\n\nPaciente: "+(p.n||"")+"\nCédula: "+(p.c||"")+"\nARS: "+(x.s||"")+"\nDiagnóstico: "+(x.dx||"")+"\nProcedimiento: "+(x.t||"")+"\nJustificación: "+(x.ju||"")+"\nMonto estimado: "+(x.mo==null?"":x.mo)+"\nVigencia: "+(x.d||"")+" días\nMédico: "+(x.mc||"")+"\nCentro: "+(x.ce||""));
   const win=window.open("","_blank");
   if(!win) return toast("Permite ventanas emergentes para ver la autorización.");
-  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Pre-autorización</title>
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Pre-autorización - ${esc(p.n||"")}</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;margin:24px;color:#111;font-size:13px}
-    h1{font-size:18px;margin:0 0 4px;text-align:center}
-    h2{font-size:14px;margin:14px 0 6px;border-bottom:1px solid #333;padding-bottom:2px}
-    .box{border:1px solid #333;padding:8px;margin:6px 0}
-    .row{display:flex;gap:12px;margin:2px 0;flex-wrap:wrap}
-    .row>div{flex:1;min-width:200px}
-    .lbl{font-weight:700;font-size:11px;text-transform:uppercase;color:#444}
-    .val{font-size:13px}
-    .sig{margin-top:40px;display:flex;gap:40px;justify-content:space-between}
-    .sig div{flex:1;text-align:center;border-top:1px solid #333;padding-top:6px;font-size:11px}
-    .actions{margin:12px 0;text-align:center}
-    .btn{padding:6px 12px;margin:0 4px;cursor:pointer}
-    @media print{.actions{display:none}}
+    *{box-sizing:border-box}
+    body{font-family:"Segoe UI",Arial,Helvetica,sans-serif;margin:0;padding:24px;color:#1a1a1a;font-size:13px;background:#fff}
+    .doc{max-width:820px;margin:0 auto;border:1px solid #cfd8dc;border-radius:10px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+    .head{text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #1e3a8a}
+    .head h1{font-size:18px;margin:0 0 2px;color:#1e3a8a}
+    .head .sub{font-size:11px;color:#555;margin:0}
+    .head .meta{display:flex;justify-content:space-between;font-size:11px;color:#666;margin-top:6px}
+    h2{font-size:13px;margin:16px 0 6px;padding:4px 8px;background:#eef3f8;border-left:4px solid #1e3a8a;color:#1e3a8a}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+    .field{margin:2px 0}
+    .lbl{font-weight:700;font-size:10.5px;text-transform:uppercase;color:#444;display:block}
+    .val{font-size:13px;min-height:16px;border-bottom:1px dotted #bbb;padding:1px 0}
+    .full{grid-column:1/-1}
+    .box{border:1px solid #cfd8dc;border-radius:8px;padding:10px;margin:6px 0;background:#fafbfd}
+    ul.checks{list-style:none;padding:0;margin:4px 0;display:flex;flex-wrap:wrap;gap:8px}
+    ul.checks li{font-size:12px}
+    .sig{margin-top:44px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;text-align:center}
+    .sig div{border-top:1px solid #333;padding-top:6px;font-size:11px;color:#333}
+    .sig small{display:block;color:#666;font-size:10px;margin-top:2px}
+    .actions{margin:16px 0;text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+    .btn{padding:8px 16px;border:1px solid #1e3a8a;border-radius:8px;background:#fff;color:#1e3a8a;cursor:pointer;font-size:13px;font-weight:600;transition:background .15s,transform .15s}
+    .btn:hover{background:#1e3a8a;color:#fff;transform:translateY(-1px)}
+    .btn.primary{background:#1e3a8a;color:#fff}
+    .btn.primary:hover{background:#16307a}
+    .footer{text-align:center;font-size:10px;color:#888;margin-top:16px;padding-top:8px;border-top:1px solid #ddd}
+    @media print{
+      body{margin:0;padding:12px}
+      .doc{border:0;box-shadow:none;padding:0}
+      .actions{display:none}
+      .sig div{page-break-inside:avoid}
+    }
   </style></head><body>
-  <h1>FORMULARIO DE PRE-AUTORIZACIÓN DE SERVICIOS DE SALUD</h1>
-  <p style="text-align:center;font-size:11px;margin:0 0 10px">República Dominicana · Uso por prestadores de servicios de salud y ARS</p>
-  <h2>1. Datos del afiliado (paciente)</h2>
-  <div class="box">
-    <div class="row"><div><span class="lbl">Nombre completo:</span> <span class="val">${esc(p.n||"")}</span></div><div><span class="lbl">Cédula:</span> <span class="val">${esc(p.c||"")}</span></div></div>
-    <div class="row"><div><span class="lbl">Fecha de nacimiento:</span> <span class="val">${esc(p.fn||"")}</span></div><div><span class="lbl">Edad:</span> <span class="val">${esc(p.e||"")}</span></div><div><span class="lbl">Sexo:</span> <span class="val">${esc(p.sx||"")}</span></div></div>
-    <div class="row"><div><span class="lbl">Teléfono:</span> <span class="val">${esc(p.tl||"")}</span></div><div><span class="lbl">Correo:</span> <span class="val">${esc(p.em||"")}</span></div></div>
-    <div class="row"><div><span class="lbl">ARS / Seguro:</span> <span class="val">${esc(x.s||"")}</span></div><div><span class="lbl">N° de afiliado:</span> <span class="val">${esc(p.na||"")}</span></div></div>
-  </div>
-  <h2>2. Datos del prestador</h2>
-  <div class="box">
-    <div class="row"><div><span class="lbl">Médico solicitante:</span> <span class="val">${esc(x.mc||"")}</span></div><div><span class="lbl">Centro médico:</span> <span class="val">${esc(x.ce||"")}</span></div></div>
-  </div>
-  <h2>3. Datos clínicos</h2>
-  <div class="box">
-    <div class="row"><div><span class="lbl">Diagnóstico (CIE-10):</span> <span class="val">${esc(x.dx||"")}</span></div></div>
-    <div class="row"><div><span class="lbl">Procedimiento / servicio solicitado:</span> <span class="val">${esc(x.t||"")}</span></div></div>
-    <div class="row"><div><span class="lbl">Justificación médica:</span> <span class="val">${esc(x.ju||"")}</span></div></div>
-    <div class="row"><div><span class="lbl">Fecha de solicitud:</span> <span class="val">${esc(x.f||"")}</span></div><div><span class="lbl">Vigencia (días):</span> <span class="val">${esc(x.d||"")}</span></div><div><span class="lbl">Monto estimado (RD$):</span> <span class="val">${x.mo==null?"":x.mo}</span></div></div>
-    <div class="row"><div><span class="lbl">Estado:</span> <span class="val">${esc(x.e||"")}</span></div></div>
-  </div>
-  <h2>4. Documentos adjuntos</h2>
-  <div class="box">
-    <p style="margin:2px 0;font-size:12px">&#9744; Informe médico &#9744; Resultados de laboratorio &#9744; Imágenes diagnósticas &#9744; Receta médica &#9744; Otros: ___________</p>
-  </div>
-  <h2>5. Declaración y firma</h2>
-  <p style="font-size:12px">Declaro que la información proporcionada es veraz y que el procedimiento solicitado es médicamente necesario. Autorizo a la ARS a verificar la información con el prestador.</p>
-  <div class="sig">
-    <div>Firma del médico solicitante<br><small>${esc(x.mc||"")}</small></div>
-    <div>Firma del afiliado / paciente<br><small>${esc(p.n||"")}</small></div>
-    <div>Sello del centro médico</div>
-  </div>
-  <div class="actions">
-    <button class="btn" onclick="window.print()">Imprimir</button>
-    <button class="btn" onclick="window.location.href=${JSON.stringify(mailto)}">Enviar por correo</button>
+  <div class="doc">
+    <div class="head">
+      <h1>FORMULARIO DE PRE-AUTORIZACIÓN DE SERVICIOS DE SALUD</h1>
+      <p class="sub">República Dominicana · Uso por prestadores de servicios de salud y ARS</p>
+      <div class="meta"><span>N° de autorización: ${esc(x.id||"")}</span><span>Fecha de solicitud: ${esc(x.f||"")}</span></div>
+    </div>
+    <h2>1. Datos del afiliado (paciente)</h2>
+    <div class="box">
+      <div class="grid">
+        <div class="field"><span class="lbl">Nombre completo</span><div class="val">${esc(p.n||"")}</div></div>
+        <div class="field"><span class="lbl">Cédula</span><div class="val">${esc(p.c||"")}</div></div>
+        <div class="field"><span class="lbl">Fecha de nacimiento</span><div class="val">${esc(p.fn||"")}</div></div>
+        <div class="field"><span class="lbl">Edad</span><div class="val">${esc(p.e||"")}</div></div>
+        <div class="field"><span class="lbl">Sexo</span><div class="val">${esc(p.sx||"")}</div></div>
+        <div class="field"><span class="lbl">Teléfono</span><div class="val">${esc(p.tl||"")}</div></div>
+        <div class="field"><span class="lbl">Correo</span><div class="val">${esc(p.em||"")}</div></div>
+        <div class="field"><span class="lbl">ARS / Seguro</span><div class="val">${esc(x.s||"")}</div></div>
+        <div class="field"><span class="lbl">N° de afiliado</span><div class="val">${esc(p.na||"")}</div></div>
+        <div class="field"><span class="lbl">Expediente</span><div class="val">${esc(p.xp||"")}</div></div>
+      </div>
+    </div>
+    <h2>2. Datos del prestador</h2>
+    <div class="box">
+      <div class="grid">
+        <div class="field"><span class="lbl">Médico solicitante</span><div class="val">${esc(x.mc||"")}</div></div>
+        <div class="field"><span class="lbl">Centro médico</span><div class="val">${esc(x.ce||"")}</div></div>
+        <div class="field"><span class="lbl">Especialidad</span><div class="val"></div></div>
+        <div class="field"><span class="lbl">Teléfono</span><div class="val"></div></div>
+      </div>
+    </div>
+    <h2>3. Datos clínicos</h2>
+    <div class="box">
+      <div class="field full"><span class="lbl">Diagnóstico (CIE-10)</span><div class="val">${esc(x.dx||"")}</div></div>
+      <div class="field full"><span class="lbl">Procedimiento / servicio solicitado</span><div class="val">${esc(x.t||"")}</div></div>
+      <div class="field full"><span class="lbl">Justificación médica</span><div class="val">${esc(x.ju||"")}</div></div>
+      <div class="grid">
+        <div class="field"><span class="lbl">Fecha de solicitud</span><div class="val">${esc(x.f||"")}</div></div>
+        <div class="field"><span class="lbl">Vigencia (días)</span><div class="val">${esc(x.d||"")}</div></div>
+        <div class="field"><span class="lbl">Monto estimado (RD$)</span><div class="val">${x.mo==null?"":x.mo}</div></div>
+        <div class="field"><span class="lbl">Estado</span><div class="val">${esc(x.e||"")}</div></div>
+      </div>
+    </div>
+    <h2>4. Documentos adjuntos</h2>
+    <div class="box">
+      <ul class="checks">
+        <li>&#9744; Informe médico</li><li>&#9744; Resultados de laboratorio</li><li>&#9744; Imágenes diagnósticas</li><li>&#9744; Receta médica</li><li>&#9744; Otros: ___________</li>
+      </ul>
+    </div>
+    <h2>5. Declaración y firma</h2>
+    <p style="font-size:12px;margin:4px 0">Declaro que la información proporcionada es veraz y que el procedimiento solicitado es médicamente necesario. Autorizo a la ARS a verificar la información con el prestador.</p>
+    <div class="sig">
+      <div>Firma del médico solicitante<br><small>${esc(x.mc||"")}</small></div>
+      <div>Firma del afiliado / paciente<br><small>${esc(p.n||"")}</small></div>
+      <div>Sello del centro médico</div>
+    </div>
+    <div class="footer">OrtoSistema · Documento generado el ${esc(hoy)}</div>
+    <div class="actions">
+      <button class="btn primary" onclick="window.print()">Imprimir</button>
+      <button class="btn" onclick="window.location.href=${JSON.stringify(mailto)}">Enviar por correo</button>
+      <button class="btn" onclick="window.close()">Cerrar</button>
+    </div>
   </div>
   </body></html>`;
   win.document.write(html);
