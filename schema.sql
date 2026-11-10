@@ -129,6 +129,11 @@ create table if not exists autorizaciones_preauth(
   procedimiento text, seguro text, estado text default 'Por solicitar', vence date);
 alter table autorizaciones_preauth add column if not exists verificado_por text;
 alter table autorizaciones_preauth add column if not exists verificado_en timestamptz;
+alter table autorizaciones_preauth add column if not exists diagnostico text;
+alter table autorizaciones_preauth add column if not exists justificacion text;
+alter table autorizaciones_preauth add column if not exists monto numeric;
+alter table autorizaciones_preauth add column if not exists medico text;
+alter table autorizaciones_preauth add column if not exists centro text;
 
 create table if not exists cargos_facturacion(
   id serial primary key,
