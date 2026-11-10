@@ -161,9 +161,9 @@ tr:hover td{background:var(--pri2)}
 .calpop .cf{display:flex;align-items:center;justify-content:space-between;gap:6px;border-top:1px solid var(--bd);margin-top:8px;padding-top:8px}
 @media(max-width:640px){.calpop{width:280px}}
 @media(prefers-reduced-motion:reduce){.calpop{animation:none}}
-.ab{position:sticky;top:57px;z-index:4;display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:8px 16px;background:var(--pri2);border-bottom:1px solid var(--bd);border-left:5px solid var(--pri)}
-.ai{width:36px;height:36px;border-radius:50%;background:var(--pri);color:var(--onp);display:grid;place-items:center;font-weight:700;flex:none}
-.am{flex:1;min-width:200px}.am b{display:inline-block;vertical-align:middle}.ab .btn{min-height:34px;padding:0 10px;font-size:13px}.ph{position:static}
+.ab{position:sticky;top:57px;z-index:4;display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:2px 10px;background:var(--pri2);border-bottom:1px solid var(--bd);border-left:5px solid var(--pri)}
+.ai{width:24px;height:24px;border-radius:50%;background:var(--pri);color:var(--onp);display:grid;place-items:center;font-weight:700;flex:none;font-size:11px}
+.am{flex:1;min-width:140px;font-size:12px}.am b{display:inline-block;vertical-align:middle}.ab .btn{min-height:24px;padding:0 6px;font-size:11px}.ph{position:static}
 .ph-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
 .ph-id{display:flex;align-items:center;gap:14px;flex:1;min-width:260px}
 .ph-info{display:flex;flex-direction:column;gap:4px}
@@ -954,7 +954,7 @@ const V={inicio:vInicio,agenda:vAgenda,pacientes:vPac,quirofano:vQuir,estudios:(
 const lb=a=="admin"?"Administración":a=="nuevo"?"Nuevo paciente":a=="evaluacion"?"Evaluación "+(b=="fis"?"física":"médica"):a=="recetas"?"Recetas":([...M,...AD].find(x=>x[0]==a)||[])[2];
 const cr=a=="inicio"?"Inicio":`<button class="bc" data-r="inicio">Inicio</button> › `+(a=="p"?`<button class="bc" data-r="pacientes">Pacientes</button> › ${esc(pk(b).n||"")}`:lb);
 $("#side").innerHTML=menu(a);
-$("#main").innerHTML=bar()+banner()+`<div class="pg"><div class="mu">${cr}</div>${a=="p"?vExp(b,c):(V[a]||vInicio)()}</div>`;
+$("#main").innerHTML=bar()+(a=="nuevo"||a=="p"?"":banner())+`<div class="pg"><div class="mu">${cr}</div>${a=="p"?vExp(b,c):(V[a]||vInicio)()}</div>`;
 $("#main").classList.toggle("en-paciente",a=="p");
 $("#main").classList.toggle("en-pacientes",a=="pacientes");
 if(S.route!==RUTA_ANT){const prev=RUTA_ANT;RUTA_ANT=S.route;const dir=prev?dirSub(prev,S.route):null;const pg=$("#main .pg");if(pg&&!sinMov()){if(dir===null)pg.classList.add("entra");else if(dir>0)pg.classList.add("entra-der");else pg.classList.add("entra-izq")}}
@@ -1591,7 +1591,7 @@ let aviso="";if(med&&!x&&gv("ev_pc")){const e=await crearCita({p:pid,f:dmy(gv("e
 toast("Evaluación guardada"+aviso);S.evi=null;go("p-"+pid+"-clinica")}
 
 /* ---- cirugías ---- */
-const SQ=["Fracturas","Artroscopia","Prótesis","Columna","Mano y pie","Mama"],CKL=["Consentimiento informado firmado","Preoperatorios y laboratorios","Evaluación cardiovascular","Ayuno indicado","Autorización del seguro","Imágenes disponibles en quirófano","Implantes confirmados"],OKA=["Autorizada","Parcialmente autorizada","No requiere"];
+const SQ=["Fracturas","Artroscopia","Prótesis","Columna","Mano y pie","Mama","Rodilla","Cadera","Pie","Tobillo","Hombro","Codo","Muslo","Pelvis","Mano","Antebrazo","Brazo","Pierna","Reemplazos Articulares","Artroscopia De Hombro","Artroscopia De Rodilla"],CKL=["Consentimiento informado firmado","Preoperatorios y laboratorios","Evaluación cardiovascular","Ayuno indicado","Autorización del seguro","Imágenes disponibles en quirófano","Implantes confirmados"],OKA=["Autorizada","Parcialmente autorizada","No requiere"];
 const cand=()=>DB.PP.map((x,i)=>[x,i]).filter(([x])=>SQ.includes(x.g)&&x.e=="Indicado");
 const rowCand=g=>{const[x0,i0]=g[0];const procs=g.map(([x,i])=>`<span data-a="cx:${i}" style="cursor:pointer;text-decoration:underline" title="Programar esta cirugía">${esc(x.t)}</span>`).join(" · ");const docs=[...new Set(g.map(([x])=>x.dr).filter(Boolean))].join(", ")||"—";return[pl(x0.p),procs,esc(docs),chip(EU,effAu(pk(x0.p))),g.length>1?`<span class="b in">${g.length} indicados</span>`:`<button class="btn p" data-a="cx:${i0}">Programar</button>`]};
 const rowCir=g=>{const[x0]=g[0],uniq=k=>[...new Set(g.map(([x])=>x[k]).filter(Boolean))].join(" · ")||"—";const procs=g.map(([x,i])=>`<span data-a="er:C.${i}" style="cursor:pointer;text-decoration:underline" title="Editar cirugía">${esc(x.t)}</span>`).join(" · ")+(g.some(([x])=>x.aw)?` <span class="b wa">${ic("alert",13)}Sin autorización</span>`:"");const ck=g.map(([x])=>x.ck?x.ck.length+"/"+CKL.length:"—").join(" · ");const est=[...new Set(g.map(([x])=>x.e).filter(Boolean))].map(e=>bd(e)).join(" ");const ver=g.map(([x])=>vb(x)).join(" ");const acts=g.map(([x,i])=>`<div style="margin-bottom:2px">${acc("C",i,x)}</div>`).join("");return[uniq("f")+" · "+uniq("h"),pl(x0.p),procs,uniq("sala")+" · "+uniq("cir"),ck,est+" "+ver,acts]};
