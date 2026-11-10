@@ -1191,7 +1191,7 @@ function fRx(i){
           <div><label class="mu" for="rxc_${idx}">Cantidad</label><input class="rx-cant" id="rxc_${idx}" data-i="${idx}" type="number" min="1" value="${it.cantidad||1}"></div>
         </div>
       </div>`;
-    }).join("") || "<p class='mu'>Sin items. Agrega al menos uno.</p>";
+    }).join("") || "<p class='mu'>Sin recetas agregadas. Agrega al menos una.</p>";
     c.querySelectorAll(".rx-sel").forEach(sl=>sl.onchange=()=>{
       const idx=+sl.dataset.i,it=S.rxItems[idx];if(!it)return;
       const tx=c.querySelector('.rx-nombre[data-i="'+idx+'"]');
