@@ -1250,6 +1250,7 @@ if (dups.length) {
 try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}}
 
 function fEditPac(id){const p=pk(id);if(!p.n)return toast("Paciente no encontrado.");
+const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`;
 const o=modal(`<h3>Editar datos del paciente</h3><div class="fg">
 ${f("ep_n","Nombre completo *",`<input id="ep_n" value="${esc(p.n)}">`)}
 ${f("ep_fn","Fecha de nacimiento *",`<input id="ep_fn" type="date" value="${iso(p.fn)}">`)}
