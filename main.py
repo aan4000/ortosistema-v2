@@ -517,7 +517,7 @@ def usuario_nuevo(d: NuevoUsuario, u=Depends(solo_admin)):
             raise HTTPException(409, "Ese usuario ya existe")
         r = c.execute("insert into usuarios(usuario,nombre,rol,password_hash,correo,telefono,cargo,"
                       "modulos,debe_cambiar_clave) values (%s,%s,%s,%s,%s,%s,%s,%s,true) returning id",
-                      (d.usuario.lower(), d.nombre, d.rol, h, d.correo, d.telefono, d.cargo, d.modulos)).fetchone()
+                      (d.usuario.lower(), d.nombre, d.rol, h, d.correo, d.telefono, d.cargo, Jsonb(d.modulos) if d.modulos is not None else None)).fetchone()
         auditar(c, u, "crear", "usuarios", r["id"])
     return {"ok": True, "id": r["id"]}
 
@@ -541,7 +541,7 @@ def usuario_editar(uid: int, d: CambioUsuario, u=Depends(solo_admin)):
     if d.cargo is not None:
         campos["cargo"] = d.cargo.strip() or None
     if d.modulos is not None:
-        campos["modulos"] = d.modulos
+        campos["modulos"] = Jsonb(d.modulos) if d.modulos is not None else None
     if d.password is not None:
         campos["password_hash"] = bcrypt.hashpw(d.password.encode(), bcrypt.gensalt()).decode()
         campos["debe_cambiar_clave"] = True
