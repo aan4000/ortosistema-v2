@@ -1102,7 +1102,7 @@ setInterval(tickReloj,1000);
 function draw(){VIS=[];$("#side").style.display=S.user?"":"none";if(!S.user)return vLogin();let[a,b,c]=S.route.split("-");
 if(!(a=="p"||a=="nuevo"||a=="evaluacion"?can("pacientes"):a=="admin"?S.user.rol=="admin":can(a))){a="inicio";S.route="inicio"}if(a=="p"&&pk(b).n)S.ap=+b;
 const V={inicio:vInicio,agenda:vAgenda,pacientes:vPac,quirofano:vQuir,estudios:()=>vEst(b),procedimientos:vProc,recetas:vRecetas,documentos:vDocs,ortesis:vOrt,rehab:vRehab,referimientos:vRef,autorizaciones:vAut,facturacion:()=>vFac(b),nuevo:vNuevo,evaluacion:()=>vEval(b),admin:()=>vAdmin(b),ayuda:vAyuda};
-const lb=a=="admin"?"Administración":a=="nuevo"?"Nuevo paciente":a=="evaluacion"?"Evaluación "+(b=="fis"?"física":"médica"):a=="recetas"?"Recetas":([...M,...AD].find(x=>x[0]==a)||[])[2];
+const lb=a=="admin"?"Administración":a=="nuevo"?"Nuevo paciente":a=="evaluacion"?"Evaluación "+(b=="fis"?"física":"médica"):a=="recetas"?"Recetas":a=="ayuda"?"Ayuda":([...M,...AD].find(x=>x[0]==a)||[])[2]||a;
 const cr=a=="inicio"?"Inicio":`<button class="bc" data-r="inicio">Inicio</button> › `+(a=="p"?`<button class="bc" data-r="pacientes">Pacientes</button> › ${esc(pk(b).n||"")}`:lb);
 $("#side").innerHTML=menu(a);
 $("#main").innerHTML=bar()+(a=="nuevo"||a=="p"?"":banner())+`<div class="pg"><div class="mu">${cr}</div>${a=="p"?vExp(b,c):(V[a]||vInicio)()}</div>`;
