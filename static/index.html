@@ -1698,7 +1698,7 @@ if(med) cu += "<br><details><summary style=\"cursor:pointer;font-weight:600;marg
 +"<br>"+card("5. Neurovascular",`<div class="fg">${fx("ev_se","Sensibilidad",fseg("ev_se",["Normal","Disminuida","Ausente"],d.se||"Normal"))}${fx("ev_pu","Pulsos",fseg("ev_pu",["Presentes","Disminuidos","Ausentes"],d.pu||"Presentes"))}${fx("ev_lc","Llenado capilar",fsel("ev_lc",["Menor de 2 s","Mayor de 2 s"],d.lc))}${fx("ev_rf","Reflejos",fsel("ev_rf",["Normales","Aumentados","Disminuidos","Ausentes"],d.rf))}</div>`)
 +"<br>"+card("6. Marcha e impresión",`<div class="fg">${fx("ev_ma","Marcha",fsel("ev_ma",["Normal","Claudicante","Antálgica","Con apoyo (bastón o muletas)","No deambula"],d.ma))}</div><label class="mu" for="ev_im">Impresión clínica</label><textarea id="ev_im" rows="3">${esc(d.im||"")}</textarea>`);
 return`<div class="sh"><h2><span class="hi">${ic(med?"act":"usercheck",22)}</span>Evaluación ${med?"médica":"física"}${x?" (edición)":""}</h2><p class="mu">${DS.evaluacion}</p></div>`+cab+"<br>"+cu+`<div class="er2" id="ev_er" role="alert"></div><div class="row"><span></span><div class="tb"><button class="btn" data-r="${S.ap||x?"p-"+pid+"-clinica":"pacientes"}">Cancelar</button><button class="btn p" data-a="ge:${med?"med":"fis"}">Guardar evaluación</button></div></div>`}
-async function guardarEval(tp){const med=tp=="Médica",er=m=>{$("#ev_er").textContent=m},x=S.evi!=null?DB.E[S.evi]:null,pid=+gv("ev_p"),f=gv("ev_f");
+async function guardarEval(tp){const med=tp=="Médica",er=m=>{$("#ev_er").textContent=m};let x=S.evi!=null?DB.E[S.evi]:null;const pid=+gv("ev_p"),f=gv("ev_f");
 if(!pid)return er("Primero crea un paciente.");if(!f)return er("Elige la fecha en el calendario.");
 let d,t,dxs="";
 if(med){d={mo:gv("ev_mo"),rg:gv("ev_rg"),ms:gv("ev_ms"),ld:gs("ev_ld"),en:gv("ev_en"),eu:gv("ev_eu"),va:+gv("ev_va")||0,ea:gv("ev_ea"),dx:gv("ev_dx"),dxt:gv("ev_dxt"),pl:gc("ev_pl"),ind:gv("ev_in")};
@@ -1707,13 +1707,15 @@ d.fisico={rg:gv("pf_rg"),ld:gs("pf_ld"),ins:gc("pf_ins"),pal:gc("pf_pal"),rom:gv
 t=`${d.mo}${d.dt?": "+d.dt:""} · ${d.rg}${d.ld&&d.ld!="No aplica"?" "+d.ld.toLowerCase():""} · Dolor ${d.va}/10 · Dx: ${dxs}${d.pl.length?" · Plan: "+d.pl.join(", "):""}`}
 else{d={rg:gv("ev_rg"),ld:gs("ev_ld"),ins:gc("ev_ins"),pal:gc("ev_pal"),rom:gv("ev_rom"),fl:gv("ev_fl"),ex:gv("ev_ex"),fz:gv("ev_fz"),va:+gv("ev_va")||0,pr:gc("ev_pr"),se:gs("ev_se"),pu:gs("ev_pu"),lc:gv("ev_lc"),rf:gv("ev_rf"),ma:gv("ev_ma"),im:gv("ev_im")};
 t=`Examen físico ${d.rg}${d.ld&&d.ld!="No aplica"?" "+d.ld.toLowerCase():""} · Movilidad: ${d.rom} · Fuerza ${d.fz} · Dolor ${d.va}/10 · Hallazgos: ${d.ins.concat(d.pal).join(", ")||"sin hallazgos"}${d.pr.length?" · Pruebas: "+d.pr.join(", "):""}`}
+// Unificar: si es nueva, buscar evaluacion existente del mismo paciente/fecha/tipo y actualizarla
+if(!x){const existing=DB.E.find(e=>e.p==pid && e.f==dmy(f) && e.tp==tp);if(existing){S.evi=DB.E.indexOf(existing);x=existing}}
 const dr=gv("ev_d"),rec={p:pid,f:dmy(f),t,tp,d,dr};
 try{
-if(x){Object.assign(x,rec);await editarK("E",x)}else{const nid=await crearK("E",rec);DB.E.push({...rec,id:nid})}
+if(x){Object.assign(x,rec);await editarK("E",x);toast("Evaluacion actualizada")}else{const nid=await crearK("E",rec);DB.E.push({...rec,id:nid});toast("Evaluacion guardada")}
 if(med&&dxs){const pp=pk(pid);if(pp.dx!=dxs){pp.dx=dxs;await editarK("P",pp)}}
 }catch(e){return er(e.message)}
 let aviso="";if(med&&!x&&gv("ev_pc")){const e=await crearCita({p:pid,f:dmy(gv("ev_pc")),h:gv("ev_ph"),du:30,ty:"Control",t:"Control: "+dxs,dr,e:"Programada"});aviso=e?" (la cita de control no se creó: "+e+")":" y cita de control agendada"}
-toast("Evaluación guardada"+aviso);S.evi=null;go("p-"+pid+"-clinica")}
+S.evi=null;go("p-"+pid+"-clinica")}
 
 /* ---- cirugías ---- */
 const SQ=["Fracturas","Artroscopia","Prótesis","Columna","Mano y pie","Mama","Rodilla","Cadera","Pie","Tobillo","Hombro","Codo","Muslo","Pelvis","Mano","Antebrazo","Brazo","Pierna","Reemplazos Articulares","Artroscopia De Hombro","Artroscopia De Rodilla"],CKL=["Consentimiento informado firmado","Preoperatorios y laboratorios","Evaluación cardiovascular","Ayuno indicado","Autorización del seguro","Imágenes disponibles en quirófano","Implantes confirmados"],OKA=["Autorizada","Parcialmente autorizada","No requiere"];
