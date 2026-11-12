@@ -465,8 +465,8 @@ function fromK(k,r){
     mot:r.motivo_cancelacion||""};
   else if(k=="E")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),t:r.texto||"",tp:r.tipo||"Médica",
     dr:r.medico||"",d:r.detalle||{}};
-  else if(k=="I")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),t:(r.tipo||"")+(r.region?" · "+r.region:""),
-    tp:r.tipo||"",rg:r.region||"",r:r.estado||"Por revisar",inf:r.informe||"",im:null,th:r.miniatura||""};
+  else if(k=="I")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),t:(r.tipo||"")+(r.region?" · "+r.region:"")+(r.lado&&r.lado!="No aplica"?" � "+r.lado:""),
+    tp:r.tipo||"",rg:r.region||"",ld:r.lado||"No aplica",r:r.estado||"Por revisar",inf:r.informe||"",im:null,th:r.miniatura||""};
   else if(k=="C")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),h:hh(r.hora),t:r.procedimiento||"",
     lado:r.lado||"No aplica",du:r.duracion||"",sala:r.sala||"",cir:r.cirujano||"",an:r.anestesia||"",
     i:r.implantes_previstos||"",e:r.estado||"Programada",ck:r.checklist||[],aw:!!r.sin_autorizacion,
@@ -506,7 +506,7 @@ function toK(k,o){
   if(k=="E")return{paciente_id:o.p,fecha:d2f(o.f)||d2f(hoy),texto:o.t||"",tipo:o.tp||"Médica",
     medico:o.dr||null,detalle:o.d||{}};
   if(k=="I")return{paciente_id:o.p,fecha:d2f(o.f)||d2f(hoy),tipo:o.tp||null,region:o.rg||null,
-    estado:o.r||"Por revisar",informe:o.inf||null,miniatura:o.th||null};
+    lado:o.ld||null,estado:o.r||"Por revisar",informe:o.inf||null,miniatura:o.th||null};
   if(k=="C")return{paciente_id:o.p,fecha:d2f(o.f)||null,hora:o.h||null,procedimiento:o.t||"",
     lado:o.lado||null,duracion:o.du||null,sala:o.sala||null,cirujano:o.cir||null,anestesia:o.an||null,
     implantes_previstos:o.i||null,tipo_sangre:o.ts||null,checklist:o.ck||[],sin_autorizacion:!!o.aw,estado:o.e||"Programada"};
@@ -1870,13 +1870,17 @@ z.addEventListener&&z.addEventListener("wheel",e=>{e.preventDefault();zm(e.delta
 ap()}
 async function guardarImg(){const v=i=>$("#"+i).value,er=m=>{$("#ue2").textContent=m},fs=UP.f;
 if(!(S.ap||S.upP))return er("Activa un paciente antes de subir imágenes.");if(!fs.length)return er("Elige al menos una imagen.");
-const b=document.querySelector('[data-a="sv"]');b.disabled=true;b.textContent="Guardando…";let n=0;
+const b=document.querySelector('[data-a="sv"]');b.disabled=true;b.textContent="Guardando…";let n=0;const preExistingEstudios=DB.I.filter(x=>x.p==+(v("up_p"))).map(x=>x.id);
 for(const[k,f]of fs.entries()){try{const im=await loadImg(f),st=UP.s[k],ed=UP.apl!==false&&!isDef(st),full=ed?bake(im,st,1800,.85):scale(im,1800,.82),th=ed?bake(im,st,240,.7):scale(im,240,.7);
 const rl=v("up_rl").split("|"),rg=rl[0]||"",ld=rl[1]||"No aplica";
-const rec={p:+v("up_p"),f:v("up_f")?dmy(v("up_f")):hoy,t:v("up_t")+" · "+rg+" · "+ld,tp:v("up_t"),rg,ld,r:"Por revisar",th,inf:v("up_o").trim()};
-const id=await crearK("I",rec),iid=await subirImagen(id,full);
-DB.I.push({...rec,id,im:iid});n++}catch(e){}}
-if(!n){b.disabled=false;b.textContent="Siguiente";return er("No pude leer las imágenes. Usa JPG, PNG o WebP.")}
+const f=v("up_f")?dmy(v("up_f")):hoy;
+const rec={p:+v("up_p"),f,t:v("up_t")+" \u2014 "+rg+" \u2014 "+ld,tp:v("up_t"),rg,ld,r:"Por revisar",th,inf:v("up_o").trim()};
+const existing=DB.I.find(x=>preExistingEstudios.includes(x.id) && x.p==rec.p && x.tp==rec.tp && x.rg==rec.rg && x.ld==rec.ld && x.f==rec.f);
+let id; let iid;
+if(existing){Object.assign(existing,rec);existing.th=th;await editarK("I",existing);id=existing.id;iid=await subirImagen(id,full);existing.im=iid;DB.I=DB.I.map(x=>x.id==id?existing:x)}
+else{ id=await crearK("I",rec);iid=await subirImagen(id,full);DB.I.push({...rec,id,im:iid})}
+n++}catch(e){}
+}if(!n){b.disabled=false;b.textContent="Siguiente";return er("No pude leer las imágenes. Usa JPG, PNG o WebP.")}
 toast(n+" imágenes guardadas");S.upP=null;upClr();const pid=+v("up_p"),next=v("up_next");S.ap=pid;
 if(next==="fis")go("evaluacion-fis");else if(next==="seg")go("agenda");else go("p-"+pid)}
 const loadUrl=u=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error("img"));i.src=u});
