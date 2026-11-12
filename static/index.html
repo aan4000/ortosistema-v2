@@ -605,7 +605,7 @@ function modal(h,c=""){const o=document.createElement("div");o.className="ov "+c
 
 const MOD=[["agenda","Agenda"],["pacientes","Pacientes"],["procedimientos","Procedimientos"],["ortesis","Órtesis"],["quirofano","Quirófano"],["estudios","Estudios"],["documentos","Documentos"],["rehab","Rehabilitación"],["recetas","Recetas"],["referimientos","Referimientos"],["autorizaciones","Autorizaciones"],["facturacion","Facturación"]];
 const PM0=()=>({medico:["agenda","pacientes","procedimientos","ortesis","quirofano","estudios","documentos","rehab","referimientos","autorizaciones","facturacion","recetas"],enfermeria:["agenda","pacientes","estudios","documentos","ortesis","recetas"],secretaria:["agenda","pacientes","procedimientos","estudios","documentos","ortesis","referimientos","autorizaciones","facturacion","recetas"],fisio:["agenda","pacientes","rehab","ortesis","estudios","documentos"],facturacion:["agenda","pacientes","procedimientos","autorizaciones","facturacion","referimientos"]});
-const can=k=>k=="inicio"||!!(S.user&&(S.user.rol=="admin"||((S.user.modulos!=null?S.user.modulos:(DB.PM[S.user.rol]||[])).includes(k))));
+const can=k=>k=="inicio"||k=="ayuda"||!!(S.user&&(S.user.rol=="admin"||((S.user.modulos!=null?S.user.modulos:(DB.PM[S.user.rol]||[])).includes(k))));
 /* ===== Sesión y usuarios ===== */
 async function entrar(usuario,password){
   const r=await api("/api/login",{method:"POST",body:{usuario,password}});
@@ -760,9 +760,60 @@ if(ad.length){h+='<div class="gl">Gestión</div>';const n=pend(),op=S.open||ad.s
 h+=`<a class="nav" href="#" data-a="adm">${ic("folder")} Administrativo${n?`<span class="bd">${n}</span>`:""}</a>`;
 if(op)ad.forEach(([k,i,l])=>h+=nv(k,i,l," sub"))}
 if(S.user.rol=="admin")h+=nv("admin","cog","Administración");
+h+=nv("ayuda","question","Ayuda");
 return h+`<div class="sp"></div><a class="nav" href="#" data-a="um"><span class="av">${esc(S.user.nombre.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase())}</span><span style="display:grid;line-height:1.25"><b style="font-weight:600">${esc(S.user.nombre)}</b><span class="mu">${RL[S.user.rol]}</span></span></a>`}
 const bar=()=>`<div class="top"><button class="btn mb" data-a="mn" aria-label="Menú">${ic("menu")}</button><input id="q" readonly placeholder="Buscar paciente o sección (Ctrl+K)" data-a="pal"><span class="mu tdt">${fechaLarga()}</span><span class="mu" id="reloj" style="font-variant-numeric:tabular-nums;font-weight:600">${new Date().toLocaleTimeString("es-DO",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:hora12()})}</span><button class="btn" data-a="fmt" title="Formato de hora">${hora12()?"12h":"24h"}</button><button class="btn" data-a="rf" title="Actualizar datos">${ic("refresh",16)} Actualizar</button><button class="btn p" data-a="nm">${ic("plus",16)} Nuevo</button></div>`;
 
+function vAyuda(){
+return sec("Ayuda y manual de usuario")+`
+<p class="mu">Guía completa de OrtoSistema. Usa el menú lateral para ir a cada sección. El botón <b>Actualizar datos</b> (barra superior) recarga la información desde la nube.</p>
+${card("1. Conceptos básicos",`
+  <ul class="mu" style="line-height:1.8">
+    <li><b>Paciente activo:</b> es el paciente con el que estás trabajando. Se activa con el botón "Activar" en la lista de Pacientes o al abrir su expediente. Mientras esté activo, las citas, procedimientos, recetas, estudios, documentos, etc. se guardan en su ficha.</li>
+    <li><b>Barra de paciente activo:</b> aparece en la parte superior de todas las secciones (excepto Registro y perfil del paciente). Muestra nombre, edad, cédula, seguro, alergia, estado de atención y autorización. Los botones de acción están debajo.</li>
+    <li><b>Ver solo este paciente:</b> casilla en la barra para filtrar las listas por el paciente activo.</li>
+    <li><b>Verificación (✓):</b> varios registros (cirugías, documentos, recetas, etc.) tienen botón "Verificar/Quitar verificación" que marca el registro como revisado por el usuario.</li>
+    <li><b>Duplicados:</b> si guardas un paciente con el mismo nombre, el sistema pregunta si agregas la información al existente o creas uno nuevo. Al actualizar un existente no se crea un nuevo registro ni se activa el paciente.</li>
+  </ul>`)}
+${card("2. Inicio",`<p class="mu">Resumen de tu jornada: indicadores (citas hoy, cirugías programadas, estudios por revisar, PROMs bajos, preauth pendientes), agenda del día, alertas y accesos rápidos. Los indicadores son clicables.</p>`)}
+${card("3. Agenda",`<p class="mu">Citas del día seleccionado y cirugías programadas. Navega entre días con las flechas o elige fecha en el calendario. Botón "Agendar cita" abre el formulario (paciente bloqueado al activo). Cada paciente aparece una sola vez aunque tenga varias citas; las horas se unen. Acciones por cita: Confirmar, Editar, Cancelar. Cirugías: fecha, hora, paciente, procedimiento, sala, estado.</p>`)}
+${card("4. Pacientes",`<p class="mu">Directorio con checkboxes para selección múltiple y botón "Eliminar seleccionados". Columnas: código, paciente (avatar+nombre+badge Activo), edad, seguro, diagnóstico, atención, autorización. Filtros por estado de atención y autorización. Botones por fila: Activar/Activo, Abrir expediente, Eliminar. "Nuevo paciente" abre el formulario de registro.</p>`)}
+${card("5. Expediente del paciente (pestañas)",`<ul class="mu" style="line-height:1.8">
+  <li><b>Resumen:</b> estado del paciente, datos del paciente (diagnóstico, fecha de nacimiento, sexo, alergias, seguro, cédula, teléfono, correo, expediente), antecedentes, historia cronológica, historial de estados. Botón "Editar datos del paciente" para modificar el perfil.</li>
+  <li><b>Clínica:</b> evaluaciones médicas y estudios de imagen. La evaluación física es una subsección desplegable ("Evaluación física").</li>
+  <li><b>Procedimientos:</b> cirugías del paciente.</li>
+  <li><b>Órtesis:</b> órtesis indicadas/entregadas.</li>
+  <li><b>Rehabilitación:</b> sesiones de fisioterapia y PROMs (cuestionarios).</li>
+  <li><b>Gestión:</b> referimientos, autorizaciones, cargos/facturación.</li>
+  <li><b>Documentos:</b> documentos adjuntos.</li>
+</ul>`)}
+${card("6. Nuevo paciente",`<p class="mu">Formulario con: datos personales (nombre, fecha de nacimiento, edad, sexo, cédula, teléfono, correo, ocupación), seguro médico, información clínica (alergias con catálogo incluyendo AINES, motivo de consulta), antecedentes (quirúrgicos, mórbidos, familiares, hábitos). La ocupación se selecciona por categoría o se escribe manualmente. Al guardar, si el nombre coincide con un paciente existente, se pregunta si agregas la info al existente o creas uno nuevo.</p>`)}
+${card("7. Quirófano",`<p class="mu">Pacientes candidatos a cirugía (procedimientos indicados) y cirugías programadas/realizadas. Programar cirugía desde un candidato o manualmente. Campos: paciente, procedimiento, lado, fecha, hora, duración, sala, cirujano, anestesia, tipo de sangre, implantes, estado, checklist preoperatorio. Las cirugías se agrupan por paciente.</p>`)}
+${card("8. Estudios e imágenes",`<p class="mu">Galería de estudios por paciente. Subir imágenes: paciente (bloqueado al activo), tipo de estudio (por categorías: Radiografía, Ecografía, RM, TAC, Medicina nuclear, Otros), región anatómica y lado (Izq/Der/Bilateral), fecha, observaciones. Las imágenes se optimizan y guardan en el navegador. Visor con zoom, giro, brillo, contraste.</p>`)}
+${card("9. Procedimientos",`<p class="mu">Catálogo de procedimientos (código, nombre, categoría, fuente, precio). Asignar procedimientos a un paciente activo (con opción de generar cargo en facturación). Selección múltiple con "Seleccionar todos"/"Limpiar".</p>`)}
+${card("10. Recetas",`<p class="mu">Recetas de medicamentos ortopédicos y prótesis para el paciente activo. Tipos: Medicamento ortopédico / Prótesis. Items con catálogo (medicamentos o prótesis), dosis, forma, frecuencia, duración, cantidad. Se unifica en una sola receta por paciente y tipo. Botones: Ver/Imprimir, Editar, Verificar.</p>`)}
+${card("11. Documentos",`<p class="mu">Subir documentos (consentimientos, informes, etc.) al paciente activo. Ver, descargar, eliminar. Verificación por registro.</p>`)}
+${card("12. Órtesis",`<p class="mu">Asignar órtesis al paciente activo: categoría, talla, lado, indicación, médico, estado (Indicada/Entregada). Genera cargo opcional.</p>`)}
+${card("13. Rehabilitación",`<p class="mu">Sesiones de fisioterapia (fecha, descripción, dolor 0-10) y PROMs (cuestionarios: WOMAC, DASH, Oswestry, KOOS, Harris Hip, Lysholm, VAS) con preguntas seleccionables por checkmark, puntuación automática y campo manual. Editar y eliminar PROMs.</p>`)}
+${card("14. Referimientos",`<p class="mu">Referimientos enviados y recibidos por paciente.</p>`)}
+${card("15. Autorizaciones",`<p class="mu">Pre-autorizaciones por estado. Botón "Nueva pre-autorización" con formulario (paciente, seguro/ARS, diagnóstico CIE-10, procedimiento, justificación, monto, médico, centro, vigencia). Ver/Imprimir genera un documento formateado. Enviar por correo. Editar y eliminar.</p>`)}
+${card("16. Facturación",`<p class="mu">Cargos por paciente: procedimiento, monto, estado (Pendiente/Cobrado/Anulada). Totales pendiente y cobrado. Editar cargo, registrar cobro.</p>`)}
+${card("17. Administración (solo admin)",`<ul class="mu" style="line-height:1.8">
+  <li><b>Usuarios:</b> crear, editar, desactivar usuarios. Asignar rol y permisos individuales (anulan los del rol). Cambiar/restablecer contraseña, preguntas de seguridad.</li>
+  <li><b>Funciones por rol:</b> matriz de secciones por rol (Médico, Enfermería, Secretaría, Fisioterapeuta, Facturación). Restaurar recomendados.</li>
+  <li><b>Seguridad y actividad:</b> cuentas activas, sin preguntas de seguridad, deben cambiar contraseña, recuperaciones. Actividad reciente.</li>
+</ul>`)}
+${card("18. Portada y acceso",`<p class="mu">Al abrir el sistema aparece la portada (landing). Si ya has iniciado sesión, se abre directamente la app. Botón "Registrarse" lleva al login/registro. El tema (claro/oscuro) se guarda por usuario.</p>`)}
+${card("19. Atajos y tips",`<ul class="mu" style="line-height:1.8">
+  <li>Ctrl+K o clic en la barra de búsqueda: paleta de comandos.</li>
+  <li>Tecla "N": nuevo paciente (fuera de inputs).</li>
+  <li>Tecla "/": abrir paleta.</li>
+  <li>Esc: cerrar modal.</li>
+  <li>Botón "Actualizar datos": recarga todo desde la nube.</li>
+  <li>Los datos se guardan en Neon (nube) y persisten entre sesiones.</li>
+</ul>`)}
+`;
+}
 function vInicio(){const{C,I,M,B,R,F,P}=DB,Q=DB.Q.filter(q=>q.f==hoy&&q.e!="Cancelada"),n=pend();
 const last=id=>F.filter(x=>x.p==id).pop(),est=P.filter(p=>{const l=last(p.id);return l&&l.d>=6}).length;
 const pc=B.filter(x=>x.e=="Pendiente").reduce((s,x)=>s+x.m,0),co=B.filter(x=>x.e=="Cobrado").reduce((s,x)=>s+x.m,0);
@@ -778,7 +829,7 @@ return `<div class="row"><div class="sh"><h2>Mi día · ${RL[S.user.rol]}</h2><p
 <div class="grid g2">${card("Agenda de hoy",tbl(["Hora","Paciente","Motivo","Atención"],Q.map(q=>[q.h,pl(q.p),esc(q.t),chip(EA,pk(q.p).ea)])))}
 ${card("Alertas",tbl(["Prioridad","Detalle"],al.map(a=>[`<span class="b ${a[0]}">${{er:"Urgente",wa:"Pendiente","in":"Aviso"}[a[0]]}</span>`,a[1]])))}</div>
 ${card("Cirugías próximas",tbl(["Fecha","Paciente","Procedimiento","Estado"],C.filter(x=>x.e=="Programada").map(x=>[x.f,pl(x.p),esc(x.t),bd(x.e)])))}`}
-const DS={inicio:"Resumen de tu jornada: indicadores, agenda y alertas que requieren atención.",agenda:"Citas del día y cirugías programadas, en un solo lugar.",pacientes:"Directorio de pacientes con los estados de atención y autorización. Abre un expediente para ver su historia clínica completa.",quirofano:"Cirugías programadas y realizadas, con los implantes utilizados en cada una.",estudios:"Sube radiografías, ecografías y otros estudios, y ábrelos en el visor con zoom, giro y contraste.",rehab:"Sesiones de fisioterapia, nivel de dolor y cuestionarios de resultados (PROMs).",referimientos:"Pacientes enviados a otros especialistas y recibidos de ellos, con su estado.",autorizaciones:"Preautorizaciones de las aseguradoras: qué falta solicitar, qué está en trámite y qué ya fue aprobado.",facturacion:"Cargos por servicios con el médico responsable, y el catálogo de procedimientos con sus precios aprobados.",admin:"Crea usuarios y define qué secciones puede usar cada rol.",nuevo:"Registro completo de un paciente nuevo: datos personales, seguro, información clínica y antecedentes.",procedimientos:"Elige procedimientos del catálogo y asígnalos al paciente. Puedes generar el cargo de facturación al mismo tiempo.",documentos:"Consentimientos, informes, recetas y otros archivos del paciente. Súbelos, descárgalos o elimínalos.",ortesis:"Elige órtesis (férulas, rodilleras, collarines, fajas y más), define lado y talla, y asígnalas al paciente activo.",evaluacion:"Formulario clínico estructurado: elige opciones, marca hallazgos y guarda la evaluación en el expediente."};
+const DS={inicio:"Resumen de tu jornada: indicadores, agenda y alertas que requieren atención.",agenda:"Citas del día y cirugías programadas, en un solo lugar.",pacientes:"Directorio de pacientes con los estados de atención y autorización. Abre un expediente para ver su historia clínica completa.",quirofano:"Cirugías programadas y realizadas, con los implantes utilizados en cada una.",estudios:"Sube radiografías, ecografías y otros estudios, y ábrelos en el visor con zoom, giro y contraste.",rehab:"Sesiones de fisioterapia, nivel de dolor y cuestionarios de resultados (PROMs).",referimientos:"Pacientes enviados a otros especialistas y recibidos de ellos, con su estado.",autorizaciones:"Preautorizaciones de las aseguradoras: qué falta solicitar, qué está en trámite y qué ya fue aprobado.",facturacion:"Cargos por servicios con el médico responsable, y el catálogo de procedimientos con sus precios aprobados.",admin:"Crea usuarios y define qué secciones puede usar cada rol.",nuevo:"Registro completo de un paciente nuevo: datos personales, seguro, información clínica y antecedentes.",procedimientos:"Elige procedimientos del catálogo y asígnalos al paciente. Puedes generar el cargo de facturación al mismo tiempo.",documentos:"Consentimientos, informes, recetas y otros archivos del paciente. Súbelos, descárgalos o elimínalos.",ortesis:"Elige órtesis (férulas, rodilleras, collarines, fajas y más), define lado y talla, y asígnalas al paciente activo.",evaluacion:"Formulario clínico estructurado: elige opciones, marca hallazgos y guarda la evaluación en el expediente.",ayuda:"Manual de usuario y ayuda del sistema."};
 const TD={resumen:"Datos clave, antecedentes y todo lo ocurrido con el paciente, de lo más reciente a lo más antiguo.",clinica:"Evaluaciones médicas y estudios de imagen.",procedimientos:"Cirugías del paciente y los implantes utilizados.",rehab:"Sesiones de fisioterapia y cuestionarios de resultados (PROMs).",gestion:"Referimientos, preautorizaciones y cargos de este paciente.",documentos:"Archivos y documentos del paciente.",ortesis:"Órtesis indicadas al paciente, con lado, talla e indicaciones de uso."};
 const SI={agenda:"cal",pacientes:"users",procedimientos:"clip",ortesis:"ort",quirofano:"act",estudios:"img",documentos:"doc",rehab:"ref",referimientos:"swap",autorizaciones:"ok",facturacion:"usd",admin:"cog",nuevo:"plus",evaluacion:"act"},KI={agenda:"cal",quirofano:"act",estudios:"img",rehab:"ref",autorizaciones:"ok",facturacion:"usd",pacientes:"users",referimientos:"swap"};
 const sec=t=>{const k=S.route.split("-")[0];return`<div class="sh"><h2><span class="hi">${ic(SI[k]||"chart",22)}</span>${t}</h2><p class="mu">${DS[k]||""}</p></div>`};
@@ -1050,7 +1101,7 @@ function tickReloj(){const e=document.getElementById("reloj");if(e)e.textContent
 setInterval(tickReloj,1000);
 function draw(){VIS=[];$("#side").style.display=S.user?"":"none";if(!S.user)return vLogin();let[a,b,c]=S.route.split("-");
 if(!(a=="p"||a=="nuevo"||a=="evaluacion"?can("pacientes"):a=="admin"?S.user.rol=="admin":can(a))){a="inicio";S.route="inicio"}if(a=="p"&&pk(b).n)S.ap=+b;
-const V={inicio:vInicio,agenda:vAgenda,pacientes:vPac,quirofano:vQuir,estudios:()=>vEst(b),procedimientos:vProc,recetas:vRecetas,documentos:vDocs,ortesis:vOrt,rehab:vRehab,referimientos:vRef,autorizaciones:vAut,facturacion:()=>vFac(b),nuevo:vNuevo,evaluacion:()=>vEval(b),admin:()=>vAdmin(b)};
+const V={inicio:vInicio,agenda:vAgenda,pacientes:vPac,quirofano:vQuir,estudios:()=>vEst(b),procedimientos:vProc,recetas:vRecetas,documentos:vDocs,ortesis:vOrt,rehab:vRehab,referimientos:vRef,autorizaciones:vAut,facturacion:()=>vFac(b),nuevo:vNuevo,evaluacion:()=>vEval(b),admin:()=>vAdmin(b),ayuda:vAyuda};
 const lb=a=="admin"?"Administración":a=="nuevo"?"Nuevo paciente":a=="evaluacion"?"Evaluación "+(b=="fis"?"física":"médica"):a=="recetas"?"Recetas":([...M,...AD].find(x=>x[0]==a)||[])[2];
 const cr=a=="inicio"?"Inicio":`<button class="bc" data-r="inicio">Inicio</button> › `+(a=="p"?`<button class="bc" data-r="pacientes">Pacientes</button> › ${esc(pk(b).n||"")}`:lb);
 $("#side").innerHTML=menu(a);
