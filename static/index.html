@@ -929,7 +929,8 @@ return`<p><button class="btn p" data-r="facturacion-nueva">${ic("plus",16)} Nuev
 function vExp(id,tab="resumen"){const p=pk(id);if(!p.n)return"<p>Paciente no encontrado.</p>";
 const f=a=>DB[a].filter(x=>x.p==id),E=f("E"),I=f("I"),C=f("C"),F=f("F"),M=f("M"),R=f("R"),A=f("A"),B=f("B"),Dd=f("D"),PPn=f("PP"),OPn=f("OP");
 const T=[["resumen","Resumen",0],["clinica","Clínica",E.length+I.length],["procedimientos","Procedimientos",C.length+PPn.length],["ortesis","Órtesis",OPn.length],["rehab","Rehabilitación",F.length+M.length],["gestion","Gestión",R.length+A.length+B.length],["documentos","Documentos",Dd.length]];
-const tl=[...E.map(x=>[x.f,"Evaluación: "+x.t]),...I.map(x=>[x.f,x.t]),...C.map(x=>[x.f,"Cirugía: "+x.t]),...F.map(x=>[x.f,"Fisioterapia: "+x.t]),...M.map(x=>[x.f,`${x.t} (${x.s}%)`]),...R.map(x=>[x.f,"Referimiento: "+x.t]),...B.map(x=>[x.f,"Cargo: "+x.t]),...PPn.map(x=>[x.f,"Procedimiento: "+x.t]),...OPn.map(x=>[x.f,"Órtesis: "+x.n])].sort((a,b)=>d8(b[0]).localeCompare(d8(a[0])));
+const tlRaw=[...E.map(x=>[x.f,"Evaluación: "+x.t]),...I.map(x=>[x.f,x.t]),...C.map(x=>[x.f,"Cirugía: "+x.t]),...F.map(x=>[x.f,"Fisioterapia: "+x.t]),...M.map(x=>[x.f,`${x.t} (${x.s}%)`]),...R.map(x=>[x.f,"Referimiento: "+x.t]),...B.map(x=>[x.f,"Cargo: "+x.t]),...PPn.map(x=>[x.f,"Procedimiento: "+x.t]),...OPn.map(x=>[x.f,"Órtesis: "+x.n])];
+const _seen=new Set();const tl=tlRaw.filter(x=>{const k=x[0]+"|"+x[1];if(_seen.has(k))return false;_seen.add(k);return true}).sort((a,b)=>d8(b[0]).localeCompare(d8(a[0])));
 const B2={resumen:()=>`${card("Estado del paciente",estCard(p))}<br><p><button class="btn p" data-a="ep:${id}">${ic("edit",14)} Editar datos del paciente</button></p><div class="grid g2">${card("Datos del paciente",tbl(["Dato","Detalle"],[["Diagnóstico activo",esc(p.dx||"—")],["Fecha de nacimiento",p.fn?esc(dmy(p.fn))+" ("+edadDe(p.fn)+" años)":"—"],["Sexo",esc(p.sx||"—")],["Alergias",esc(p.al||"Ninguna registrada")],["Aseguradora",esc((p.s||"—")+(p.na?" · afiliado "+p.na:""))],["Cédula",esc(p.c||"—")],["Teléfono",esc(p.tl||"—")],["Correo",esc(p.em||"—")]]))}${card("Antecedentes",tbl(["Tipo","Detalle"],[["Mórbidos",esc(p.am||"No registrados")],["Quirúrgicos",esc(p.aq||"No registrados")],["Medicamentos actuales",esc(p.me||"No registrados")],["Familiares",esc(p.af||"No registrados")],["Hábitos",esc(p.ha||"No registrados")]])+'<p><button class="btn" data-a="ant">Editar antecedentes</button></p>')}</div>${card("Historia en orden cronológico",tbl(["Fecha","Actividad"],tl.map(x=>[x[0],esc(x[1])])))}<br>${card("Historial de estados",tbl(["Fecha y hora","Tipo","Cambio","Usuario","Nota"],(p.hs||[]).slice().reverse().map(x=>[x.f+" "+x.h,esc(x.t),esc(x.de)+" → "+esc(x.a),esc(x.u),esc(x.n||"—")])))}`,
 clinica:()=>card("Evaluaciones",tk("E",id,["Fecha","Tipo","Resumen"],x=>[x.f,esc(x.tp||"General"),esc(x.t)]))+"<br>"+`<p><button class="btn p" data-a="ui:${id}">${ic("up",16)} Subir imagen</button></p>`+card("Imágenes",tbl(["Imagen","Fecha","Estudio","Estado",""],DB.I.map((x,i)=>[x,i]).filter(([x])=>x.p==id).map(([x,i])=>[x.th?`<img class="thm" src="${x.th}" alt="Vista previa" data-a="vw:${i}">`:'<span class="mu">Sin imagen</span>',x.f,esc(x.t),bd(x.r),x.im?`<div class="acts"><button class="icb" data-a="vw:${i}" data-tip="Ver imagen" aria-label="Ver imagen">${ic("eye",17)}</button><button class="icb d" data-a="delimg:${i}" data-tip="Eliminar imagen" aria-label="Eliminar imagen">${ic("trash",17)}</button></div>`:""]))),
 procedimientos:()=>`<p><button class="btn p" data-a="ap:${id}">${ic("plus",16)} Asignar procedimientos</button> <button class="btn" data-a="cx">Programar cirugía</button></p>`+card("Procedimientos indicados",tk("PP",id,["Fecha","Procedimiento","Categoría","Médico","Precio","Estado"],x=>[x.f,esc(x.t),esc(x.g||"General"),esc(x.dr||"—"),x.pr?mon(x.pr):"—",bd(x.e)]))+"<br>"+card("Cirugías e implantes",tk("C",id,["Fecha","Procedimiento","Implante","Estado"],x=>[x.f,esc(x.t),esc(x.i||"—"),bd(x.e)])),
@@ -1871,8 +1872,18 @@ return card(`2. Asignar al paciente · ${it.length} seleccionados`,lista+`<div c
 async function asignar(){const it=[...S.sel].map(i=>DB.T[i]).filter(Boolean),a=S.pa,er=m=>{$("#pse").textContent=m};
 if(!it.length)return er("Elige al menos un procedimiento.");if(!a.p)return er("Elige el paciente.");if(!a.f)return er("Elige la fecha en el calendario.");
 const f=dmy(a.f);let cnt=0;
-try{for(const x of it){const r={p:+a.p,f,t:x.n,c:x.c,g:x.g||"General",pr:x.p||0,dr:a.dr,e:a.e};const id=await crearK("PP",r);DB.PP.push({...r,id});cnt++;
-if(a.cg){const cb={p:+a.p,f,c:x.c,t:x.n,m:x.p||0,dr:a.dr,e:"Pendiente"};const bid=await crearK("B",cb);DB.B.push({...cb,id:bid})}}}catch(e){return er(e.message)}
+try{for(const x of it){
+  const existing=DB.PP.find(pp=>pp.p==+a.p && pp.t==x.n && pp.f==f);
+  const r={p:+a.p,f,t:x.n,c:x.c,g:x.g||"General",pr:x.p||0,dr:a.dr,e:a.e};
+  if(existing){Object.assign(existing,r);await editarK("PP",existing)}
+  else{const id=await crearK("PP",r);DB.PP.push({...r,id})}
+  cnt++;
+  if(a.cg){const cb={p:+a.p,f,c:x.c,t:x.n,m:x.p||0,dr:a.dr,e:"Pendiente"};
+    const exB=DB.B.find(b=>b.p==+a.p && b.t==x.n && b.f==f);
+    if(exB){Object.assign(exB,cb);await editarK("B",exB)}
+    else{const bid=await crearK("B",cb);DB.B.push({...cb,id:bid})}
+  }
+}}catch(e){return er(e.message)}
 S.sel.clear();toast(cnt+" procedimientos asignados");go("p-"+a.p+"-procedimientos")}
 const cnt=(a,f)=>{const m={};a.forEach(x=>{const k=f(x)||"Sin dato";m[k]=(m[k]||0)+1});return Object.entries(m)};
 function pie(it,f=v=>v){const t=it.reduce((s,x)=>s+x[1],0);if(!t)return'<p class="mu">Sin datos todavía.</p>';let a=-Math.PI/2,sv="";const n=it.filter(y=>y[1]).length;
