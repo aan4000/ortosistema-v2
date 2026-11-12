@@ -10,6 +10,7 @@ create table if not exists usuarios(
   activo boolean not null default true,
   debe_cambiar_clave boolean not null default false);
 alter table usuarios add column if not exists debe_cambiar_clave boolean not null default false;
+alter table usuarios add column if not exists modulos jsonb;
 
 create sequence if not exists paciente_codigo_seq start 1;
 create sequence if not exists paciente_expediente_seq start 1;

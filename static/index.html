@@ -548,12 +548,12 @@ async function cargar(){
   for(const k of Object.keys(TABLA))DB[k]=(todo[TABLA[k]]||[]).map(r=>fromK(k,r));
   const imgs={};(todo["_imagenes"]||[]).forEach(i=>{if(!imgs[i.estudio_id])imgs[i.estudio_id]=i.id});
   DB.I.forEach(x=>x.im=imgs[x.id]||null);
-  S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config};
+  S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config,modulos:yo.modulos||null};
   if(yo.es_admin){
     const[f,us,med,adm]=await Promise.all([api("/api/funciones"),api("/api/usuarios"),api("/api/medicos"),api("/api/admin/resumen").catch(()=>null)]);
     Object.entries(f.roles).forEach(([r,m])=>DB.PM[r]=m);
     DB.REC=f.recomendados||{};DB.RDESC=f.descripciones||{};
-    DB.users=(us.usuarios||[]).map(x=>({id:x.id,u:x.usuario,nombre:x.nombre,rol:x.rol,on:x.activo,cp:x.debe_cambiar_clave,correo:x.correo||"",telefono:x.telefono||"",cargo:x.cargo||"",ultimo:x.ultimo_ingreso,preguntas:x.preguntas||0}));
+    DB.users=(us.usuarios||[]).map(x=>({id:x.id,u:x.usuario,nombre:x.nombre,rol:x.rol,on:x.activo,cp:x.debe_cambiar_clave,correo:x.correo||"",telefono:x.telefono||"",cargo:x.cargo||"",modulos:x.modulos||null,ultimo:x.ultimo_ingreso,preguntas:x.preguntas||0}));
     DB.medicos=med.medicos||[];S.adm=adm;
   }else{
     DB.PM[yo.rol]=yo.modulos||[];
@@ -605,7 +605,7 @@ function modal(h,c=""){const o=document.createElement("div");o.className="ov "+c
 
 const MOD=[["agenda","Agenda"],["pacientes","Pacientes"],["procedimientos","Procedimientos"],["ortesis","Órtesis"],["quirofano","Quirófano"],["estudios","Estudios"],["documentos","Documentos"],["rehab","Rehabilitación"],["recetas","Recetas"],["referimientos","Referimientos"],["autorizaciones","Autorizaciones"],["facturacion","Facturación"]];
 const PM0=()=>({medico:["agenda","pacientes","procedimientos","ortesis","quirofano","estudios","documentos","rehab","referimientos","autorizaciones","facturacion","recetas"],enfermeria:["agenda","pacientes","estudios","documentos","ortesis","recetas"],secretaria:["agenda","pacientes","procedimientos","estudios","documentos","ortesis","referimientos","autorizaciones","facturacion","recetas"],fisio:["agenda","pacientes","rehab","ortesis","estudios","documentos"],facturacion:["agenda","pacientes","procedimientos","autorizaciones","facturacion","referimientos"]});
-const can=k=>k=="inicio"||!!(S.user&&(S.user.rol=="admin"||(DB.PM[S.user.rol]||[]).includes(k)));
+const can=k=>k=="inicio"||!!(S.user&&(S.user.rol=="admin"||((S.user.modulos!=null?S.user.modulos:(DB.PM[S.user.rol]||[])).includes(k))));
 /* ===== Sesión y usuarios ===== */
 async function entrar(usuario,password){
   const r=await api("/api/login",{method:"POST",body:{usuario,password}});
@@ -666,10 +666,12 @@ return sec("Administración")+T+`<div class="grid">${[["Cuentas activas",a.activ
 const a=S.adm||{},d=a.datos||{};
 return sec("Administración")+`<div class="row">${T}<button class="btn p" data-a="nu">${ic("userplus",16)} Nuevo usuario</button></div>`+`<div class="grid">${[["Usuarios activos",a.activos||0,"users"],["Pacientes",d.pacientes||0,"users"],["Estudios de imagen",d.estudios_imagenes||0,"scan"],["Pendientes de contraseña",a.deben_cambiar||0,"key"]].map(([l,n,i])=>`<div class="card k"><span class="ki">${ic(i,24)}</span><div class="mu">${l}</div><b>${n}</b></div>`).join("")}</div>`+`<br>`+card("Usuarios",tbl(["Usuario","Nombre","Rol","Seguridad","Último ingreso","Estado",""],DB.users.map((x,i)=>[esc(x.u),esc(x.nombre),`<span class="b in">${ic("shield",12)} ${RL[x.rol]||x.rol}</span>`,x.preguntas>=3?`<span class="b ok">${ic("shieldcheck",13)} Configurada</span>`:`<span class="b wa">${ic("shieldx",13)} Pendiente</span>`,fmtFecha(x.ultimo),bd(x.on?"Activo":"Inactivo")+(x.cp?' <span class="b wa">Cambiar clave</span>':""),`<div class="acts"><button class="icb" data-a="eu:${i}" data-tip="Editar perfil" aria-label="Editar ${esc(x.u)}">${ic("edit",17)}</button><button class="icb" data-a="rp:${i}" data-tip="Restablecer contraseña" aria-label="Restablecer contraseña de ${esc(x.u)}">${ic("key",17)}</button><button class="icb" data-a="rsec:${i}" data-tip="Borrar preguntas de seguridad" aria-label="Borrar preguntas de ${esc(x.u)}">${ic("shieldq",17)}</button><button class="icb" data-a="unlock:${i}" data-tip="Desbloquear intentos" aria-label="Desbloquear ${esc(x.u)}">${ic("unlock",17)}</button><button class="icb d" data-a="delu:${i}" data-tip="Eliminar cuenta" aria-label="Eliminar ${esc(x.u)}">${ic("trash",17)}</button></div>`])))}
 const fmtFecha=s=>{if(!s)return'<span class="mu">Nunca</span>';try{return new Date(s).toLocaleString("es-DO",{dateStyle:"short",timeStyle:"short"})}catch(e){return esc(s)}};
-function fUs(i){const nu=i==null,x=nu?{u:"",nombre:"",rol:"medico",on:true,correo:"",telefono:"",cargo:"",preguntas:0}:DB.users[i];
-const o=modal(`<div class="row"><h3 style="margin:0">${ic(nu?"userplus":"edit",20)} ${nu?"Nuevo usuario":"Editar perfil"}</h3>${nu?"":`<button class="icb" data-tip="Cerrar" aria-label="Cerrar" id="uclose">${ic("x",18)}</button>`}</div><div class="fg"><div><label>Usuario<input id="uu" value="${esc(x.u)}" ${nu?"":"readonly"} autocomplete="off" placeholder="tu_usuario"></label></div><div><label>Nombre completo<input id="un" value="${esc(x.nombre)}" placeholder="Ej. Juan Pérez"></label></div></div><div class="fg"><div><label>Rol<select id="ur">${Object.entries(RL).map(([k,v])=>`<option value="${k}"${k==x.rol?" selected":""}>${v}</option>`).join("")}</select></label></div><div><label>Cargo o especialidad<input id="uc" value="${esc(x.cargo||"")}" placeholder="Ej. Ortopeda, Recepción"></label></div></div><div class="fg"><div><label>Correo<input id="ue" type="email" value="${esc(x.correo||"")}" autocomplete="off"></label></div><div><label>Teléfono<input id="ut" value="${esc(x.telefono||"")}" autocomplete="off"></label></div></div><label>${nu?"Contraseña (mínimo 10 caracteres)":"Cambiar contraseña (déjala vacía para mantener la actual)"}<input id="up" type="password" autocomplete="new-password"></label><label class="ck" style="margin:8px 0"><input type="checkbox" id="ucp" ${nu||x.cp?"checked":""}> Pedir cambio de contraseña al próximo ingreso</label>${nu?"":`<label class="ck" style="margin:8px 0"><input type="checkbox" id="ua" ${x.on?"checked":""}> Usuario activo</label><p class="mu" style="margin:4px 0">${x.preguntas>=3?`<span class="b ok">${ic("shieldcheck",13)} Preguntas de seguridad configuradas</span>`:`<span class="b wa">${ic("shieldx",13)} Sin preguntas de seguridad</span>`}</p>`}<div class="er2" id="ue2" role="alert"></div><div class="tb"><button class="btn" id="ucancel">${ic("x",16)} Cancelar</button><button class="btn p" id="ug">${ic("save",16)} Guardar usuario</button></div>`);
+function fUs(i){const nu=i==null,x=nu?{u:"",nombre:"",rol:"medico",on:true,correo:"",telefono:"",cargo:"",preguntas:0,modulos:null}:DB.users[i];
+const eff=x.modulos!=null?x.modulos:(DB.PM[x.rol]||[]);
+const permHtml=MOD.map(([k,l])=>`<label class="ck"><input type="checkbox" class="umod" value="${k}" ${eff.includes(k)?"checked":""}> ${l}</label>`).join("");
+const o=modal(`<div class="row"><h3 style="margin:0">${ic(nu?"userplus":"edit",20)} ${nu?"Nuevo usuario":"Editar perfil"}</h3>${nu?"":`<button class="icb" data-tip="Cerrar" aria-label="Cerrar" id="uclose">${ic("x",18)}</button>`}</div><div class="fg"><div><label>Usuario<input id="uu" value="${esc(x.u)}" ${nu?"":"readonly"} autocomplete="off" placeholder="tu_usuario"></label></div><div><label>Nombre completo<input id="un" value="${esc(x.nombre)}" placeholder="Ej. Juan Pérez"></label></div></div><div class="fg"><div><label>Rol<select id="ur">${Object.entries(RL).map(([k,v])=>`<option value="${k}"${k==x.rol?" selected":""}>${v}</option>`).join("")}</select></label></div><div><label>Cargo o especialidad<input id="uc" value="${esc(x.cargo||"")}" placeholder="Ej. Ortopeda, Recepción"></label></div></div><div class="fg" style="grid-column:1/-1"><label class="mu" style="display:block">Permisos (anula los del rol)<div class="chips" style="flex-direction:column;align-items:flex-start;gap:4px;margin-top:6px">${permHtml}</div></label></div><div class="fg"><div><label>Correo<input id="ue" type="email" value="${esc(x.correo||"")}" autocomplete="off"></label></div><div><label>Teléfono<input id="ut" value="${esc(x.telefono||"")}" autocomplete="off"></label></div></div><label>${nu?"Contraseña (mínimo 10 caracteres)":"Cambiar contraseña (déjala vacía para mantener la actual)"}<input id="up" type="password" autocomplete="new-password"></label><label class="ck" style="margin:8px 0"><input type="checkbox" id="ucp" ${nu||x.cp?"checked":""}> Pedir cambio de contraseña al próximo ingreso</label>${nu?"":`<label class="ck" style="margin:8px 0"><input type="checkbox" id="ua" ${x.on?"checked":""}> Usuario activo</label><p class="mu" style="margin:4px 0">${x.preguntas>=3?`<span class="b ok">${ic("shieldcheck",13)} Preguntas de seguridad configuradas</span>`:`<span class="b wa">${ic("shieldx",13)} Sin preguntas de seguridad</span>`}</p>`}<div class="er2" id="ue2" role="alert"></div><div class="tb"><button class="btn" id="ucancel">${ic("x",16)} Cancelar</button><button class="btn p" id="ug">${ic("save",16)} Guardar usuario</button></div>`);
 const q=s=>o.querySelector(s),er=m=>{q("#ue2").textContent=m};if(q("#uclose"))q("#uclose").onclick=()=>o.remove();q("#ucancel").onclick=()=>o.remove();
-q("#ug").onclick=async()=>{const u=q("#uu").value.trim().toLowerCase(),nombre=q("#un").value.trim(),rol=q("#ur").value,p=q("#up").value,on=nu?true:q("#ua").checked,cp=q("#ucp").checked,correo=q("#ue").value.trim(),telefono=q("#ut").value.trim(),cargo=q("#uc").value.trim();
+q("#ug").onclick=async()=>{const u=q("#uu").value.trim().toLowerCase(),nombre=q("#un").value.trim(),rol=q("#ur").value,p=q("#up").value,on=nu?true:q("#ua").checked,cp=q("#ucp").checked,correo=q("#ue").value.trim(),telefono=q("#ut").value.trim(),cargo=q("#uc").value.trim(),modulos=[...o.querySelectorAll(".umod:checked")].map(c=>c.value);
 if(!u||!nombre)return er("Completa usuario y nombre.");
 if(nu&&DB.users.some(y=>y.u==u))return er("Ese usuario ya existe.");
 if((nu||p)&&p.length<10)return er("La contraseña debe tener al menos 10 caracteres.");
@@ -678,13 +680,13 @@ q("#ug").disabled=true;
 try{
   if(nu){
     const r=await api("/api/usuarios",{method:"POST",body:{usuario:u,nombre,rol,password:p,correo,telefono,cargo}});
-    DB.users.push({id:r.id,u,nombre,rol,on:true,cp:true,correo,telefono,cargo,ultimo:null,preguntas:0});
+    DB.users.push({id:r.id,u,nombre,rol,on:true,cp:true,correo,telefono,cargo,modulos,ultimo:null,preguntas:0});
   }else{
-    const d={nombre,rol,activo:on,debe_cambiar_clave:p?true:cp,correo,telefono,cargo};
+    const d={nombre,rol,activo:on,debe_cambiar_clave:p?true:cp,correo,telefono,cargo,modulos};
     if(p)d.password=p;
     await api("/api/usuarios/"+x.id,{method:"PATCH",body:d});
-    Object.assign(x,{nombre,rol,on,cp:d.debe_cambiar_clave,correo,telefono,cargo});
-    if(S.user.u==x.u){S.user.nombre=nombre;S.user.correo=correo;S.user.cargo=cargo;if(S.user.rol!=rol){S.user.rol=rol;await cargar()}}
+    Object.assign(x,{nombre,rol,on,cp:d.debe_cambiar_clave,correo,telefono,cargo,modulos});
+    if(S.user.u==x.u){S.user.nombre=nombre;S.user.correo=correo;S.user.cargo=cargo;S.user.modulos=modulos;if(S.user.rol!=rol){S.user.rol=rol;await cargar()}}
   }
   S.adm=await api("/api/admin/resumen").catch(()=>S.adm);
   toast("Usuario guardado");o.remove();draw()
