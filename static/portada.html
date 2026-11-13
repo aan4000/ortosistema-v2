@@ -3,276 +3,404 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ortosistema</title>
+<title>Gestión Ortopedia — Sistema clínico centrado en el paciente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>try{var tm=localStorage.getItem('orto_theme')||localStorage.getItem('theme');if(tm)document.documentElement.setAttribute('data-theme',tm)}catch(e){}</script>
 <style>
-:root{--bg:#EDF2F5;--surface:#fff;--ink:#0F2233;--muted:#4F6272;--line:#CCD8E0;--accent:#0B7F86;--on-accent:#fff;--warm:#E2A13A;--xr:#08141D;--xr2:#102635;--xr-ink:#C9DCE6;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1620;--surface:#13232F;--ink:#E6EEF3;--muted:#9DB0BF;--line:#24394A;--accent:#38B6BC;--on-accent:#06222A;--xr:#050D13;--xr2:#0E2230;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0B1620;--surface:#13232F;--ink:#E6EEF3;--muted:#9DB0BF;--line:#24394A;--accent:#38B6BC;--on-accent:#06222A;--xr:#050D13;--xr2:#0E2230;color-scheme:dark}
-html{scroll-padding-top:calc(76px + env(safe-area-inset-top,0px));scroll-behavior:smooth}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 "Instrument Sans",system-ui,sans-serif;transition:opacity .32s ease;overflow-x:hidden}
-.bg-anim{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.bg-anim span{position:absolute;display:block;opacity:.05;animation:floatBone 22s linear infinite}
-.bg-anim span svg{width:64px;height:64px;fill:none;stroke:var(--accent);stroke-width:1.6}
-.bg-anim span:nth-child(2){left:15%;animation-delay:-6s;animation-duration:26s}
-.bg-anim span:nth-child(3){left:35%;animation-delay:-12s;animation-duration:20s}
-.bg-anim span:nth-child(4){left:55%;animation-delay:-4s;animation-duration:24s}
-.bg-anim span:nth-child(5){left:75%;animation-delay:-16s;animation-duration:28s}
-header,main,footer,section{position:relative;z-index:1}
-@keyframes floatBone{0%{transform:translateY(110vh) rotate(0deg)}100%{transform:translateY(-20vh) rotate(360deg)}}body.leaving{opacity:0}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
-h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;line-height:1.05;margin:0;letter-spacing:-.03em}
-:focus-visible{outline:3px solid var(--warm);outline-offset:3px;border-radius:8px}
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--line)}
-.bar{max-width:1180px;margin:auto;padding:14px 28px;display:flex;align-items:center;gap:28px}
-.brand{display:flex;align-items:center;gap:10px;font:800 22px "Bricolage Grotesque",sans-serif;letter-spacing:-.03em;color:inherit;text-decoration:none}
-.brand svg{width:32px;height:32px}
-nav{display:flex;gap:26px;margin-left:12px;flex:1}
-nav a{color:var(--muted);text-decoration:none;font-weight:500;font-size:15.5px;padding:4px 0;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
-nav a:hover{color:var(--ink);border-color:var(--accent)}
-.actions{display:flex;gap:10px;flex-wrap:wrap}
-.btn{font:600 16px "Instrument Sans",sans-serif;padding:11px 20px;border-radius:999px;border:1.5px solid var(--ink);background:none;color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block;transition:transform .15s,box-shadow .15s}
-.btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px -8px var(--ink)}
-.btn.fill{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.wrap{max-width:1180px;margin:auto;padding:0 28px}
-.hero{display:grid;grid-template-columns:1fr 1.02fr;gap:56px;align-items:center;padding:72px 0 88px}
-h1{font-family:"Instrument Sans","Bricolage Grotesque",system-ui,sans-serif;font-size:clamp(44px,7vw,84px);font-weight:700;letter-spacing:-.04em}
-.lead{font-size:20px;color:var(--muted);max-width:44ch;margin:26px 0 34px}
-.hero .btn{padding:15px 30px;font-size:17px}
-.scope{background:radial-gradient(120% 90% at 50% 0,var(--xr2),var(--xr));border-radius:32px;padding:20px;box-shadow:0 30px 60px -30px rgba(8,20,29,.7);border:1px solid #1d3547;color:var(--xr-ink)}
-.fh{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid #22394b}
-.av{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:700 16px "Bricolage Grotesque",sans-serif}
-.fh b{display:block;color:#fff;font:700 18px "Bricolage Grotesque",sans-serif;line-height:1.2}
-.fh small{font-size:14px;color:#8FA9B8}
-.live{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:14px}
-.live i{width:9px;height:9px;border-radius:50%;background:var(--warm);animation:blink 1.8s ease-in-out infinite}
-@keyframes blink{50%{transform:scale(1.7);opacity:.45}}
-.rows{list-style:none;margin:10px 0 4px;padding:0}
-.row{position:relative;display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;cursor:pointer;overflow:hidden;transition:background .3s}
-.row svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.row .n{font-weight:500;flex:1}
-.row .st{font-size:14px;color:#7F9AAA;transition:color .3s}
-.row::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--warm)}
-.row.on{background:#143045}.row.on::after{animation:fill 2.4s linear forwards}
-@keyframes fill{to{width:100%}}
-.row.done .st,.row.on .st{color:var(--warm)}
-.cap{min-height:3.4em;margin:8px 4px 0;font-size:15.5px;border-top:1px solid #22394b;padding-top:14px}
-.cap b{color:#fff;font-weight:600}
-section.blk{padding:88px 0;border-top:1px solid var(--line)}
-.head{max-width:620px;margin-bottom:48px}
-.head h2,.split h2{font-size:clamp(34px,4.4vw,56px);font-weight:800}
-.head p,.split>div>p{color:var(--muted);margin:18px 0 0}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
-.fe{padding:32px 28px 36px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transition:background .25s;border-radius:0}
-.fe:hover{background:var(--surface)}
-.fe .ib{width:48px;height:48px;border-radius:16px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;margin-bottom:20px;transition:background .25s,transform .25s}
-.fe:hover .ib{background:var(--accent);transform:rotate(-6deg)}
-.fe svg{width:24px;height:24px;fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .25s}
-.fe:hover svg{stroke:var(--on-accent)}
-.fe h3{font-size:24px;margin-bottom:8px}
-.fe p{margin:0;color:var(--muted)}
-.split{display:grid;grid-template-columns:1fr 1.5fr;gap:64px}
-.split.rev{grid-template-columns:1.1fr 1fr;align-items:center}
-.split>div:first-child h2{position:sticky;top:100px}
-.split.rev>div:first-child h2{position:static}
-ol{list-style:none;margin:0;padding:0}
-li.step{position:relative;padding:0 0 52px 76px}
-li.step:last-child{padding-bottom:0}
-.mk{position:absolute;left:0;top:0;width:50px;height:50px;border-radius:50%;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center;font:700 20px "Bricolage Grotesque",sans-serif;color:var(--muted);transition:all .5s}
-li.step::before{content:"";position:absolute;left:24px;top:54px;bottom:4px;width:2px;background:var(--accent);transform:scaleY(0);transform-origin:top;transition:transform .8s .25s}
-li.step:last-child::before{display:none}
-li.step.on .mk{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-li.step.on::before{transform:scaleY(1)}
-.step h3{font-size:28px;margin:6px 0 10px}
-.step p{margin:0;color:var(--muted);max-width:50ch}
-.chip{display:inline-flex;align-items:center;gap:9px;margin-top:16px;padding:7px 16px;border-radius:99px;background:var(--xr);color:var(--xr-ink);font-size:14.5px;font-weight:500}
-.chip i{width:9px;height:9px;border-radius:50%;background:var(--warm);display:block}
-.perm{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:24px 26px;transition:transform .25s,box-shadow .25s}.perm:hover{transform:translateY(-4px);box-shadow:0 16px 36px -20px rgba(0,0,0,.2)}
-.perm h3{font-size:22px}
-.perm small{color:var(--muted);font-size:14.5px}
-.pr{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);font-weight:500}
-.pr:last-of-type{border-bottom:0}
-.sw{width:46px;height:26px;border-radius:99px;background:var(--line);position:relative;transition:background .35s;flex:none}
-.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .35s}
-.pr.on .sw{background:var(--accent)}.pr.on .sw::after{transform:translateX(20px)}
-.pw{margin-top:14px;padding-top:18px;border-top:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap}
-.pw span{font-size:14.5px;font-weight:600;padding:7px 14px;border-radius:99px;border:1.5px solid var(--line);color:var(--muted)}
-.faq{max-width:780px}
-details{border-bottom:1px solid var(--line)}
-details:first-of-type{border-top:1px solid var(--line)}
-summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font:700 21px "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
-summary::-webkit-details-marker{display:none}
-summary::after{content:"+";font-size:28px;font-weight:500;color:var(--accent);transition:transform .3s}
-details[open] summary::after{transform:rotate(45deg)}
-details p{margin:0 0 24px;color:var(--muted);max-width:60ch;animation:show .4s}
-@keyframes show{from{opacity:0;transform:translateY(-6px)}}
-.cta{background:radial-gradient(100% 140% at 85% 0,var(--xr2),var(--xr));color:#fff;border-radius:36px;padding:72px 36px;text-align:center;margin:0 0 88px;transition:transform .25s}.cta:hover{transform:scale(1.01)}
-.cta h2{font-size:clamp(30px,4.2vw,52px);font-weight:800;max-width:16ch;margin:auto}
-.cta p{color:var(--xr-ink);margin:16px auto 30px;max-width:42ch}
-.cta .actions{justify-content:center}
-.cta .btn{border-color:#fff;color:#fff}.cta .btn.fill{background:var(--warm);border-color:var(--warm);color:#1B1405}
-footer{border-top:1px solid var(--line);padding:40px 0 48px;color:var(--muted);font-size:15px}
-footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
-footer nav{margin:0;flex:none}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:12px;font-size:15px;opacity:0;pointer-events:none;transition:all .3s;max-width:90vw;text-align:center;z-index:20}
-#toast.show{opacity:1;transform:translate(-50%,0)}
-@media (max-width:900px){nav.top{display:none}.bar{justify-content:space-between}.hero,.split,.split.rev{grid-template-columns:1fr;gap:40px}.hero{padding:44px 0 56px}.grid{grid-template-columns:1fr 1fr}.split>div:first-child h2{position:static}section.blk{padding:64px 0}.bar .btn{padding:9px 15px;font-size:15px}.brand span{display:none}}
-@media (max-width:560px){.grid{grid-template-columns:1fr}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}.row.on::after{width:100%}}
+:root{
+  --bg:#f4f8fb; --surface:#ffffff; --text:#12202f; --muted:#5a6b7d;
+  --primary:#0b6e8a; --primary-ink:#ffffff; --accent:#e3f1f6; --border:#d7e3ec; --glow:#e0527a; --art:.55;
+  --b1:#f6edda; --b2:#c7b58f; --bk:#8a7a58; --m1:#d9566f; --m2:#9c2a45; --tend:#b89b5e; --cart:#7fcfe4;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b141d; --surface:#15212d; --text:#e8eef4; --muted:#9aaabb;
+    --primary:#4cb8d6; --primary-ink:#06222c; --accent:#183240; --border:#263647; --glow:#ff7a9c; --art:.62;
+    --b1:#efe4cb; --b2:#9a8c6b; --bk:#cbbf9f; --m1:#ff7a9c; --m2:#b13b58; --tend:#e8dcc0;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b141d; --surface:#15212d; --text:#e8eef4; --muted:#9aaabb;
+  --primary:#4cb8d6; --primary-ink:#06222c; --accent:#183240; --border:#263647; --glow:#ff7a9c; --art:.62;
+  --b1:#efe4cb; --b2:#9a8c6b; --bk:#cbbf9f; --m1:#ff7a9c; --m2:#b13b58; --tend:#e8dcc0;
+  color-scheme:dark;
+}
+:root{--serif:Fraunces,Georgia,"Times New Roman",serif;--sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;overflow-x:hidden}
+
+/* Fondo anatómico: aparece y se mueve solo con el scroll */
+.art{position:fixed;z-index:0;pointer-events:none;overflow:visible;opacity:calc(var(--art) * var(--vis,0))}
+.knee{width:min(58vw,460px);right:-3vw;top:6vh;transform:translate(calc((1 - var(--vis,0)) * 90px),calc(var(--sy,0) * -.05px)) rotate(calc(var(--tilt,0) * 1deg))}
+.hip{width:min(48vw,360px);left:-7vw;bottom:2vh;transform:translate(calc((var(--vis,0) - 1) * 90px),calc(var(--sy,0) * -.03px)) rotate(calc(var(--tilt,0) * -1deg))}
+.musc{transform-box:fill-box;transform-origin:50% 0}
+.art{filter:drop-shadow(0 6px 10px rgb(0 0 0 / .22))}
+.aura{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:var(--vis,0);background:radial-gradient(42vmax 42vmax at calc(82% - var(--sy,0) * .02px) 22%,color-mix(in srgb,var(--glow) 15%,transparent),transparent 70%),radial-gradient(46vmax 46vmax at calc(14% + var(--sy,0) * .015px) 84%,color-mix(in srgb,var(--primary) 17%,transparent),transparent 70%)}
+.drop{position:fixed;top:0;z-index:0;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 30%,#fff,var(--glow) 60%,transparent 72%);opacity:calc(var(--vis,0) * .45)}
+.hand{width:min(44vw,340px);left:-5vw;top:7vh;opacity:calc(var(--art) * var(--vis,0) * .85);transform:translate(calc((var(--vis,0) - 1) * 90px),calc(var(--sy,0) * .04px)) rotate(calc(var(--tilt,0) * .8deg))}
+.ob{fill:url(#gb);stroke:var(--bk);stroke-width:2.5;stroke-linejoin:round}
+.cart{fill:none;stroke:var(--cart);stroke-width:5;stroke-linecap:round}
+.trab{fill:none;stroke:var(--bk);stroke-width:1.4;opacity:.4}
+.tdn{fill:none;stroke:var(--tend);stroke-width:7;stroke-linecap:round}
+.lg{fill:none;stroke:var(--tend);stroke-width:5;stroke-linecap:round}
+.mus{fill:none;stroke:var(--m1);stroke-width:24;stroke-linecap:round}
+.mus2{fill:none;stroke:#fff;stroke-width:24;stroke-linecap:round;stroke-dasharray:1 4;opacity:.3}
+.cap{fill:var(--glow);fill-opacity:.1;stroke:var(--glow);stroke-width:2.5;stroke-dasharray:4 7}
+
+.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 -20px;padding:12px 20px;border-radius:0 0 16px 16px;background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid color-mix(in srgb,var(--border) 70%,transparent);animation:down .7s ease both}
+.nav{display:flex;gap:22px;margin-left:auto}
+.nav a{color:var(--muted);text-decoration:none;font-weight:500;font-size:.95rem;transition:color .2s}
+.nav a:hover{color:var(--primary)}
+.hact{display:flex;align-items:center;gap:10px}
+.theme{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--primary);display:grid;place-items:center;cursor:pointer;padding:0;transition:transform .2s,box-shadow .3s,color .3s}
+.theme:hover{transform:translateY(-2px)}
+.theme svg{width:22px;height:22px}
+.theme .bulb{fill:transparent;transition:fill .3s}
+.theme[aria-pressed="false"]{color:#b07d00;box-shadow:0 0 18px color-mix(in srgb,#ffd45c 60%,transparent)}
+.theme[aria-pressed="false"] .bulb{fill:#ffd45c}
+.theme.pop svg{animation:flick .5s ease}
+@keyframes flick{30%{transform:scale(.8) rotate(-12deg)}60%{transform:scale(1.2) rotate(8deg)}}
+:root.tt *{transition:background-color .35s,color .35s,border-color .35s,fill .35s!important}
+.prog{position:fixed;top:0;left:0;height:3px;z-index:20;width:calc(var(--prog,0) * 100%);background:linear-gradient(90deg,var(--primary),var(--glow))}
+@media (max-width:760px){.nav{display:none}}
+@keyframes down{from{opacity:0;transform:translateY(-14px)}}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700}
+.brand svg{width:34px;height:34px;color:var(--primary)}
+.btn{display:inline-block;padding:11px 22px;border-radius:999px;font-weight:600;text-decoration:none;border:1px solid var(--primary);color:var(--primary);background:var(--surface);transition:transform .2s,box-shadow .2s,background .2s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 10px 22px -8px var(--primary)}
+.btn.solid{background:linear-gradient(135deg,var(--primary),color-mix(in srgb,var(--primary) 55%,var(--glow)));color:var(--primary-ink);border-color:transparent;box-shadow:0 10px 26px -10px var(--primary)}
+.hero{min-height:calc(100vh - 90px);min-height:calc(100svh - 90px);padding:30px 0 40px;display:grid;gap:28px;grid-template-columns:1.1fr .9fr;align-items:center}
+.eyebrow{display:inline-block;background:var(--accent);color:var(--primary);font-size:.82rem;font-weight:600;padding:5px 12px;border-radius:999px;animation:up .7s .1s ease both}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(2.1rem,5.4vw,3.6rem);line-height:1.08;letter-spacing:-.02em;margin:16px 0;animation:up .7s .25s ease both}
+h1 span{background:linear-gradient(90deg,var(--primary),var(--glow),var(--primary));background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4s linear infinite}
+@keyframes shine{to{background-position:200% center}}
+.lead{color:var(--muted);font-size:1.1rem;max-width:520px;margin:0 0 24px;animation:up .7s .4s ease both}
+.cta{display:flex;flex-wrap:wrap;gap:12px;animation:up .7s .55s ease both}
+@keyframes up{from{opacity:0;transform:translateY(22px)}}
+.panel{background:color-mix(in srgb,var(--surface) 90%,transparent);border:1px solid var(--border);border-radius:24px;padding:24px;box-shadow:0 30px 60px -30px rgb(0 0 0 / .35);animation:up .8s .5s ease both;backdrop-filter:blur(10px)}
+.tl{position:relative;margin-top:18px;padding-left:24px;display:grid;gap:14px}
+.tl::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--border)}
+.tl::after{content:"";position:absolute;left:6px;top:6px;width:2px;height:calc((100% - 12px) * min(1, var(--prog,0) * 3));background:linear-gradient(var(--primary),var(--glow))}
+.tl>div{position:relative}
+.tl i{position:absolute;left:-24px;top:5px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:2px solid var(--primary);z-index:1}
+.tl b{display:block;font-size:.92rem}
+.tl small{color:var(--muted);font-size:.8rem}
+.panel h3{margin:0 0 12px;font-size:.95rem;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:8px}
+.dot{width:9px;height:9px;border-radius:50%;background:#2fbf71;animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.25}}
+.pt{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--primary);display:grid;place-items:center;font-weight:700}
+.pt small{color:var(--muted);display:block}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--accent);border-radius:8px;padding:6px 11px;font-size:.88rem;opacity:0;animation:pop .5s ease forwards}
+.chip:nth-child(1){animation-delay:.9s}.chip:nth-child(2){animation-delay:1.05s}.chip:nth-child(3){animation-delay:1.2s}.chip:nth-child(4){animation-delay:1.35s}.chip:nth-child(5){animation-delay:1.5s}.chip:nth-child(6){animation-delay:1.65s}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+section{padding:46px 0}
+h2{font-family:var(--serif);font-weight:700;font-size:clamp(1.7rem,3.4vw,2.3rem);letter-spacing:-.01em;line-height:1.15;margin:6px 0 8px}
+.kicker{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--primary)}
+.sub{color:var(--muted);margin:0 0 22px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card{position:relative;overflow:hidden;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:20px;padding:24px;transition:transform .25s,box-shadow .25s,border-color .25s}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--primary),var(--glow));transform:scaleX(0);transform-origin:left;transition:transform .45s}
+.card:hover::before{transform:scaleX(1)}
+.card:hover{transform:translateY(-8px);border-color:var(--primary);box-shadow:0 16px 30px -16px var(--primary)}
+.card .ic{width:40px;height:40px;border-radius:10px;background:var(--accent);color:var(--primary);display:grid;place-items:center;margin-bottom:12px;font-weight:700}
+.card .ic svg{width:22px;height:22px}
+.card h3{margin:0 0 6px;font-size:1.05rem}
+.card p{margin:0;color:var(--muted);font-size:.95rem}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+.grid .reveal:nth-child(2){transition-delay:.12s}.grid .reveal:nth-child(3){transition-delay:.24s}.grid .reveal:nth-child(4){transition-delay:.36s}
+.band{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--primary),#1a9bbd,var(--primary));background-size:220% 100%;color:var(--primary-ink);border-radius:28px;padding:52px 24px;text-align:center;animation:bandflow 8s ease-in-out infinite alternate}
+.band::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;border:2px solid color-mix(in srgb,var(--primary-ink) 25%,transparent);box-shadow:0 0 0 30px color-mix(in srgb,var(--primary-ink) 8%,transparent),0 0 0 60px color-mix(in srgb,var(--primary-ink) 5%,transparent);pointer-events:none}
+@keyframes bandflow{to{background-position:100% 0}}
+.band p{margin:0 auto 18px;max-width:520px}
+.band .btn{background:var(--primary-ink);color:var(--primary);border-color:var(--primary-ink)}
+footer{padding:36px 0 28px;margin-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:.88rem;text-align:center}
+footer p{margin:0 0 8px}
+footer a{color:var(--muted);text-decoration:none;margin:0 10px}
+footer a:hover{color:var(--primary)}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.art{--art:.38}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal,.chip{opacity:1;transform:none}
+  .knee,.hip,.hand{transform:none}
+  .aura,.drop{display:none}
+}
 </style>
 </head>
 <body>
-<div class="bg-anim" aria-hidden="true">
-<span><svg viewBox="0 0 24 24"><path d="M6 4c-1.5 0-2.5 1-2.5 2.5S4.5 9 6 9h2v6H6c-1.5 0-2.5 1-2.5 2.5S4.5 20 6 20s2.5-1 2.5-2.5V16h7v1.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5-1-2.5-2.5-2.5h-2V9h2c1.5 0 2.5-1 2.5-2.5S19.5 4 18 4s-2.5 1-2.5 2.5V8h-7V6.5C8.5 5 7.5 4 6 4z"/></svg></span>
-<span><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="3"/><path d="M12 8v10M9 18h6M10 12h4"/></svg></span>
-<span><svg viewBox="0 0 24 24"><path d="M8 3v18M16 3v18M5 7h6M5 11h6M5 15h6M13 9h6M13 13h6M13 17h6"/></svg></span>
-<span><svg viewBox="0 0 24 24"><path d="M4 4c4 0 6 4 6 8s-2 8-6 8M20 4c-4 0-6 4-6 8s2 8 6 8"/></svg></span>
-<span><svg viewBox="0 0 24 24"><path d="M2 12c2-3 4-3 6 0s4 3 6 0s4-3 6 0"/></svg></span>
-<span><svg viewBox="0 0 24 24"><path d="M4 4l6 8-6 8M20 4l-6 8 6 8"/></svg></span>
-</div>
-<header><div class="bar">
-  <a class="brand" href="#inicio"><svg viewBox="0 0 32 32" fill="none" stroke="var(--accent)" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M7 25 25 7"/><circle cx="7" cy="25" r="3.6" fill="var(--bg)"/><circle cx="25" cy="7" r="3.6" fill="var(--bg)"/></svg><span>Ortosistema</span></a>
-  <nav class="top" aria-label="Principal"><a href="#funciones">Funciones</a><a href="#como-funciona">Cómo funciona</a><a href="#administracion">Administración</a><a href="#preguntas">Preguntas</a></nav>
-  <div class="actions"><a class="btn go" data-go="login" href="#">Iniciar sesión</a><a class="btn fill go" data-go="registro" href="#">Registrarse</a></div>
-</div></header>
 
-<main id="inicio">
+<div class="prog"></div>
+<div class="aura"></div>
+<!-- Rodilla -->
+<svg class="art knee" viewBox="0 0 300 520" aria-hidden="true">
+  <defs>
+    <linearGradient id="gb" x1="0" x2="1"><stop offset="0" stop-color="var(--b2)"/><stop offset=".38" stop-color="var(--b1)"/><stop offset="1" stop-color="var(--b2)"/></linearGradient>
+    <linearGradient id="gm" x1="0" x2="1"><stop offset="0" stop-color="var(--m2)"/><stop offset=".5" stop-color="var(--m1)"/><stop offset="1" stop-color="var(--m2)"/></linearGradient>
+    <linearGradient id="gs" x1="0" x2=".07" spreadMethod="repeat"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".28"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <radialGradient id="gl"><stop offset="0" stop-color="var(--glow)" stop-opacity=".85"/><stop offset="1" stop-color="var(--glow)" stop-opacity="0"/></radialGradient>
+  </defs>
+  <circle id="kg" cx="150" cy="252" r="95" fill="url(#gl)" opacity=".15"/>
+  <g id="mq" class="musc"><path fill="url(#gm)" d="M184 6C230 40 246 120 214 214C206 224 194 216 186 200Z"/><path fill="url(#gs)" d="M184 6C230 40 246 120 214 214C206 224 194 216 186 200Z"/></g>
+  <g id="mh" class="musc"><path fill="url(#gm)" d="M116 6C70 40 54 120 86 214C94 224 106 216 114 200Z"/><path fill="url(#gs)" d="M116 6C70 40 54 120 86 214C94 224 106 216 114 200Z"/></g>
+  <path class="ob" d="M121 -10H179C182 80 186 160 190 214C190 234 178 248 150 248C122 248 110 234 110 214C114 160 118 80 121 -10Z"/>
+  <path class="trab" d="M128 190C140 216 160 216 172 190M124 168C140 202 160 202 176 168M130 140C142 160 158 160 170 140"/>
+  <path class="cart" d="M113 218C114 238 130 248 150 248C170 248 186 238 187 218"/>
+  <path id="qt" class="tdn"/>
+  <path id="pt" class="tdn"/>
+  <g id="pat"><ellipse class="ob" cx="212" cy="236" rx="15" ry="21"/><path class="cart" d="M200 224C206 218 218 218 224 224" style="stroke-width:3"/></g>
+  <g id="tib">
+    <g id="mc" class="musc"><path fill="url(#gm)" d="M124 290C84 330 78 420 112 520H130Z"/><path fill="url(#gs)" d="M124 290C84 330 78 420 112 520H130Z"/></g>
+    <path fill="url(#gm)" d="M176 292C206 330 210 420 186 520H170Z"/>
+    <path class="ob" d="M126 286H174C176 360 172 440 170 540H130C128 440 124 360 126 286Z"/>
+    <ellipse class="ob" cx="178" cy="318" rx="7" ry="10"/>
+    <path class="ob" d="M96 278C96 262 124 258 150 258C176 258 204 262 204 278C204 290 176 292 150 292C124 292 96 290 96 278Z"/>
+    <path class="ob" d="M140 260L150 246L160 260Z"/>
+    <path class="cart" d="M101 270C112 262 188 262 199 270" style="stroke-width:4"/>
+    <g id="men" fill="var(--m2)" fill-opacity=".75"><path d="M100 268C108 252 136 256 142 266C130 272 110 274 100 268Z"/><path d="M200 268C192 252 164 256 158 266C170 272 190 274 200 268Z"/></g>
+  </g>
+  <path id="pcl" class="lg"/>
+  <path id="acl" class="lg"/>
+</svg>
+
+<!-- Cadera -->
+<svg class="art hip" viewBox="0 0 300 330" aria-hidden="true">
+  <circle id="hg" cx="150" cy="140" r="80" fill="url(#gl)" opacity=".15"/>
+  <g id="hl"><path class="mus"/><path class="mus2"/></g>
+  <g id="hm"><path class="mus"/><path class="mus2"/></g>
+  <path class="ob" d="M50 140A100 100 0 0 1 250 140L200 140A50 50 0 0 0 100 140Z"/>
+  <path class="cart" d="M101 140A49 49 0 0 1 199 140"/>
+  <circle id="cp" class="cap" cx="150" cy="140" r="68"/>
+  <path id="hi" class="lg"/>
+  <g id="hb">
+    <path class="ob" d="M130 172C118 184 110 196 108 212L196 216C190 196 178 182 168 170Z"/>
+    <ellipse class="ob" cx="106" cy="216" rx="18" ry="22"/>
+    <rect class="ob" x="124" y="206" width="56" height="140" rx="24"/>
+    <circle class="ob" cx="150" cy="140" r="40"/>
+    <circle class="cart" cx="150" cy="140" r="38" style="stroke-width:3"/>
+    <circle cx="150" cy="148" r="4" fill="var(--bk)" opacity=".5"/>
+  </g>
+</svg>
+
+<!-- Mano (vista lateral): antebrazo, carpo, metacarpiano, dedos y pulgar -->
+<svg class="art hand" viewBox="0 0 330 300" aria-hidden="true">
+  <circle id="hdg" cx="190" cy="165" r="95" fill="url(#gl)" opacity=".15"/>
+  <g id="hex" class="musc"><path fill="url(#gm)" d="M0 136C34 104 84 100 120 128V138H0Z"/><path fill="url(#gs)" d="M0 136C34 104 84 100 120 128V138H0Z"/></g>
+  <g id="hfl" class="musc"><path fill="url(#gm)" d="M0 166C34 206 84 208 122 176V166Z"/><path fill="url(#gs)" d="M0 166C34 206 84 208 122 176V166Z"/></g>
+  <rect class="ob" x="-10" y="137" width="108" height="12" rx="6"/>
+  <rect class="ob" x="-10" y="152" width="108" height="12" rx="6"/>
+  <ellipse cx="168" cy="172" rx="50" ry="17" fill="var(--m1)" opacity=".25"/>
+  <circle class="ob" cx="104" cy="151" r="14"/><circle class="ob" cx="121" cy="143" r="12"/><circle class="ob" cx="121" cy="160" r="12"/>
+  <rect class="ob" x="130" y="143" width="72" height="14" rx="7"/>
+  <path class="lg" d="M30 176C70 196 110 182 130 166L200 160"/>
+  <path id="htd2" d="M30 176C70 196 110 182 130 166L200 160" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="3 7" opacity=".5"/>
+  <g id="hfg"></g>
+</svg>
+
 <div class="wrap">
-<section class="hero">
-  <div>
-    <h1>Todo el expediente en un solo lugar.</h1>
-    <p class="lead">Abre un paciente y cada imagen, procedimiento, documento, órtesis, antecedente y registro se guarda en su ficha. Nada queda suelto.</p>
-    <div class="actions"><a class="btn fill go" data-go="registro" href="#">Registrarse</a><a class="btn go" data-go="login" href="#">Iniciar sesión</a></div>
-  </div>
-  <div class="scope" aria-label="Ejemplo animado de la ficha del paciente">
-    <div class="fh"><span class="av">PA</span><div><b>Paciente activo</b><small>Ficha abierta</small></div><span class="live"><i></i>Conectado</span></div>
-    <ul class="rows" id="rows"></ul>
-    <p class="cap" id="cap" aria-live="polite"></p>
-  </div>
-</section>
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 34 34 14"/><circle cx="12" cy="30" r="4"/><circle cx="18" cy="36" r="4"/><circle cx="30" cy="12" r="4"/><circle cx="36" cy="18" r="4"/></svg>
+      Gestión Ortopedia
+    </div>
+    <nav class="nav"><a href="#funciones">Funciones</a><a href="#flujo">Cómo funciona</a><a href="#acceso">Acceso</a></nav>
+    <div class="hact"><button class="theme" id="theme" type="button" aria-label="Cambiar entre modo claro y oscuro" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="bulb" d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/><path d="M9.500 18.500h5M10.500 21h3"/></svg></button><a class="btn" href="#acceso">Iniciar sesión</a></div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <span class="eyebrow">Articulaciones y tejido blando</span>
+        <h1>Todo el historial clínico, <span>ordenado alrededor del paciente.</span></h1>
+        <p class="lead">Un sistema único para registrar, consultar y dar seguimiento a cada caso: procedimientos, imágenes, documentos, órtesis y antecedentes, siempre vinculados al paciente activo.</p>
+        <div class="cta">
+          <a class="btn solid" href="#acceso">Entrar al sistema</a>
+          <a class="btn" href="#funciones">Ver funciones</a>
+        </div>
+      </div>
+      <aside class="panel" aria-label="Vista previa del expediente">
+        <h3><span class="dot"></span>Paciente activo</h3>
+        <div class="pt">
+          <div class="avatar">PA</div>
+          <div><strong>Expediente del paciente</strong><small>Toda la información en un solo lugar</small></div>
+        </div>
+        <div class="chips">
+          <span class="chip">Antecedentes</span><span class="chip">Procedimientos</span><span class="chip">Imágenes</span><span class="chip">Documentos</span><span class="chip">Órtesis</span><span class="chip">Registros</span>
+        </div>
+        <div class="tl">
+          <div><i></i><b>Consulta inicial</b><small>Valoración y antecedentes</small></div>
+          <div><i></i><b>Estudio de imagen</b><small>Radiografía vinculada al paciente</small></div>
+          <div><i></i><b>Procedimiento y órtesis</b><small>Registro y seguimiento</small></div>
+        </div>
+      </aside>
+    </div>
+
+    <section id="funciones">
+      <span class="kicker reveal">Funciones</span>
+      <h2 class="reveal">Pensado para la consulta diaria</h2>
+      <p class="sub reveal">Menos pasos, información accesible y un flujo claro por secciones.</p>
+      <div class="grid">
+        <article class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><h3>Paciente al centro</h3><p>Cada imagen, procedimiento y documento queda conectado al paciente activo.</p></article>
+        <article class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18M3 9h6"/></svg></div><h3>Panel y menú lateral</h3><p>Navegación por secciones con un dashboard claro desde el primer vistazo.</p></article>
+        <article class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div><h3>Acceso por roles</h3><p>El administrador crea usuarios, gestiona contraseñas y activa o quita funciones.</p></article>
+        <article class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4M10 13h6M10 17h6"/></svg></div><h3>Documentos y registros</h3><p>Autorizaciones, estudios, evaluaciones y seguimiento al alcance de un clic.</p></article>
+      </div>
+    </section>
+
+    <section id="flujo">
+      <span class="kicker reveal">Flujo</span>
+      <h2 class="reveal">Cómo funciona</h2>
+      <p class="sub reveal">Tres pasos, siempre alrededor del mismo paciente.</p>
+      <div class="grid">
+        <article class="card reveal"><div class="ic">1</div><h3>Seleccione al paciente</h3><p>El paciente activo define todo lo que ve y registra en el sistema.</p></article>
+        <article class="card reveal"><div class="ic">2</div><h3>Registre la atención</h3><p>Procedimientos, imágenes, órtesis y documentos quedan vinculados al expediente.</p></article>
+        <article class="card reveal"><div class="ic">3</div><h3>Consulte el historial</h3><p>Antecedentes y seguimiento completos, en un solo lugar y sin buscar.</p></article>
+      </div>
+    </section>
+
+    <section id="acceso" class="reveal">
+      <div class="band">
+        <h2>Comience a trabajar</h2>
+        <p>Inicie sesión con su usuario o, si es la primera vez, registre la cuenta de administrador.</p>
+        <a class="btn" href="index.html?enter=1">Iniciar sesión</a><a class="btn solid" href="index.html?enter=1" style="margin-left:10px">Registrarse</a>
+      </div>
+    </section>
+  </main>
+
+  <footer><p><a href="#funciones">Funciones</a><a href="#flujo">Cómo funciona</a><a href="#acceso">Acceso</a></p><p>Gestión Ortopedia · Sistema de historial clínico</p></footer>
 </div>
-
-<div class="wrap"><section class="blk" id="funciones">
-  <div class="head"><h2>Seis secciones, un solo paciente</h2><p>Todo lo que registras en cualquier sección se guarda en la ficha del paciente activo.</p></div>
-  <div class="grid" id="feat"></div>
-</section></div>
-
-<div class="wrap"><section class="blk split" id="como-funciona">
-  <div><h2>Cómo funciona</h2><p>De la cuenta de administrador al trabajo diario con el paciente, en cuatro pasos.</p></div>
-  <ol>
-    <li class="step"><span class="mk">1</span><h3>Crea la cuenta de administrador</h3><p>El primer registro es el del administrador. Desde esa cuenta controlas todo el sistema.</p></li>
-    <li class="step"><span class="mk">2</span><h3>Agrega a tu equipo</h3><p>Crea usuarios y activa o quita funciones a cada uno. Si alguien olvida su contraseña, tú la cambias o la recuperas.</p></li>
-    <li class="step"><span class="mk">3</span><h3>Abre un paciente</h3><p>Busca o registra al paciente. Queda como paciente activo en todas las secciones hasta que abras otro.</p><span class="chip"><i></i>Paciente activo</span></li>
-    <li class="step"><span class="mk">4</span><h3>Trabaja con todo conectado</h3><p>Lo que subas o anotes se guarda en la ficha del paciente activo.</p></li>
-  </ol>
-</section></div>
-
-<div class="wrap"><section class="blk split rev" id="administracion">
-  <div><h2>Tú decides quién usa qué</h2><p>El administrador crea los usuarios y activa o quita funciones para cada uno. También puede cambiar y recuperar contraseñas, sin depender de nadie más.</p></div>
-  <div class="perm" aria-label="Ejemplo animado de funciones por usuario">
-    <h3>Funciones del usuario</h3><small>Ejemplo de cómo se ajustan los permisos</small>
-    <div id="perm"></div>
-    <div class="pw"><span>Cambiar contraseña</span><span>Recuperar contraseña</span></div>
-  </div>
-</section></div>
-
-<div class="wrap"><section class="blk" id="preguntas">
-  <div class="head"><h2>Preguntas frecuentes</h2></div>
-  <div class="faq">
-    <details><summary>¿Qué es el paciente activo?</summary><p>Es el paciente que tienes abierto. Mientras esté activo, todo lo que subas o registres en cualquier sección se guarda en su ficha.</p></details>
-    <details><summary>¿Quién crea los usuarios?</summary><p>El administrador. Se registra la primera vez y desde su cuenta crea a cada usuario del equipo.</p></details>
-    <details><summary>¿Puedo limitar lo que ve cada usuario?</summary><p>Sí. El administrador agrega o quita funciones para cada usuario cuando lo necesite.</p></details>
-    <details><summary>¿Qué pasa si alguien olvida su contraseña?</summary><p>El administrador puede cambiarla o recuperarla desde el sistema.</p></details>
-    <details><summary>¿Cómo empiezo?</summary><p>Presiona Registrarse para crear la cuenta de administrador. Después agrega a tu equipo y abre tu primer paciente.</p></details>
-  </div>
-</section></div>
-
-<div class="wrap"><section class="cta">
-  <h2>Empieza con tu cuenta de administrador</h2>
-  <p>Regístrate, crea a tu equipo y abre tu primer paciente.</p>
-  <div class="actions"><a class="btn fill go" data-go="registro" href="#">Registrarse</a><a class="btn go" data-go="login" href="#">Iniciar sesión</a></div>
-</section></div>
-</main>
-
-<footer><div class="wrap">
-  <div><b style="font:800 20px 'Bricolage Grotesque',sans-serif;color:var(--ink)">Ortosistema</b><br>Gestión ortopédica centrada en el paciente.</div>
-  <nav aria-label="Pie"><a href="#funciones">Funciones</a><a href="#como-funciona">Cómo funciona</a><a href="#preguntas">Preguntas</a></nav>
-</div></footer>
-<div id="toast" role="status"></div>
-
 <script>
-// Pon aquí las rutas reales de tu sistema, por ejemplo "login.html" y "registro.html".
-const URLS = { login: "index.html?enter=1", registro: "index.html?enter=1" };
+(function(){
+  var d=document, root=d.documentElement;
+  var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function $(i){return d.getElementById(i)}
+  var tib=$('tib'),pat=$('pat'),men=$('men'),mq=$('mq'),mh=$('mh'),mc=$('mc'),qt=$('qt'),pt=$('pt'),acl=$('acl'),pcl=$('pcl'),kg=$('kg');
+  var hb=$('hb'),hl=$('hl'),hm=$('hm'),hi=$('hi'),hg=$('hg'),cp=$('cp');
+  var cur=0,raf=0,vel=0;
+  var X={},L={xi:[46,28],xm:[50,31],xt:[42,30]};
+  function seg(len,last,t){
+    var s='<rect x="-9" y="-'+(t+5)+'" width="'+(len+16)+'" height="'+(2*t+10)+'" rx="'+(t+5)+'" fill="var(--m1)" fill-opacity=".22" stroke="var(--m2)" stroke-opacity=".4" stroke-width="1.5"/>'
+     +'<rect class="ob" x="0" y="-'+t+'" width="'+len+'" height="'+(2*t)+'" rx="'+t+'"/>'
+     +'<path d="M2 '+(t+3)+'H'+(len-2)+'" fill="none" stroke="var(--tend)" stroke-width="3" stroke-linecap="round"/>'
+     +'<path d="M2 -'+(t+3)+'H'+(len-2)+'" fill="none" stroke="var(--tend)" stroke-width="1.6" stroke-linecap="round" opacity=".6"/>';
+    if(last)s+='<rect x="'+(len-15)+'" y="-'+(t+7)+'" width="13" height="5" rx="2" fill="var(--b1)" stroke="var(--bk)" stroke-width="1"/>';
+    else s+='<circle class="cart" cx="'+len+'" cy="0" r="'+t+'" style="stroke-width:2.5"/>';
+    return s;
+  }
+  function finger(p,a,b,c,t){
+    return '<g id="'+p+'a">'+seg(a,0,t)+'<g id="'+p+'b">'+seg(b,0,t-.5)+'<g id="'+p+'c">'+seg(c,1,t-1)+'</g></g></g>';
+  }
+  $('hfg').innerHTML=finger('xm',50,31,23,7.5)+finger('xi',46,28,22,7)+finger('xt',42,30,24,7);
+  ['xi','xm','xt'].forEach(function(p){['a','b','c'].forEach(function(k){X[p+k]=$(p+k)})});
+  X.xma.style.opacity=.85;
+  function pose(p,x,y,r1,r2,r3){
+    X[p+'a'].setAttribute('transform','translate('+x+' '+y+') rotate('+r1.toFixed(2)+')');
+    X[p+'b'].setAttribute('transform','translate('+L[p][0]+' 0) rotate('+r2.toFixed(2)+')');
+    X[p+'c'].setAttribute('transform','translate('+L[p][1]+' 0) rotate('+r3.toFixed(2)+')');
+  }
+  var hex=$('hex'),hfl=$('hfl'),hd2=$('htd2'),hdg=$('hdg');
+  hex.style.transformOrigin='50% 100%';
+  var gsg=$('gs'),drops=[];
+  if(!rm){for(var n=0;n<16;n++){var el=d.createElement('i');el.className='drop';var sz=4+((n*7)%9);el.style.cssText='left:'+((n*37)%97+1)+'vw;width:'+sz+'px;height:'+sz+'px';d.body.appendChild(el);drops.push({e:el,b:(n*173)%900,v:.15+((n*13)%10)/22});}}
+  function R(dx,dy,a,cx,cy){var r=a*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return [cx+dx*c-dy*s,cy+dx*s+dy*c]}
+  function F(p){return p[0].toFixed(1)+' '+p[1].toFixed(1)}
+  function curve(a,b,off){
+    var mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,dx=b[0]-a[0],dy=b[1]-a[1],l=Math.sqrt(dx*dx+dy*dy)||1;
+    return 'M'+F(a)+'Q'+(mx-dy/l*off).toFixed(1)+' '+(my+dx/l*off).toFixed(1)+' '+F(b);
+  }
+  function setMus(g,a,b,off){
+    var dd=curve(a,b,off),p=g.querySelectorAll('path');
+    p[0].setAttribute('d',dd);p[1].setAttribute('d',dd);
+  }
+  function frame(){
+    raf=0;
+    var y=window.scrollY||0, lag=y-cur;
+    vel=Math.max(-70,Math.min(70,(vel+lag*.05)*.75));cur+=vel;
+    var vh=window.innerHeight||700;
+    var s=Math.min(1,Math.max(0,cur/(vh*.35)));s=s*s*(3-2*s);
+    root.style.setProperty('--vis',s.toFixed(3));
+    root.style.setProperty('--sy',Math.min(cur,1400).toFixed(1));
+    root.style.setProperty('--tilt',Math.max(-4,Math.min(4,vel*.18)).toFixed(2));
+    root.style.setProperty('--prog',Math.min(1,cur/Math.max(1,root.scrollHeight-vh)).toFixed(4));
+    var glow=Math.min(1,Math.abs(lag)/50);
+    var th=rm?24:34*(1-Math.cos(cur/240)), f=th/68;
+    var ph=rm?10:26*Math.sin(cur/280), g=ph/26;
+    /* Rodilla: la tibia rota y la rótula desciende con tendones de longitud constante */
+    var pth=th*.55,C=[150,252];
+    tib.setAttribute('transform','rotate('+th.toFixed(2)+' 150 252)');
+    pat.setAttribute('transform','rotate('+pth.toFixed(2)+' 150 252)');
+    men.setAttribute('transform','translate('+(-5*f).toFixed(2)+' 0)');
+    qt.setAttribute('d','M186 178L'+F(R(62,-37,pth,150,252)));
+    pt.setAttribute('d','M'+F(R(62,5,pth,150,252))+'L'+F(R(28,66,th,150,252)));
+    acl.setAttribute('d',curve([138,236],R(10,10,th,150,252),.5*f*12));
+    pcl.setAttribute('d',curve([164,232],R(-14,10,th,150,252),(1-f)*12));
+    mq.style.transform='scale('+(1-.07*f).toFixed(3)+','+(1+.06*f).toFixed(3)+')';
+    mh.style.transform='scale('+(1+.18*f).toFixed(3)+','+(1-.07*f).toFixed(3)+')';
+    mc.style.transform='scale('+(1+.14*f).toFixed(3)+','+(1-.04*f).toFixed(3)+')';
+    kg.setAttribute('opacity',(.15+.85*glow).toFixed(2));
+    /* Cadera: abducción y aducción con músculos que se estiran y se acortan */
+    hb.setAttribute('transform','rotate('+ph.toFixed(2)+' 150 140)');
+    setMus(hl,[78,100],R(-44,76,ph,150,140),16+12*g);
+    setMus(hm,[198,150],R(20,150,ph,150,140),-(16-12*g));
+    hi.setAttribute('d',curve([118,96],R(-22,60,ph,150,140),(1-Math.abs(g))*10));
+    hg.setAttribute('opacity',(.15+.85*glow).toFixed(2));
+    cp.setAttribute('r',(68+8*glow).toFixed(1));
+    /* Mano: flexión coordinada MCP-PIP-DIP, oposición del pulgar y músculos del antebrazo */
+    var hf=rm?.5:(1-Math.cos(cur/210))/2, hk=hf*.9;
+    pose('xm',198,143,72*hk,98*hk,58*hk);
+    pose('xi',200,150,75*hf,95*hf,60*hf);
+    pose('xt',126,166,44-34*hf,4+26*hf,2+30*hf);
+    hex.style.transform='scale('+(1+.02*hf).toFixed(3)+','+(1-.12*hf).toFixed(3)+')';
+    hfl.style.transform='scale('+(1-.06*hf).toFixed(3)+','+(1+.2*hf).toFixed(3)+')';
+    hd2.setAttribute('stroke-dashoffset',(-hf*40).toFixed(1));
+    hdg.setAttribute('opacity',(.15+.85*glow).toFixed(2));
+    /* Fondo vivo: fibras musculares que se deslizan y gotitas sinoviales con parallax */
+    gsg.setAttribute('gradientTransform','translate('+(cur*.0007).toFixed(4)+' 0)');
+    for(var q=0;q<drops.length;q++){var o=drops[q],yy=(((o.b-cur*o.v)%(vh+60))+(vh+60))%(vh+60)-30;o.e.style.transform='translate3d(0,'+yy.toFixed(1)+'px,0)';}
+    if(Math.abs(y-cur)>.05||Math.abs(vel)>.05)raf=requestAnimationFrame(frame);
+  }
+  function kick(){if(!raf)raf=requestAnimationFrame(frame)}
+  window.addEventListener('scroll',kick,{passive:true});
+  window.addEventListener('resize',kick);
+  frame();
 
-const items = [
- {n:"Pacientes", d:'<path d="M8.6 11.6a3.6 3.6 0 1 0 0-7.2 3.6 3.6 0 0 0 0 7.2"/><path d="M2.6 20.4v-.9a4.9 4.9 0 0 1 4.9-4.9h2.2a4.9 4.9 0 0 1 4.9 4.9v.9"/>', f:"Expedientes clínicos completos con datos personales, antecedentes y evaluaciones.", t:"Todo el expediente del paciente en una sola ficha."},
- {n:"Agenda", d:'<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9.6h18M8 3v3.6M16 3v3.6"/>', f:"Citas y cirugías programadas por día, con el paciente activo.", t:"La agenda se filtra por el paciente que estás atendiendo."},
- {n:"Evaluaciones", d:'<path d="M12 4v16M4 12h16"/>', f:"Evaluación médica y examen físico con hallazgos estructurados.", t:"Cada evaluación queda en el registro del paciente activo."},
- {n:"Imágenes", d:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/>', f:"Radiografías y estudios de imagen dentro de la ficha.", t:"Cada estudio de imagen queda en la ficha del paciente activo."},
- {n:"Recetas", d:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>', f:"Medicamentos y prótesis ortopédicas recetadas al paciente.", t:"Las recetas se guardan en el registro del paciente activo."},
- {n:"Procedimientos", d:'<path d="M12 2v20M8 6h8M8 10h8M8 14h8M8 18h8"/>', f:"Catálogo de procedimientos y asignación por paciente.", t:"Los procedimientos se asignan al paciente activo."},
- {n:"Órtesis", d:'<path d="M5 19 19 5"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/>', f:"Órtesis indicadas y entregadas ligadas al historial.", t:"Las órtesis quedan ligadas al historial del paciente."},
- {n:"Facturación", d:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>', f:"Cargos y cobros por paciente con procedimientos.", t:"La facturación se genera a partir del paciente activo."}
-];
-const ic = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
-document.getElementById("feat").innerHTML = items.map(i => `<div class="fe"><div class="ib">${ic(i.d)}</div><h3>${i.n}</h3><p>${i.f}</p></div>`).join("");
-
-// Ficha del paciente: las secciones se van guardando una por una
-const rowsEl = document.getElementById("rows"), cap = document.getElementById("cap");
-rowsEl.innerHTML = items.map((i, k) => `<li class="row" data-i="${k}" tabindex="0" role="button">${ic(i.d)}<span class="n">${i.n}</span><span class="st">Pendiente</span></li>`).join("");
-const rows = [...rowsEl.children];
-let cur = -1, pause = 0;
-function show(i) {
-  cur = i;
-  rows.forEach((r, k) => {
-    r.classList.toggle("on", k === i);
-    r.classList.toggle("done", k < i);
-    r.querySelector(".st").textContent = k < i ? "Guardado" : k === i ? "Guardando…" : "Pendiente";
+  var els=d.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return}
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target)}
+    });
+  },{threshold:.15});
+  els.forEach(function(e){io.observe(e)});
+})();
+(function(){
+  var btn=document.getElementById('theme'),root=document.documentElement;
+  var mq=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)');
+  function cur(){var t=root.getAttribute('data-theme');return t||(mq&&mq.matches?'dark':'light')}
+  function paint(){
+    var dk=cur()==='dark';
+    btn.setAttribute('aria-pressed',dk?'true':'false');
+    btn.title=dk?'Modo oscuro activo: cambiar a claro':'Modo claro activo: cambiar a oscuro';
+  }
+  btn.addEventListener('click',function(){
+    var n=cur()==='dark'?'light':'dark';
+    root.classList.add('tt');root.setAttribute('data-theme',n);
+    try{localStorage.setItem('theme',n);localStorage.setItem('orto_theme',n)}catch(e){}
+    paint();
+    btn.classList.remove('pop');void btn.offsetWidth;btn.classList.add('pop');
+    setTimeout(function(){root.classList.remove('tt')},450);
   });
-  cap.innerHTML = i < 0 ? "" : "<b>" + items[i].n + ".</b> " + items[i].t;
-}
-function allDone() { cur = items.length; rows.forEach(r => { r.classList.remove("on"); r.classList.add("done"); r.querySelector(".st").textContent = "Guardado"; }); cap.innerHTML = "<b>Todo conectado.</b> Cada dato quedó en la ficha del paciente activo."; }
-rows.forEach(r => {
-  const pick = () => { show(+r.dataset.i); pause = Date.now() + 9000; };
-  r.addEventListener("click", pick);
-  r.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
-});
-const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-show(0);
-if (!still) setInterval(() => {
-  if (Date.now() < pause) return;
-  if (cur < items.length - 1) show(cur + 1); else if (cur === items.length - 1) allDone(); else show(0);
-}, 2600);
-else allDone();
-
-// Permisos: los interruptores cambian solos
-const names = ["Imágenes","Procedimientos","Documentos","Órtesis","Antecedentes","Registros"], state = [1,1,1,0,1,0];
-const perm = document.getElementById("perm");
-perm.innerHTML = names.map((n, k) => `<div class="pr${state[k] ? " on" : ""}"><span>${n}</span><span class="sw"></span></div>`).join("");
-const prs = [...perm.children];
-let seq = [3,5,0,2,3,5,0,2], p = 0;
-if (!still) setInterval(() => { const k = seq[p++ % seq.length]; prs[k].classList.toggle("on"); }, 1700);
-
-// Pasos al hacer scroll
-const steps = document.querySelectorAll(".step");
-if ("IntersectionObserver" in window && !still) {
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } }), {threshold:.6});
-  steps.forEach(x => io.observe(x));
-} else steps.forEach(x => x.classList.add("on"));
-
-// Botones de acceso
-const toast = document.getElementById("toast");
-document.querySelectorAll(".go").forEach(b => b.addEventListener("click", e => {
-  const url = URLS[b.dataset.go];
-  if (url) { e.preventDefault(); document.body.classList.add("leaving"); setTimeout(() => { location.href = url; }, 320); return; }
-  e.preventDefault();
-  toast.textContent = "Conecta este botón con tu pantalla de " + (b.dataset.go === "login" ? "inicio de sesión" : "registro") + " en URLS, dentro del script.";
-  toast.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => toast.classList.remove("show"), 3800);
-}));
+  if(mq&&mq.addEventListener)mq.addEventListener('change',function(){if(!root.getAttribute('data-theme'))paint()});
+  paint();
+})();
 </script>
 </body>
 </html>
