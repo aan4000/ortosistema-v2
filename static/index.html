@@ -1818,10 +1818,12 @@ o.querySelector("#rgd").onclick=()=>{o.remove();conf("¿Eliminar este registro d
 const tDocs=(r,sp=true)=>tbl([...(sp?["Paciente"]:[]),"Documento","Tipo","Fecha","Tamaño","Verificación",""],r.map(([x,i])=>[...(sp?[pl(x.p)]:[]),esc(x.t),esc(x.tp||"—"),x.f||"—",x.sz?Math.round(x.sz/1024)+" KB":"—",vb(x),(x.k?`<button class="btn" data-a="dd:${i}">${ic("dl",14)} Descargar</button> `:'<span class="mu">Sin archivo</span> ')+`<button class="btn" data-a="vf:D.${i}">${ic("shieldcheck",14)} ${x.v?"Quitar verificación":"Verificar"}</button> <button class="btn" data-a="dx:${i}">${ic("trash",14)} Eliminar</button>`]));
 const DOCT=["Consentimiento informado","Informe médico","Receta","Laboratorio","Orden médica","Otro"];
 function vDocs(){const a=S.ap||S.upP||(DB.P[0]&&DB.P[0].id),rows=DB.D.map((x,i)=>[x,i]).filter(([x])=>!S.ap||!S.only||x.p==S.ap);
-return sec("Documentos")+card("Subir documento",`<div class="fg"><div><label class="mu" for="dp">Paciente *</label><select id="dp" disabled>${DB.P.map(p=>`<option value="${p.id}"${p.id==a?" selected":""}>${esc(p.n)}</option>`).join("")}</select></div><div><label class="mu" for="dt">Tipo de documento</label><select id="dt">${opt(DOCT)}</select></div><div><label class="mu" for="df">Fecha</label><input id="df" type="date" value="${iso(hoy)}"></div><div><label class="mu" for="dfile">Archivo (máximo 8 MB)</label><div class="filepick"><button type="button" class="btn p" data-a="pickfile">${ic("up",16)} Seleccionar archivo</button><span class="mu" id="dfile_name">Ningún archivo seleccionado</span><input id="dfile" type="file" style="display:none"></div></div></div><div class="er2" id="dr2" role="alert"></div><button class="btn p" data-a="sd">${ic("up",16)} Subir documento</button>`)+"<br>"+card(`Documentos (${rows.length})`,tDocs(rows))}
+return sec("Documentos")+card("Subir documento",`<div class="fg"><div><label class="mu" for="dp">Paciente *</label><select id="dp" disabled>${DB.P.map(p=>`<option value="${p.id}"${p.id==a?" selected":""}>${esc(p.n)}</option>`).join("")}</select></div><div><label class="mu" for="dt">Tipo de documento</label><select id="dt">${opt(DOCT)}</select></div><div><label class="mu" for="df">Fecha</label><input id="df" type="date" value="${iso(hoy)}"></div><div><label class="mu" for="dfile">Archivo (máximo 8 MB)</label><div class="filepick" style="margin:10px 0;padding:12px;border:1px dashed var(--bd);border-radius:10px;text-align:center"><span class="mu" id="dfile_name">Ningún archivo seleccionado</span><input id="dfile" type="file" style="display:none"></div></div></div><div class="er2" id="dr2" role="alert"></div><button class="btn p" data-a="sd" style="width:100%">${ic("up",16)} <span id="sd_label">Seleccionar y subir documento</span></button>`)+"<br>"+card(`Documentos (${rows.length})`,tDocs(rows))}
 async function subirDoc(){const v=i=>$("#"+i).value,er=m=>{$("#dr2").textContent=m},fl=($("#dfile").files||[])[0];
-if(!(S.ap||S.upP))return er("Activa un paciente antes de subir documentos.");if(!fl)return er("Elige un archivo.");if(fl.size>8e6)return er("El archivo supera 8 MB.");if(!v("df"))return er("Elige la fecha.");
-const b=document.querySelector('[data-a="sd"]');b.disabled=true;b.textContent="Subiendo…";
+if(!(S.ap||S.upP))return er("Activa un paciente antes de subir documentos.");
+if(!fl){const fi=$("#dfile");if(fi)fi.click();return}
+if(fl.size>8e6)return er("El archivo supera 8 MB.");if(!v("df"))return er("Elige la fecha.");
+const b=document.querySelector('[data-a="sd"]');if(b){b.disabled=true;const lb=b.querySelector("#sd_label");if(lb)lb.textContent="Subiendo..."}
 try{
 const rec={p:+v("dp"),t:fl.name,tp:v("dt"),f:dmy(v("df"))};
 const id=await crearK("D",rec);
@@ -1829,7 +1831,9 @@ const data=String(await archivoB64(fl)).split(",")[1]||"";
 await api("/api/documentos/"+id+"/archivo",{method:"PUT",body:{mime:fl.type||"application/octet-stream",datos_base64:data}});
 DB.D.push({...rec,id,k:id,sz:fl.size,m:fl.type});
 toast("Documento subido");draw()
-}catch(e){b.disabled=false;b.textContent="Subir documento";er(e.message)}}
+}catch(e){if(b){b.disabled=false;const lb=b.querySelector("#sd_label");if(lb)lb.textContent="Seleccionar y subir documento"}er(e.message)}}
+document.addEventListener("change",e=>{if(e.target&&e.target.id==="dfile"){const f=e.target.files&&e.target.files[0];const n=document.getElementById("dfile_name");if(n)n.textContent=f?f.name+" ("+Math.round(f.size/1024)+" KB)":"Ningún archivo seleccionado";const lb=document.querySelector("#sd_label");if(lb)lb.textContent=f?"Subir documento":"Seleccionar y subir documento"}});
+
 async function bajarDoc(i){const x=DB.D[i];if(!x||!x.k)return toast("Este documento no tiene archivo");
 try{const r=await fetch("/api/documentos/"+x.k+"/archivo",{headers:{Authorization:"Bearer "+token()}});
 if(!r.ok)throw new Error("No se pudo descargar el archivo");
