@@ -683,7 +683,7 @@ try{
     const r=await api("/api/usuarios",{method:"POST",body:{usuario:u,nombre,rol,password:p,correo,telefono,cargo}});
     DB.users.push({id:r.id,u,nombre,rol,on:true,cp:true,correo,telefono,cargo,modulos,ultimo:null,preguntas:0});
   }else{
-    const d={nombre,rol,activo:on,debe_cambiar_clave:p?true:cp,correo,telefono,cargo,modulos};
+    const roleDefaults=DB.PM[rol]||[];const resetPerms=modulos.length===roleDefaults.length && modulos.every(m=>roleDefaults.includes(m)) && roleDefaults.every(m=>modulos.includes(m));const d={nombre,rol,activo:on,debe_cambiar_clave:p?true:cp,correo,telefono,cargo,modulos:resetPerms?null:modulos,resetear_permisos:resetPerms};
     if(p)d.password=p;
     await api("/api/usuarios/"+x.id,{method:"PATCH",body:d});
     Object.assign(x,{nombre,rol,on,cp:d.debe_cambiar_clave,correo,telefono,cargo,modulos});

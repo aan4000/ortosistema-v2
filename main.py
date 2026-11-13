@@ -482,6 +482,7 @@ class NuevoUsuario(BaseModel):
 class CambioUsuario(BaseModel):
     nombre: str | None = None
     modulos: list[str] | None = None
+    resetear_permisos: bool | None = None
     rol: str | None = None
     activo: bool | None = None
     password: str | None = None
@@ -541,8 +542,10 @@ def usuario_editar(uid: int, d: CambioUsuario, u=Depends(solo_admin)):
         campos["telefono"] = d.telefono.strip() or None
     if d.cargo is not None:
         campos["cargo"] = d.cargo.strip() or None
-    if d.modulos is not None:
-        campos["modulos"] = Jsonb(d.modulos) if d.modulos is not None else None
+    if d.resetear_permisos:
+        campos["modulos"] = None
+    elif d.modulos is not None:
+        campos["modulos"] = Jsonb(d.modulos)
     if d.password is not None:
         campos["password_hash"] = bcrypt.hashpw(d.password.encode(), bcrypt.gensalt()).decode()
         campos["debe_cambiar_clave"] = True
