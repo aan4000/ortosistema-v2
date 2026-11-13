@@ -1826,11 +1826,14 @@ if(fl.size>8e6)return er("El archivo supera 8 MB.");if(!v("df"))return er("Elige
 const b=document.querySelector('[data-a="sd"]');if(b){b.disabled=true;const lb=b.querySelector("#sd_label");if(lb)lb.textContent="Subiendo..."}
 try{
 const rec={p:+v("dp"),t:fl.name,tp:v("dt"),f:dmy(v("df"))};
-const id=await crearK("D",rec);
+const existing=DB.D.find(x=>x.p==rec.p && x.t==rec.t && x.tp==rec.tp && x.f==rec.f);
+let id;
+if(existing){Object.assign(existing,rec);existing.sz=fl.size;existing.m=fl.type;await editarK("D",existing);id=existing.id}
+else{ id=await crearK("D",rec);DB.D.push({...rec,id,k:id,sz:fl.size,m:fl.type})}
 const data=String(await archivoB64(fl)).split(",")[1]||"";
 await api("/api/documentos/"+id+"/archivo",{method:"PUT",body:{mime:fl.type||"application/octet-stream",datos_base64:data}});
-DB.D.push({...rec,id,k:id,sz:fl.size,m:fl.type});
-toast("Documento subido");draw()
+const idx=DB.D.findIndex(x=>x.id==id);if(idx>=0){DB.D[idx].k=id;DB.D[idx].sz=fl.size;DB.D[idx].m=fl.type}
+toast(existing?"Documento actualizado":"Documento subido");draw()
 }catch(e){if(b){b.disabled=false;const lb=b.querySelector("#sd_label");if(lb)lb.textContent="Seleccionar y subir documento"}er(e.message)}}
 document.addEventListener("change",e=>{if(e.target&&e.target.id==="dfile"){const f=e.target.files&&e.target.files[0];const n=document.getElementById("dfile_name");if(n)n.textContent=f?f.name+" ("+Math.round(f.size/1024)+" KB)":"Ningún archivo seleccionado";const lb=document.querySelector("#sd_label");if(lb)lb.textContent=f?"Subir documento":"Seleccionar y subir documento"}});
 
