@@ -69,6 +69,7 @@ create table if not exists estudios_imagenes(
   paciente_id int not null references pacientes(id) on delete cascade,
   fecha date not null default current_date, tipo text, estado text default 'Por revisar', informe text);
 alter table estudios_imagenes add column if not exists region text;
+alter table estudios_imagenes add column if not exists lado text;
 alter table estudios_imagenes add column if not exists miniatura text;
 alter table estudios_imagenes add column if not exists verificado_por text;
 alter table estudios_imagenes add column if not exists verificado_en timestamptz;
