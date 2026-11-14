@@ -289,7 +289,7 @@ h1,h2,h3{letter-spacing:-.01em}
 window.onerror=function(m,s,l){document.body.insertAdjacentHTML("afterbegin",'<pre style="white-space:pre-wrap;padding:12px;margin:0;background:#C62828;color:#fff;position:relative;z-index:50">Error en OrtoSistema: '+m+' (línea '+l+')</pre>')};
 </script>
 <script>
-const $=s=>document.querySelector(s),K="orto_v1",d0=new Date(),hoy=String(d0.getDate()).padStart(2,"0")+"/"+String(d0.getMonth()+1).padStart(2,"0")+"/"+d0.getFullYear();
+let $=s=>document.querySelector(s),K="orto_v1",d0=new Date(),hoy=String(d0.getDate()).padStart(2,"0")+"/"+String(d0.getMonth()+1).padStart(2,"0")+"/"+d0.getFullYear();
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const IC={
 home:"<path d='M3.5 10.6 12 3.5l8.5 7.1'/><path d='M5.6 9.7V20a1 1 0 0 0 1 1h10.8a1 1 0 0 0 1-1V9.7'/><path d='M9.6 21v-5.4h4.8V21'/>",
@@ -2048,6 +2048,7 @@ if(enter){ try{history.replaceState(null,"",location.pathname)}catch(e){} }
 try{
   const e=await api("/api/estado");
   S.nuevo=!!e.requiere_registro;
+  if(e.fecha){const d=new Date(e.fecha+"T00:00:00");hoy=String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear()}
   if(enter) return vLogin();
   if(!token()) { location.href="portada.html"; return; }
   await cargar();

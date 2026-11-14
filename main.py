@@ -442,7 +442,9 @@ def estado():
     """El front-end muestra la pantalla de registro cuando aún no existe ningún usuario."""
     with pool.connection() as c:
         n = c.execute("select count(*) n from usuarios").fetchone()["n"]
-    return {"requiere_registro": n == 0}
+    return {"requiere_registro": n == 0,
+            "fecha": dt.date.today().isoformat(),
+            "hora": dt.datetime.now(dt.timezone.utc).strftime("%H:%M")}
 
 
 @app.post("/api/registro-inicial")
