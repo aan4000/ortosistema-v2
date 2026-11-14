@@ -597,7 +597,7 @@ const silueta=sx=>claseSexo(sx)==="fem"?SILUETA_F:SILUETA_M;
 const avSexo=(sx,size)=>`<span class="avp ${claseSexo(sx)}${size?" "+size:""}" aria-hidden="true">${silueta(sx)}</span>`;
 const mon=n=>"RD$ "+n.toLocaleString("es-DO");
 const pend=()=>DB.A.filter(x=>x.e=="Por solicitar"||x.e=="Enviada").length;
-const d8=s=>s.split("/").reverse().join("");
+const d8=s=>{const p=String(s||"").split("/");return p.length===3?p[2]+p[1].padStart(2,"0")+p[0].padStart(2,"0"):String(s||"")};
 /* Los cambios se guardan en el servidor con crearK, editarK y borrarK. */
 function toast(m){const t=document.createElement("div");t.className="ts";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1400)}
 const ovx=()=>document.querySelectorAll(".ov").forEach(x=>x.remove());
