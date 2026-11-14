@@ -1242,6 +1242,7 @@ return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div
 ${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",'<input id="nf" type="date" max="'+new Date().toISOString().slice(0,10)+'">')}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
 <br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",'<select id="ns">'+opt(SEG)+"</select>")}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
 <br>${card("Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}</div>`)}
+<br>${card("Estudios indicados",`<div class="fg">${f("si_t","Tipo de estudio",`<select id="si_t"><option value="">Ninguno</option>`+optGroups(TIPOS)+`</select>`)}${f("si_rg","Región anatómica",`<select id="si_rg">${REG.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join("")}</select>`)}${f("si_ld","Lado",`<select id="si_ld">${LADOS.map(l=>`<option value="${esc(l)}">${esc(l)}</option>`).join("")}</select>`)}</div><label class="mu" for="si_o">Observaciones<textarea id="si_o" rows="2"></textarea></label>`)}
 <br>${card("Antecedentes",`${mbSel([])}
 <br><div class="fg">${antField("nq","Antecedentes quirurgicos",null,SURGS)}${antField("nu","Medicamentos actuales",null,MEDS,"Concentración y forma según el Cuadro Básico de Medicamentos Esenciales (MSP/DIGEMAPS). Cada opción indica si es <b>genérico</b> o de <b>marca</b>.")}${antField("nh","Antecedentes familiares",FAMH,null)}</div>
 <br><div class="fg">${f("ni","Motivo de consulta",'<input id="ni">')}</div>
@@ -1294,7 +1295,9 @@ if (dups.length) {
     <p class="mu">¿Deseas agregar la información al paciente existente, crear uno nuevo de todos modos, o cancelar?</p>
     <div class="tb"><button class="btn" id="dup_cancel">Cancelar</button><button class="btn" id="dup_nuevo">Crear como nuevo</button><button class="btn p" id="dup_add">Agregar al existente</button></div>`, "w");
   o.querySelector("#dup_cancel").onclick=()=>o.remove();
-  o.querySelector("#dup_nuevo").onclick=async()=>{o.remove();try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}};
+  o.querySelector("#dup_nuevo").onclick=async()=>{o.remove();try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;
+  const siT=v("si_t"); if(siT){const siRg=v("si_rg")||"", siLd=v("si_ld")||"No aplica", siRec={p:id,f:fn,t:siT+" \u2014 "+siRg+" \u2014 "+siLd,tp:siT,rg:siRg,ld:siLd,r:"Por revisar",th:"",inf:v("si_o").trim()}; try{const siId=await crearK("I",siRec); DB.I.push({...siRec,id:siId})}catch(e){}}
+  go("p-"+id)}catch(e){er(e.message)}};
   o.querySelector("#dup_add").onclick=async()=>{o.remove();
     const campos=["e","c","s","al","dx","fn","sx","tl","em","na","oc","am","aq","me","af","ha","ea","eu"];
     for(const k of campos){ if(rec[k]!==undefined && rec[k]!=="" && rec[k]!==null && (dup[k]===undefined || dup[k]==="" || dup[k]===null)){ dup[k]=rec[k] } }
