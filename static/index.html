@@ -1797,24 +1797,10 @@ const fa=a=>S.ap&&S.only?a.filter(x=>x.p==S.ap):a;
 const vb=x=>x.v?`<span class="b ok" title="${esc(x.v.u)} · ${esc(x.v.f)}">${ic("shieldcheck",13)}Verificado</span>`:`<span class="b wa">${ic("clock",13)}Sin verificar</span>`;
 const acc=(k,i,x)=>`<button class="btn" data-a="er:${k}.${i}">${ic("edit",14)} Editar</button> <button class="btn" data-a="vf:${k}.${i}">${ic("shieldcheck",14)} ${x.v?"Quitar verificación":"Verificar"}</button>`;
 const tk=(k,id,h,fn)=>tbl([...h,"Verificación",""],DB[k].map((x,i)=>[x,i]).filter(([x])=>x.p==id).map(([x,i])=>[...fn(x),vb(x),acc(k,i,x)]));
-function _sec(){const parts=S.route.split("-");return parts[0]=="p"?(parts[2]||""):parts[0]}
-function nextStep(){const a=_sec(),p=S.ap;
-  if(!p) return {label:"Pacientes",route:"pacientes"};
-  const flow=["clinica","estudios","procedimientos","quirofano","recetas","autorizaciones","facturacion","documentos","rehab","agenda","resumen"];
-  const i=flow.indexOf(a);
-  if(i>=0 && i<flow.length-1) return {label:flow[i+1].charAt(0).toUpperCase()+flow[i+1].slice(1),route:"p-"+p+"-"+flow[i+1]};
-  if(a=="pacientes"||a==""||a=="inicio") return {label:"Evaluación médica",route:"p-"+p+"-clinica"};
-  return {label:"Expediente",route:"p-"+p+"-resumen"};
-}
-function prevStep(){const a=_sec(),p=S.ap;
-  if(!p) return {label:"Pacientes",route:"pacientes"};
-  const flow=["clinica","estudios","procedimientos","quirofano","recetas","autorizaciones","facturacion","documentos","rehab","agenda"];
-  const i=flow.indexOf(a);
-  if(i>0) return {label:flow[i-1].charAt(0).toUpperCase()+flow[i-1].slice(1),route:"p-"+p+"-"+flow[i-1]};
-  if(i==0) return {label:"Pacientes",route:"pacientes"};
-  if(a=="resumen") return {label:"Agenda",route:"p-"+p+"-agenda"};
-  return {label:"Pacientes",route:"pacientes"};
-}
+function _mainSec(){const parts=S.route.split("-");if(parts[0]=="p")return "pacientes";return parts[0]||"inicio"}
+function _flow(){const secs=[...M,...AD].filter(x=>can(x[0])).map(x=>x[0]);return [...new Set(secs)]}
+function nextStep(){const secs=_flow();const a=_mainSec();const i=secs.indexOf(a);const ni=(i>=0)?(i+1)%secs.length:0;const key=secs[ni]||secs[0];return {label:key,route:key}}
+function prevStep(){const secs=_flow();const a=_mainSec();const i=secs.indexOf(a);const pi=(i>=0)?(i-1+secs.length)%secs.length:secs.length-1;const key=secs[pi]||secs[secs.length-1];return {label:key,route:key}}
 function banner(){if(S.ap&&!pk(S.ap).n)S.ap=null;if(!S.ap)return"";const p=pk(S.ap),q=[["procedimientos","Procedimientos"],["estudios","Imágenes"],["ortesis","Órtesis"],["documentos","Documentos"],["facturacion","Facturación"]].filter(x=>can(x[0]));
 return`<div class="ab" role="status"><div class="ai">${esc(p.n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase())}</div><div class="am"><b>Paciente activo: ${esc(p.n)}</b><span class="mu"> ${p.e?p.e+" años · ":""}${p.c?"Cédula "+esc(p.c)+" · ":""}${esc(p.s||"Sin seguro")}</span>${p.xp?` <span class="mu">· Expediente ${esc(p.xp)}</span>`:""}${p.al?` <span class="b er">${ic("alert",13)} Alergia: ${esc(p.al)}</span>`:""} ${chip(EA,p.ea)} ${chip(EU,effAu(p))}</div><div class="tb"><button class="btn p" data-a="es:${p.id}">${ic("edit",14)} Cambiar estado</button><button class="btn" data-r="p-${p.id}">Expediente</button><button class="btn" data-a="ant">Antecedentes</button>${can("pacientes")?`<button class="btn" data-a="ev:med">Evaluación médica</button>`:""}${q.map(x=>`<button class="btn" data-r="${x[0]}">${x[1]}</button>`).join("")}<label class="ck"><input type="checkbox" data-pa2="only" ${S.only?"checked":""}> Ver solo este paciente</label><button class="btn" data-a="ca">Cerrar paciente</button></div><div class="tb" style="justify-content:flex-end;margin-top:6px"><button class="btn" data-a="pvstep" aria-label="Anterior">${ic("chevl",14)}</button> <button class="btn" data-a="nxstep" aria-label="Siguiente">${ic("chevr",14)}</button></div></div>`}
 function conf(m,fn,ok="Eliminar"){const o=modal(`<h3>Confirmar</h3><p>${esc(m)}</p><div class="tb"><button class="btn" id="cn">${ic("x",16)} Cancelar</button><button class="btn p" id="cs">${ic("check",16)} ${esc(ok)}</button></div>`);o.querySelector("#cn").onclick=()=>o.remove();o.querySelector("#cs").onclick=()=>{o.remove();fn()}}
