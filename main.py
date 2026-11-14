@@ -53,6 +53,7 @@ TABLAS = {
     "pacientes": ["codigo", "expediente", "nombre", "edad", "cedula", "seguro", "alergias", "diagnostico", "etapa",
                   "antecedentes_morbidos", "antecedentes_quirurgicos", "medicamentos",
                   "antecedentes_familiares", "habitos", "fecha_nacimiento", "sexo", "telefono",
+                  "estado_civil",
                   "ocupacion",
                   "correo", "numero_afiliado",
                   "estado_atencion", "estado_autorizacion", "autorizacion", "historial"],
