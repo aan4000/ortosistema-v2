@@ -680,7 +680,7 @@ const upq=q("#uprocq");if(upq)upq.oninput=()=>{const t=upq.value.trim().toLowerC
 if(q("#uprocall"))q("#uprocall").onclick=()=>o.querySelectorAll(".uproc").forEach(cb=>{if(cb.closest("label").style.display!="none")cb.checked=true});
 if(q("#uprocnone"))q("#uprocnone").onclick=()=>o.querySelectorAll(".uproc").forEach(cb=>cb.checked=false);
 const urEl=q("#ur"); if(urEl) urEl.onchange=()=>{const nr=urEl.value; const eff=DB.PM[nr]||[]; o.querySelectorAll(".umod").forEach(cb=>{cb.checked=eff.includes(cb.value)});const w=o.querySelector("#uprocwrap"); if(w)w.style.display=nr=="medico"?"":"none";};
-q("#ug").onclick=async()=>{const u=q("#uu").value.trim().toLowerCase(),nombre=q("#un").value.trim(),rol=q("#ur").value,p=q("#up").value,on=nu?true:q("#ua").checked,cp=q("#ucp").checked,correo=q("#ue").value.trim(),telefono=q("#ut").value.trim(),cargo=q("#uc").value.trim(),modulos=[...o.querySelectorAll(".umod:checked")].map(c=>c.value);
+q("#ug").onclick=async()=>{const u=q("#uu").value.trim().toLowerCase(),nombre=q("#un").value.trim(),rol=q("#ur").value,p=q("#up").value,on=nu?true:q("#ua").checked,cp=q("#ucp").checked,correo=q("#ue").value.trim(),telefono=q("#ut").value.trim(),cargo=q("#uc").value.trim(),modulos=[...o.querySelectorAll(".umod:checked")].map(c=>c.value),procedimientos=rol=="medico"?[...o.querySelectorAll(".uproc:checked")].map(c=>c.value):[];
 if(!u||!nombre)return er("Completa usuario y nombre.");
 if(nu&&DB.users.some(y=>y.u==u))return er("Ese usuario ya existe.");
 if((nu||p)&&p.length<10)return er("La contraseña debe tener al menos 10 caracteres.");
@@ -688,14 +688,14 @@ if(!nu&&!DB.users.some((y,j)=>j==i?rol=="admin"&&on:y.rol=="admin"&&y.on))return
 q("#ug").disabled=true;
 try{
   if(nu){
-    const r=await api("/api/usuarios",{method:"POST",body:{usuario:u,nombre,rol,password:p,correo,telefono,cargo}});
-    DB.users.push({id:r.id,u,nombre,rol,on:true,cp:true,correo,telefono,cargo,modulos,ultimo:null,preguntas:0});
+    const r=await api("/api/usuarios",{method:"POST",body:{usuario:u,nombre,rol,password:p,correo,telefono,cargo,procedimientos}});
+    DB.users.push({id:r.id,u,nombre,rol,on:true,cp:true,correo,telefono,cargo,modulos,procedimientos,ultimo:null,preguntas:0});
   }else{
-    const roleDefaults=DB.PM[rol]||[];const resetPerms=modulos.length===roleDefaults.length && modulos.every(m=>roleDefaults.includes(m)) && roleDefaults.every(m=>modulos.includes(m));const d={nombre,rol,activo:on,debe_cambiar_clave:p?true:cp,correo,telefono,cargo,modulos:resetPerms?null:modulos,resetear_permisos:resetPerms};
+    const roleDefaults=DB.PM[rol]||[];const resetPerms=modulos.length===roleDefaults.length && modulos.every(m=>roleDefaults.includes(m)) && roleDefaults.every(m=>modulos.includes(m));const d={nombre,rol,activo:on,debe_cambiar_clave:p?true:cp,correo,telefono,cargo,modulos:resetPerms?null:modulos,resetear_permisos:resetPerms,procedimientos};
     if(p)d.password=p;
     await api("/api/usuarios/"+x.id,{method:"PATCH",body:d});
-    Object.assign(x,{nombre,rol,on,cp:d.debe_cambiar_clave,correo,telefono,cargo,modulos});
-    if(S.user.u==x.u){S.user.nombre=nombre;S.user.correo=correo;S.user.cargo=cargo;S.user.modulos=modulos;if(S.user.rol!=rol){S.user.rol=rol;await cargar()}}
+    Object.assign(x,{nombre,rol,on,cp:d.debe_cambiar_clave,correo,telefono,cargo,modulos,procedimientos});
+    if(S.user.u==x.u){S.user.nombre=nombre;S.user.correo=correo;S.user.cargo=cargo;S.user.modulos=modulos;S.user.procedimientos=procedimientos;if(S.user.rol!=rol){S.user.rol=rol;await cargar()}}
   }
   S.adm=await api("/api/admin/resumen").catch(()=>S.adm);
   toast("Usuario guardado");o.remove();draw()
