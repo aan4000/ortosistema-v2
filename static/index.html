@@ -1253,11 +1253,11 @@ function fNac(id, val){
   const mm=String(val||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if(mm){ y=mm[1]; m=mm[2]; d=mm[3]; }
   const nowY=new Date().getFullYear();
-  let ys='<option value="">Ano</option>',ds='<option value="">Dia</option>',ms='<option value="">Mes</option>';
+  let ys='<option value="">Año</option>',ds='<option value="">Día</option>',ms='<option value="">Mes</option>';
   for(let i=nowY;i>=nowY-120;i--) ys+='<option value="'+i+'"'+(+y===i?' selected':'')+'>'+i+'</option>';
   for(let i=1;i<=31;i++) ds+='<option value="'+i+'"'+(+d===i?' selected':'')+'>'+i+'</option>';
   MESES_ES.forEach((nm,i)=>{ ms+='<option value="'+(i+1)+'"'+(+m===i+1?' selected':'')+'>'+nm+'</option>'; });
-  return '<div class="fdate"><select id="'+id+'_d" aria-label="Dia">'+ds+'</select><select id="'+id+'_m" aria-label="Mes">'+ms+'</select><select id="'+id+'_y" aria-label="Ano">'+ys+'</select></div>';
+  return '<div class="fdate"><select id="'+id+'_d" aria-label="Día">'+ds+'</select><select id="'+id+'_m" aria-label="Mes">'+ms+'</select><select id="'+id+'_y" aria-label="Año">'+ys+'</select></div>';
 }
 function fNacRead(id){
   const g=x=>{ const e=document.getElementById(id+x); return e?e.value:""; };
@@ -1300,7 +1300,7 @@ async function gp(){const v=i=>$("#"+i).value.trim(),er=m=>{$("#nr").textContent
 let fn=fn0;
 if(!fn){const a=+v("ne").replace(/\D/g,"");if(a&&a>0&&a<=130){const d=new Date();d.setFullYear(d.getFullYear()-a);fn=d.toISOString().slice(0,10)}}
 if(!n)return er("Escribe el nombre completo.");
- if(fn0==="invalid")return er("La fecha de nacimiento no es valida.");
+ if(fn0==="invalid")return er("La fecha de nacimiento no es válida.");
 if(!fn)return er("Elige la fecha de nacimiento en el calendario.");
 if(!v("nx"))return er("Selecciona el sexo.");
 const mb=[...document.querySelectorAll(".mb")].filter(x=>x.checked).map(x=>x.value).concat(v("no")?[v("no")]:[]);
@@ -1357,8 +1357,8 @@ o.querySelector("#ep_cancel").onclick=()=>o.remove();
 o.querySelector("#ep_g").onclick=async()=>{
   const n=v("#ep_n"),fn=fNacRead("ep_fn");
   if(!n)return er("Escribe el nombre.");
-  if(fn==="invalid")return er("La fecha de nacimiento no es valida.");
-  if(!fn)return er("Elige la fecha de nacimiento (dia, mes y ano).");
+  if(fn==="invalid")return er("La fecha de nacimiento no es válida.");
+  if(!fn)return er("Elige la fecha de nacimiento (día, mes y año).");
   if(!v("#ep_sx"))return er("Selecciona el sexo.");
   const ocVal=v("#ep_oc")==="__otro__"?v("#ep_oc_other"):v("#ep_oc");
   const segVal=v("#ep_s")==="Otros"?(v("#ep_s_other")||"Otros"):v("#ep_s");
