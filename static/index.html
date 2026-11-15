@@ -1113,8 +1113,11 @@ $("#main").classList.toggle("en-pacientes",a=="pacientes");
 if(S.route!==RUTA_ANT){const prev=RUTA_ANT;RUTA_ANT=S.route;const dir=prev?dirSub(prev,S.route):null;const pg=$("#main .pg");if(pg&&!sinMov()){if(dir===null)pg.classList.add("entra");else if(dir>0)pg.classList.add("entra-der");else pg.classList.add("entra-izq")}}
 const vb0=$("#vbox0");if(vb0&&VIS.length)viewer(vb0,VIS,VIS[0]);
 const ps=$("#ps");if(ps)ps.oninput=()=>{$("#pl").innerHTML=listaP(ps.value)};
-const nf=$("#nf");if(nf)nf.onchange=()=>{const e=edadDe(nf.value);$("#ne").value=e===""?"":e+" años"};
-const ne=$("#ne");if(ne){ne.oninput=()=>{const a=+ne.value.replace(/\D/g,"");if(!a||a<0||a>130)return;if(!nf)return;const d=new Date();d.setFullYear(d.getFullYear()-a);nf.value=d.toISOString().slice(0,10);$("#ne").value=a+" años (aprox.)"};ne.onchange=()=>{const a=+ne.value.replace(/\D/g,"");if(!a||a<0||a>130)return;const d=new Date();d.setFullYear(d.getFullYear()-a);nf.value=d.toISOString().slice(0,10)}};
+const nfSel=["nf_d","nf_m","nf_y"].map(x=>$("#"+x)).filter(Boolean);
+const ne=$("#ne");
+const edadAuto=()=>{const e=edadDe(fNacRead("nf"));if(ne&&e!=="")ne.value=e+" años"};
+if(nfSel.length)nfSel.forEach(s=>s.addEventListener("change",edadAuto));
+if(ne){ne.oninput=()=>{const a=+ne.value.replace(/\D/g,"");if(!a||a<0||a>130)return;const d=new Date();d.setFullYear(d.getFullYear()-a);fNacSet("nf",d.toISOString().slice(0,10));ne.value=a+" años (aprox.)"};ne.onchange=()=>{const a=+ne.value.replace(/\D/g,"");if(!a||a<0||a>130)return;const d=new Date();d.setFullYear(d.getFullYear()-a);fNacSet("nf",d.toISOString().slice(0,10))}};
 const uf=$("#uf");if(uf){const add=fl=>{upAdd([...fl].filter(f=>f.type.startsWith("image/")));uf.value=""};uf.onchange=()=>add(uf.files);const z=$("#upz");z.ondragover=e=>e.preventDefault();z.ondrop=e=>{e.preventDefault();add(e.dataTransfer.files)};uvDraw()}
 const df=$("#dfile");if(df)df.onchange=()=>{const n=$("#dfile_name");if(n)n.textContent=df.files&&df.files[0]?df.files[0].name:"Ningún archivo seleccionado"};
 const bfq=$("#bf_q");if(bfq)bfq.onchange=()=>{const t=DB.T[bfq.value];if(!t)return;const k=$("#bf_k"),tt=$("#bf_t"),m=$("#bf_m");if(k)k.value=t.c||"";if(tt)tt.value=t.n;if(m&&t.p)m.value=t.p};
@@ -1267,6 +1270,14 @@ function fNacRead(id){
   if(dt.getFullYear()!=+y||dt.getMonth()!=+m-1||dt.getDate()!=+d) return "invalid";
   return y+"-"+String(m).padStart(2,"0")+"-"+String(d).padStart(2,"0");
 }
+/* Escribe una fecha ISO (AAAA-MM-DD) en los tres selects de fNac */
+function fNacSet(id, val){
+  const mm=String(val||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const set=(suf,v)=>{ const e=document.getElementById(id+suf); if(e) e.value=v||""; };
+  set("_y", mm?mm[1]:"");
+  set("_m", mm?String(+mm[2]):"");
+  set("_d", mm?String(+mm[3]):"");
+}
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
 ${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",fNac("nf",""))}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
@@ -1301,7 +1312,7 @@ let fn=fn0;
 if(!fn){const a=+v("ne").replace(/\D/g,"");if(a&&a>0&&a<=130){const d=new Date();d.setFullYear(d.getFullYear()-a);fn=d.toISOString().slice(0,10)}}
 if(!n)return er("Escribe el nombre completo.");
  if(fn0==="invalid")return er("La fecha de nacimiento no es válida.");
-if(!fn)return er("Elige la fecha de nacimiento en el calendario.");
+if(!fn)return er("Elige la fecha de nacimiento (día, mes y año).");
 if(!v("nx"))return er("Selecciona el sexo.");
 const mb=[...document.querySelectorAll(".mb")].filter(x=>x.checked).map(x=>x.value).concat(v("no")?[v("no")]:[]);
 const ocVal=v("oc")==="__otro__"?v("oc_other"):v("oc");
