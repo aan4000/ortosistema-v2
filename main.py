@@ -293,13 +293,14 @@ def login(d: Login, req: Request):
 @app.get("/api/yo")
 def yo(u=Depends(usuario_actual)):
     with pool.connection() as c:
-        p = c.execute("select correo, cargo, telefono, ultimo_ingreso, preguntas_config_en, modulos "
+        p = c.execute("select correo, cargo, telefono, ultimo_ingreso, preguntas_config_en, modulos, procedimientos "
                       "from usuarios where usuario=%s", (u["sub"],)).fetchone()
     return {"usuario": u["sub"], "rol": u["rol"], "nombre": u["nombre"],
             "correo": p["correo"] if p else None,
             "cargo": p["cargo"] if p else None,
             "telefono": p["telefono"] if p else None,
             "modulos": p["modulos"] if p else None,
+            "procedimientos": (p["procedimientos"] or []) if p else [],
             "ultimo_ingreso": p["ultimo_ingreso"] if p else None,
             "preguntas_config": bool(p and p["preguntas_config_en"]),
             "modulos": sorted(MODULOS) if u["rol"] == "admin" else sorted(FUNC.get(u["rol"], set())),
@@ -481,12 +482,14 @@ class NuevoUsuario(BaseModel):
     telefono: str | None = None
     cargo: str | None = None
     modulos: list[str] | None = None
+    procedimientos: list[str] | None = None
 
 
 class CambioUsuario(BaseModel):
     nombre: str | None = None
     modulos: list[str] | None = None
     resetear_permisos: bool | None = None
+    procedimientos: list[str] | None = None
     rol: str | None = None
     activo: bool | None = None
     password: str | None = None
@@ -510,7 +513,7 @@ def usuarios(u=Depends(solo_admin)):
             "select u.id,u.usuario,u.nombre,u.rol,u.activo,u.debe_cambiar_clave,"
             "u.correo,u.telefono,u.cargo,u.ultimo_ingreso,"
             "(select count(*) from preguntas_seguridad p where p.usuario_id=u.id) preguntas, "
-            "u.modulos "
+            "u.modulos, u.procedimientos "
             "from usuarios u order by u.usuario").fetchall()}
 
 
@@ -522,8 +525,9 @@ def usuario_nuevo(d: NuevoUsuario, u=Depends(solo_admin)):
         if c.execute("select 1 from usuarios where lower(usuario)=%s", (d.usuario.lower(),)).fetchone():
             raise HTTPException(409, "Ese usuario ya existe")
         r = c.execute("insert into usuarios(usuario,nombre,rol,password_hash,correo,telefono,cargo,"
-                      "modulos,debe_cambiar_clave) values (%s,%s,%s,%s,%s,%s,%s,%s,true) returning id",
-                      (d.usuario.lower(), d.nombre, d.rol, h, d.correo, d.telefono, d.cargo, Jsonb(d.modulos) if d.modulos is not None else None)).fetchone()
+                      "modulos,procedimientos,debe_cambiar_clave) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,true) returning id",
+                      (d.usuario.lower(), d.nombre, d.rol, h, d.correo, d.telefono, d.cargo, Jsonb(d.modulos) if d.modulos is not None else None,
+                       Jsonb(d.procedimientos) if d.procedimientos is not None else None)).fetchone()
         auditar(c, u, "crear", "usuarios", r["id"])
     return {"ok": True, "id": r["id"]}
 
@@ -550,6 +554,8 @@ def usuario_editar(uid: int, d: CambioUsuario, u=Depends(solo_admin)):
         campos["modulos"] = None
     elif d.modulos is not None:
         campos["modulos"] = Jsonb(d.modulos)
+    if d.procedimientos is not None:
+        campos["procedimientos"] = Jsonb(d.procedimientos)
     if d.password is not None:
         campos["password_hash"] = bcrypt.hashpw(d.password.encode(), bcrypt.gensalt()).decode()
         campos["debe_cambiar_clave"] = True
