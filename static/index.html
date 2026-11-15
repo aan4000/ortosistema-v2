@@ -106,6 +106,7 @@ td .btn{min-height:32px;padding:0 10px;font-size:13px}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px}
 .bar{height:10px;min-width:120px;background:var(--bg);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
 .fg{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:12px 0}.fg label{display:block;margin-bottom:4px}
+.fdate{display:grid;grid-template-columns:74px minmax(90px,1fr) 82px;gap:6px}.fdate select{width:100%}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.ck{display:flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:13px}.ck input,.ck input[type="checkbox"]{width:14px;height:14px;min-height:0}table input[type="checkbox"]{width:14px;height:14px}
 body{font-family:Inter,Roboto,system-ui,sans-serif}
 .card{border-radius:12px}.btn{border-radius:10px;font-weight:500}.side{width:248px}
@@ -1132,7 +1133,7 @@ o.querySelectorAll("input,select,textarea").forEach(inp=>{const flip=()=>{if(gg.
 const dmy=s=>s.split("-").reverse().join("/"),iso=s=>s.split("/").reverse().join("-");
 const edadDe=f=>{if(!f)return"";const d=new Date(f+"T00:00:00"),n=new Date();let e=n.getFullYear()-d.getFullYear();if(n<new Date(n.getFullYear(),d.getMonth(),d.getDate()))e--;return e>=0?e:""};
 const opt=(a,s)=>a.map(x=>`<option${x==s?" selected":""}>${esc(x)}</option>`).join("");
-const SEG=["Privado (sin seguro)","ARS Humano","SeNaSa","ARS Universal","Mapfre Salud ARS","ARS Reservas","ARS Palic","ARS Futuro","ARS Monumental","ARS Yunen","Primera ARS","ARS Simag","ARS Semma","ARS CMD","IDOPPRIL (riesgos laborales)","Otro"];
+const SEG=["Privado (sin seguro)","ARS Humano","SeNaSa","ARS Universal","Mapfre Salud ARS","ARS Reservas","ARS Palic","ARS Futuro","ARS Monumental","ARS Yunen","Primera ARS","ARS Simag","ARS Semma","ARS CMD","IDOPPRIL (riesgos laborales)","Otros"];
 const MB=["Hipertensión","Diabetes","Cardiopatía","Asma o EPOC","Artritis","Osteoporosis","Enfermedad tiroidea","Obesidad"];
 const ALG=["AINES (antiinflamatorios no esteroideos)","Penicilina","Amoxicilina","Aspirina (AAS)","Ibuprofeno","Sulfonamidas","Cefalosporinas","Látex","Yodo / contraste","Anestésicos locales","Codeína","Morfina","Polen","Ácaros del polvo","Caspa de animales","Hongos","Maní","Mariscos","Huevo","Leche","Trigo / gluten","Frutos secos","Fresas","Chocolate","Colorantes alimentarios","Níquel","Cosméticos","Penicilamina","Sulfato de gentamicina"];
 const MEDS=[
@@ -1238,10 +1239,38 @@ function occSelect(id, val){
   h+='<input id="'+id+'_other" placeholder="Escribe la ocupacion" style="margin-top:4px;display:'+(isOther?'':'none')+'" value="'+(isOther?val:'')+'">';
   return h;
 }
+/* Seguro: lista cerrada + "Otros" con campo manual */
+function segSelect(id, val){
+  const isOther = !!val && !SEG.includes(val);
+  let h='<select id="'+id+'">'+opt(SEG, isOther?"Otros":(val||""))+'</select>';
+  h+='<input id="'+id+'_other" placeholder="Escribe la aseguradora" style="margin-top:4px;display:'+(isOther?'':'none')+'" value="'+(isOther?esc(val):'')+'">';
+  return h;
+}
+/* Fecha de nacimiento: dia / mes (en espanol) / ano */
+const MESES_ES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+function fNac(id, val){
+  let y="",m="",d="";
+  const mm=String(val||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(mm){ y=mm[1]; m=mm[2]; d=mm[3]; }
+  const nowY=new Date().getFullYear();
+  let ys='<option value="">Ano</option>',ds='<option value="">Dia</option>',ms='<option value="">Mes</option>';
+  for(let i=nowY;i>=nowY-120;i--) ys+='<option value="'+i+'"'+(+y===i?' selected':'')+'>'+i+'</option>';
+  for(let i=1;i<=31;i++) ds+='<option value="'+i+'"'+(+d===i?' selected':'')+'>'+i+'</option>';
+  MESES_ES.forEach((nm,i)=>{ ms+='<option value="'+(i+1)+'"'+(+m===i+1?' selected':'')+'>'+nm+'</option>'; });
+  return '<div class="fdate"><select id="'+id+'_d" aria-label="Dia">'+ds+'</select><select id="'+id+'_m" aria-label="Mes">'+ms+'</select><select id="'+id+'_y" aria-label="Ano">'+ys+'</select></div>';
+}
+function fNacRead(id){
+  const g=x=>{ const e=document.getElementById(id+x); return e?e.value:""; };
+  const d=g("_d"),m=g("_m"),y=g("_y");
+  if(!d||!m||!y) return "";
+  const dt=new Date(+y,+m-1,+d);
+  if(dt.getFullYear()!=+y||dt.getMonth()!=+m-1||dt.getDate()!=+d) return "invalid";
+  return y+"-"+String(m).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+}
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
-${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",'<input id="nf" type="date" max="'+new Date().toISOString().slice(0,10)+'">')}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
-<br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",'<select id="ns">'+opt(SEG)+"</select>")}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
+${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",fNac("nf",""))}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
+<br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",segSelect("ns",""))}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
 <br>${card("Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}</div>`)}
 <br>${card("Antecedentes",`${mbSel([])}
 <br><div class="fg">${antField("nq","Antecedentes quirurgicos",null,SURGS)}${antField("nu","Medicamentos actuales",null,MEDS,"Concentración y forma según el Cuadro Básico de Medicamentos Esenciales (MSP/DIGEMAPS). Cada opción indica si es <b>genérico</b> o de <b>marca</b>.")}${antField("nh","Antecedentes familiares",FAMH,null)}</div>
@@ -1265,17 +1294,19 @@ async function cedulaLookup(){
 }
 document.addEventListener("blur", e=>{ if(e.target && e.target.id==="nc") cedulaLookup(); }, true);
 
-document.addEventListener("change", e=>{ if(e.target && e.target.id==="oc"){ const o=document.getElementById("oc_other"); if(o) o.style.display = e.target.value==="__otro__" ? "" : "none"; } });
+document.addEventListener("change", e=>{ const id=e.target&&e.target.id; if(!id)return; if(id==="oc"){ const o=document.getElementById("oc_other"); if(o) o.style.display = e.target.value==="__otro__" ? "" : "none"; } else if(id==="ns"||id==="ep_s"){ const o=document.getElementById(id+"_other"); if(o) o.style.display = e.target.value==="Otros" ? "" : "none"; } });
 
-async function gp(){const v=i=>$("#"+i).value.trim(),er=m=>{$("#nr").textContent=m},n=v("nn"),fn0=v("nf");
+async function gp(){const v=i=>$("#"+i).value.trim(),er=m=>{$("#nr").textContent=m},n=v("nn"),fn0=fNacRead("nf");
 let fn=fn0;
 if(!fn){const a=+v("ne").replace(/\D/g,"");if(a&&a>0&&a<=130){const d=new Date();d.setFullYear(d.getFullYear()-a);fn=d.toISOString().slice(0,10)}}
 if(!n)return er("Escribe el nombre completo.");
+ if(fn0==="invalid")return er("La fecha de nacimiento no es valida.");
 if(!fn)return er("Elige la fecha de nacimiento en el calendario.");
 if(!v("nx"))return er("Selecciona el sexo.");
 const mb=[...document.querySelectorAll(".mb")].filter(x=>x.checked).map(x=>x.value).concat(v("no")?[v("no")]:[]);
 const ocVal=v("oc")==="__otro__"?v("oc_other"):v("oc");
-const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),em:v("nm"),s:v("ns"),na:v("na"),al:v("nl"),dx:v("ni"),oc:ocVal,am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,ea:"Por agendar",eu:/Privado/i.test(v("ns"))?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
+ const segVal=v("ns")==="Otros"?(v("ns_other")||"Otros"):v("ns");
+const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),em:v("nm"),s:segVal,na:v("na"),al:v("nl"),dx:v("ni"),oc:ocVal,am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,ea:"Por agendar",eu:/Privado/i.test(segVal)?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
 const dupByCode = rec.c?null: (rec.cd ? DB.P.find(x=>x.cd && x.cd===rec.cd) : null);
 const dupByCed = rec.c ? DB.P.find(x=>x.c && x.c===rec.c) : null;
 const dupByName = DB.P.filter(x=>(x.n||"").toLowerCase()===(rec.n||"").toLowerCase());
@@ -1309,13 +1340,13 @@ function fEditPac(id){const p=pk(id);if(!p.n)return toast("Paciente no encontrad
 const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`;
 const o=modal(`<h3>Editar datos del paciente</h3><div class="fg">
 ${f("ep_n","Nombre completo *",`<input id="ep_n" value="${esc(p.n)}">`)}
-${f("ep_fn","Fecha de nacimiento *",`<input id="ep_fn" type="date" value="${iso(p.fn)}">`)}
+${f("ep_fn","Fecha de nacimiento *",fNac("ep_fn",p.fn))}
 ${f("ep_e","Edad",`<input id="ep_e" inputmode="numeric" value="${esc(p.e||"")}">`)}
 ${f("ep_sx","Sexo *",`<select id="ep_sx"><option value="">Selecciona</option>`+opt(["Femenino","Masculino"],p.sx)+`</select>`)}
 ${f("ep_c","Cédula",`<input id="ep_c" value="${esc(p.c||"")}">`)}
 ${f("ep_tl","Teléfono",`<input id="ep_tl" value="${esc(p.tl||"")}">`)}
 ${f("ep_em","Correo",`<input id="ep_em" type="email" value="${esc(p.em||"")}">`)}
-${f("ep_s","Seguro",`<select id="ep_s">${opt(SEG,p.s||"")}</select>`)}
+${f("ep_s","Seguro",segSelect("ep_s",p.s||""))}
 ${f("ep_na","N° afiliado",`<input id="ep_na" value="${esc(p.na||"")}">`)}
 ${f("ep_oc","Ocupación", occSelect("ep_oc", p.oc||""))}
 ${f("ep_al","Alergias",`<input id="ep_al" value="${esc(p.al||"")}">`)}
@@ -1324,12 +1355,14 @@ ${f("ep_dx","Diagnóstico",`<input id="ep_dx" value="${esc(p.dx||"")}">`)}
 const v=i=>o.querySelector(i).value.trim(),er=m=>{o.querySelector("#ep_er").textContent=m};
 o.querySelector("#ep_cancel").onclick=()=>o.remove();
 o.querySelector("#ep_g").onclick=async()=>{
-  const n=v("#ep_n"),fn=v("#ep_fn");
+  const n=v("#ep_n"),fn=fNacRead("ep_fn");
   if(!n)return er("Escribe el nombre.");
-  if(!fn)return er("Elige la fecha de nacimiento.");
+  if(fn==="invalid")return er("La fecha de nacimiento no es valida.");
+  if(!fn)return er("Elige la fecha de nacimiento (dia, mes y ano).");
   if(!v("#ep_sx"))return er("Selecciona el sexo.");
   const ocVal=v("#ep_oc")==="__otro__"?v("#ep_oc_other"):v("#ep_oc");
-  Object.assign(p,{n,fn,e:edadDe(fn),sx:v("#ep_sx"),c:v("#ep_c"),tl:v("#ep_tl"),em:v("#ep_em"),s:v("#ep_s"),na:v("#ep_na"),oc:ocVal,al:v("#ep_al"),dx:v("#ep_dx")});
+  const segVal=v("#ep_s")==="Otros"?(v("#ep_s_other")||"Otros"):v("#ep_s");
+  Object.assign(p,{n,fn,e:edadDe(fn),sx:v("#ep_sx"),c:v("#ep_c"),tl:v("#ep_tl"),em:v("#ep_em"),s:segVal,na:v("#ep_na"),oc:ocVal,al:v("#ep_al"),dx:v("#ep_dx")});
   p.v=null;
   try{await editarK("P",p);const idx=DB.P.findIndex(x=>x.id==p.id);if(idx>=0)DB.P[idx]=p;toast("Datos del paciente actualizados");o.remove();draw()}catch(e){er(e.message)}};
 }
@@ -2090,7 +2123,7 @@ else if(d.ox){const[i,k]=d.ox.split(":");S.ox[i][k]=g.value}
 else if(d.oa){S.oa[d.oa]=g.value}
 else if(g.id=="nx"){const row=document.getElementById("nvrow"),a=document.getElementById("nvav"),t=document.getElementById("nvaT");if(!g.value){if(row)row.style.display="none";return}if(row)row.style.display="";if(a){a.className="avp "+claseSexo(g.value);a.innerHTML=silueta(g.value)}if(t)t.textContent=g.value==="Femenino"?"Paciente femenina":g.value==="Masculino"?"Paciente masculino":""}
 else if(g.classList&&g.classList.contains("mb")){mbUpd(g)}});
-document.addEventListener("input",e=>{const d=e.target.dataset;if(e.target.type=="range"&&e.target.id){const o=document.getElementById(e.target.id+"o");if(o)o.textContent=e.target.value+"/10"}if(d.pf=="q"){S.pf.q=e.target.value;$("#pcl").innerHTML=listaProc().html}else if(e.target.id&&e.target.id.endsWith("_other")){const id=e.target.id.replace("_other","");const hid=document.getElementById(id);if(hid)hid.value=e.target.value}else if(d.pa=="dr")S.pa.dr=e.target.value;else if(d.of=="q"){S.of.q=e.target.value;$("#ocl").innerHTML=listaOrt().html}else if(d.oa=="dr"||d.oa=="ind")S.oa[d.oa]=e.target.value});
+document.addEventListener("input",e=>{const d=e.target.dataset;if(e.target.type=="range"&&e.target.id){const o=document.getElementById(e.target.id+"o");if(o)o.textContent=e.target.value+"/10"}if(d.pf=="q"){S.pf.q=e.target.value;$("#pcl").innerHTML=listaProc().html}else if(e.target.id&&e.target.id.endsWith("_other")){const id=e.target.id.replace("_other","");const hid=document.getElementById(id);if(hid&&hid.tagName!=="SELECT")hid.value=e.target.value}else if(d.pa=="dr")S.pa.dr=e.target.value;else if(d.of=="q"){S.of.q=e.target.value;$("#ocl").innerHTML=listaOrt().html}else if(d.oa=="dr"||d.oa=="ind")S.oa[d.oa]=e.target.value});
 function aplicarTema(){const t=localStorage.getItem("orto_theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}
 async function boot(){
 aplicarTema();
