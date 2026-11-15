@@ -551,12 +551,12 @@ async function cargar(){
   for(const k of Object.keys(TABLA))DB[k]=(todo[TABLA[k]]||[]).map(r=>fromK(k,r));
   const imgs={};(todo["_imagenes"]||[]).forEach(i=>{if(!imgs[i.estudio_id])imgs[i.estudio_id]=i.id});
   DB.I.forEach(x=>x.im=imgs[x.id]||null);
-  S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config,modulos:yo.modulos||null};
+  S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config,modulos:yo.modulos||null,procedimientos:yo.procedimientos||[]};
   if(yo.es_admin){
     const[f,us,med,adm]=await Promise.all([api("/api/funciones"),api("/api/usuarios"),api("/api/medicos"),api("/api/admin/resumen").catch(()=>null)]);
     Object.entries(f.roles).forEach(([r,m])=>DB.PM[r]=m);
     DB.REC=f.recomendados||{};DB.RDESC=f.descripciones||{};
-    DB.users=(us.usuarios||[]).map(x=>({id:x.id,u:x.usuario,nombre:x.nombre,rol:x.rol,on:x.activo,cp:x.debe_cambiar_clave,correo:x.correo||"",telefono:x.telefono||"",cargo:x.cargo||"",modulos:x.modulos||null,ultimo:x.ultimo_ingreso,preguntas:x.preguntas||0}));
+    DB.users=(us.usuarios||[]).map(x=>({id:x.id,u:x.usuario,nombre:x.nombre,rol:x.rol,on:x.activo,cp:x.debe_cambiar_clave,correo:x.correo||"",telefono:x.telefono||"",cargo:x.cargo||"",modulos:x.modulos||null,procedimientos:x.procedimientos||[],ultimo:x.ultimo_ingreso,preguntas:x.preguntas||0}));
     DB.medicos=med.medicos||[];S.adm=adm;
   }else{
     DB.PM[yo.rol]=yo.modulos||[];
@@ -672,9 +672,14 @@ const fmtFecha=s=>{if(!s)return'<span class="mu">Nunca</span>';try{return new Da
 function fUs(i){const nu=i==null,x=nu?{u:"",nombre:"",rol:"medico",on:true,correo:"",telefono:"",cargo:"",preguntas:0,modulos:null}:DB.users[i];
 const eff=x.modulos!=null?x.modulos:(DB.PM[x.rol]||[]);
 const permHtml=MOD.map(([k,l])=>`<label class="ck"><input type="checkbox" class="umod" value="${k}" ${eff.includes(k)?"checked":""}> ${l}</label>`).join("");
-const o=modal(`<div class="row"><h3 style="margin:0">${ic(nu?"userplus":"edit",20)} ${nu?"Nuevo usuario":"Editar perfil: "+esc(x.nombre||x.u)}</h3>${nu?"":`<button class="icb" data-tip="Cerrar" aria-label="Cerrar" id="uclose">${ic("x",18)}</button>`}</div>${nu?"":`<p class="mu" style="margin:4px 0 8px">Usuario: <b>${esc(x.u)}</b> · Rol actual: <b>${esc(RL[x.rol]||x.rol)}</b> · Los permisos que marques aquí anulan los del rol.</p>`}<div class="fg"><div><label>Usuario<input id="uu" value="${esc(x.u)}" ${nu?"":"readonly"} autocomplete="off" placeholder="tu_usuario"></label></div><div><label>Nombre completo<input id="un" value="${esc(x.nombre)}" placeholder="Ej. Juan Pérez"></label></div></div><div class="fg"><div><label>Rol<select id="ur">${Object.entries(RL).map(([k,v])=>`<option value="${k}"${k==x.rol?" selected":""}>${v}</option>`).join("")}</select></label></div><div><label>Cargo o especialidad<input id="uc" value="${esc(x.cargo||"")}" placeholder="Ej. Ortopeda, Recepción"></label></div></div><div class="fg" style="grid-column:1/-1"><label class="mu" style="display:block">Permisos de ${esc(x.nombre||x.u)} (anulan los del rol)<div class="chips" style="flex-direction:column;align-items:flex-start;gap:4px;margin-top:6px">${permHtml}</div></label></div><div class="fg"><div><label>Correo<input id="ue" type="email" value="${esc(x.correo||"")}" autocomplete="off"></label></div><div><label>Teléfono<input id="ut" value="${esc(x.telefono||"")}" autocomplete="off"></label></div></div><label>${nu?"Contraseña (mínimo 10 caracteres)":"Cambiar contraseña (déjala vacía para mantener la actual)"}<input id="up" type="password" autocomplete="new-password"></label><label class="ck" style="margin:8px 0"><input type="checkbox" id="ucp" ${nu||x.cp?"checked":""}> Pedir cambio de contraseña al próximo ingreso</label>${nu?"":`<label class="ck" style="margin:8px 0"><input type="checkbox" id="ua" ${x.on?"checked":""}> Usuario activo</label><p class="mu" style="margin:4px 0">${x.preguntas>=3?`<span class="b ok">${ic("shieldcheck",13)} Preguntas de seguridad configuradas</span>`:`<span class="b wa">${ic("shieldx",13)} Sin preguntas de seguridad</span>`}</p>`}<div class="er2" id="ue2" role="alert"></div><div class="tb"><button class="btn" id="ucancel">${ic("x",16)} Cancelar</button><button class="btn p" id="ug">${ic("save",16)} Guardar usuario</button></div>`);
+const procSel=new Set(x.procedimientos||[]);
+const procHtml=(()=>{const g={};DB.T.forEach(t=>{const k=t.g||"General";(g[k]=g[k]||[]).push(t.n)});const cat=Object.keys(g).sort((a,b)=>a.localeCompare(b,"es"));if(!cat.length)return '<p class="mu">No hay procedimientos en el catálogo. Créalos en Procedimientos o en Facturación → Catálogo.</p>';return cat.map(k=>`<div class="pgrupo"><b class="mu" style="display:block;margin:8px 0 4px 0">${esc(k)} (${g[k].length})</b><div class="chips" style="gap:6px">${g[k].sort((a,b)=>a.localeCompare(b,"es")).map(n=>`<label class="ck"><input type="checkbox" class="uproc" value="${esc(n)}"${procSel.has(n)?" checked":""}> ${esc(n)}</label>`).join("")}</div></div>`).join("")})();
+const o=modal(`<div class="row"><h3 style="margin:0">${ic(nu?"userplus":"edit",20)} ${nu?"Nuevo usuario":"Editar perfil: "+esc(x.nombre||x.u)}</h3>${nu?"":`<button class="icb" data-tip="Cerrar" aria-label="Cerrar" id="uclose">${ic("x",18)}</button>`}</div>${nu?"":`<p class="mu" style="margin:4px 0 8px">Usuario: <b>${esc(x.u)}</b> · Rol actual: <b>${esc(RL[x.rol]||x.rol)}</b> · Los permisos que marques aquí anulan los del rol.</p>`}<div class="fg"><div><label>Usuario<input id="uu" value="${esc(x.u)}" ${nu?"":"readonly"} autocomplete="off" placeholder="tu_usuario"></label></div><div><label>Nombre completo<input id="un" value="${esc(x.nombre)}" placeholder="Ej. Juan Pérez"></label></div></div><div class="fg"><div><label>Rol<select id="ur">${Object.entries(RL).map(([k,v])=>`<option value="${k}"${k==x.rol?" selected":""}>${v}</option>`).join("")}</select></label></div><div><label>Cargo o especialidad<input id="uc" value="${esc(x.cargo||"")}" placeholder="Ej. Ortopeda, Recepción"></label></div></div><div class="fg" style="grid-column:1/-1"><label class="mu" style="display:block">Permisos de ${esc(x.nombre||x.u)} (anulan los del rol)<div class="chips" style="flex-direction:column;align-items:flex-start;gap:4px;margin-top:6px">${permHtml}</div></label></div><div class="fg" id="uprocwrap" style="grid-column:1/-1;display:${x.rol=="medico"?"":"none"}"><div><span class="mu" style="display:block">Procedimientos que realiza (se eligen del catálogo, por categoría)</span><div class="tb" style="margin:6px 0"><input id="uprocq" placeholder="Buscar procedimiento" style="flex:1;min-width:180px" autocomplete="off"><button class="btn" id="uprocall">Marcar todos los mostrados</button><button class="btn" id="uprocnone">Limpiar</button></div><div id="uproclist" style="max-height:260px;overflow:auto;border:1px solid var(--bd);border-radius:10px;padding:8px">${procHtml}</div></div></div><div class="fg"><div><label>Correo<input id="ue" type="email" value="${esc(x.correo||"")}" autocomplete="off"></label></div><div><label>Teléfono<input id="ut" value="${esc(x.telefono||"")}" autocomplete="off"></label></div></div><label>${nu?"Contraseña (mínimo 10 caracteres)":"Cambiar contraseña (déjala vacía para mantener la actual)"}<input id="up" type="password" autocomplete="new-password"></label><label class="ck" style="margin:8px 0"><input type="checkbox" id="ucp" ${nu||x.cp?"checked":""}> Pedir cambio de contraseña al próximo ingreso</label>${nu?"":`<label class="ck" style="margin:8px 0"><input type="checkbox" id="ua" ${x.on?"checked":""}> Usuario activo</label><p class="mu" style="margin:4px 0">${x.preguntas>=3?`<span class="b ok">${ic("shieldcheck",13)} Preguntas de seguridad configuradas</span>`:`<span class="b wa">${ic("shieldx",13)} Sin preguntas de seguridad</span>`}</p>`}<div class="er2" id="ue2" role="alert"></div><div class="tb"><button class="btn" id="ucancel">${ic("x",16)} Cancelar</button><button class="btn p" id="ug">${ic("save",16)} Guardar usuario</button></div>`);
 const q=s=>o.querySelector(s),er=m=>{q("#ue2").textContent=m};if(q("#uclose"))q("#uclose").onclick=()=>o.remove();q("#ucancel").onclick=()=>o.remove();
-const urEl=q("#ur"); if(urEl) urEl.onchange=()=>{const nr=urEl.value; const eff=DB.PM[nr]||[]; o.querySelectorAll(".umod").forEach(cb=>{cb.checked=eff.includes(cb.value)});};
+const upq=q("#uprocq");if(upq)upq.oninput=()=>{const t=upq.value.trim().toLowerCase();o.querySelectorAll("#uproclist .pgrupo").forEach(g=>{let v=0;g.querySelectorAll("label.ck").forEach(l=>{const ok=!t||l.textContent.toLowerCase().includes(t);l.style.display=ok?"":"none";if(ok)v++});g.style.display=v?"":"none"})};
+if(q("#uprocall"))q("#uprocall").onclick=()=>o.querySelectorAll(".uproc").forEach(cb=>{if(cb.closest("label").style.display!="none")cb.checked=true});
+if(q("#uprocnone"))q("#uprocnone").onclick=()=>o.querySelectorAll(".uproc").forEach(cb=>cb.checked=false);
+const urEl=q("#ur"); if(urEl) urEl.onchange=()=>{const nr=urEl.value; const eff=DB.PM[nr]||[]; o.querySelectorAll(".umod").forEach(cb=>{cb.checked=eff.includes(cb.value)});const w=o.querySelector("#uprocwrap"); if(w)w.style.display=nr=="medico"?"":"none";};
 q("#ug").onclick=async()=>{const u=q("#uu").value.trim().toLowerCase(),nombre=q("#un").value.trim(),rol=q("#ur").value,p=q("#up").value,on=nu?true:q("#ua").checked,cp=q("#ucp").checked,correo=q("#ue").value.trim(),telefono=q("#ut").value.trim(),cargo=q("#uc").value.trim(),modulos=[...o.querySelectorAll(".umod:checked")].map(c=>c.value);
 if(!u||!nombre)return er("Completa usuario y nombre.");
 if(nu&&DB.users.some(y=>y.u==u))return er("Ese usuario ya existe.");
@@ -1284,14 +1289,9 @@ function fNacSet(id, val){
 }
 /* Tipo de teléfono: solo el celular recibe recordatorios por WhatsApp */
 const TEL_TIPOS=["Celular","Línea fija"];
-/* Un solo número y dos opciones: se confirma si es celular o línea fija. */
-function telTipoGroup(id, val){
-  return '<div class="telop" role="radiogroup" aria-label="Tipo de teléfono">'+
-    '<span class="mu">Tipo:</span>'+
-    TEL_TIPOS.map(t=>'<label class="ck"><input type="radio" name="'+id+'" value="'+t+'"'+
-      (t==val?' checked':'')+'> '+t+'</label>').join("")+'</div>';
+function telTipoSelect(id, val){
+  return '<select id="'+id+'" aria-label="Tipo de teléfono">'+opt(TEL_TIPOS, val||"Celular")+'</select>';
 }
-const telTipoVal=id=>{const e=document.querySelector('input[name="'+id+'"]:checked');return e?e.value:""};
 const esCelular=p=>/celular/i.test((p&&p.tt)||"");
 /* Número para wa.me: 10 dígitos -> se le agrega el 1 de República Dominicana */
 function telWa(t){
@@ -1323,7 +1323,7 @@ async function enviarRecordatorio(id){
 }
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
-${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",fNac("nf",""))}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",`<input id="nt" type="tel" placeholder="809-000-0000">${telTipoGroup("nt_tipo","Celular")}`)}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
+${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",fNac("nf",""))}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",`<div class="tb" style="gap:6px"><span style="flex:0 0 auto;min-width:124px">${telTipoSelect("nt_tipo","Celular")}</span><input id="nt" type="tel" style="flex:1;min-width:0" placeholder="809-000-0000"></div>`)}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
 <br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",segSelect("ns",""))}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
 <br>${card("Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}</div>`)}
 <br>${card("Antecedentes",`${mbSel([])}
@@ -1357,12 +1357,10 @@ if(!n)return er("Escribe el nombre completo.");
  if(fn0==="invalid")return er("La fecha de nacimiento no es válida.");
 if(!fn)return er("Elige la fecha de nacimiento (día, mes y año).");
 if(!v("nx"))return er("Selecciona el sexo.");
-const ttTel=telTipoVal("nt_tipo");
-if(v("nt")&&!ttTel)return er("Confirma si el teléfono es celular o línea fija.");
 const mb=[...document.querySelectorAll(".mb")].filter(x=>x.checked).map(x=>x.value).concat(v("no")?[v("no")]:[]);
 const ocVal=v("oc")==="__otro__"?v("oc_other"):v("oc");
  const segVal=v("ns")==="Otros"?(v("ns_other")||"Otros"):v("ns");
-const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),tt:ttTel,em:v("nm"),s:segVal,na:v("na"),al:v("nl"),dx:v("ni"),oc:ocVal,am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,ea:"Por agendar",eu:/Privado/i.test(segVal)?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
+const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),tt:v("nt_tipo"),em:v("nm"),s:segVal,na:v("na"),al:v("nl"),dx:v("ni"),oc:ocVal,am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,ea:"Por agendar",eu:/Privado/i.test(segVal)?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
 const dupByCode = rec.c?null: (rec.cd ? DB.P.find(x=>x.cd && x.cd===rec.cd) : null);
 const dupByCed = rec.c ? DB.P.find(x=>x.c && x.c===rec.c) : null;
 const dupByName = DB.P.filter(x=>(x.n||"").toLowerCase()===(rec.n||"").toLowerCase());
@@ -1400,7 +1398,7 @@ ${f("ep_fn","Fecha de nacimiento *",fNac("ep_fn",p.fn))}
 ${f("ep_e","Edad",`<input id="ep_e" inputmode="numeric" value="${esc(p.e||"")}">`)}
 ${f("ep_sx","Sexo *",`<select id="ep_sx"><option value="">Selecciona</option>`+opt(["Femenino","Masculino"],p.sx)+`</select>`)}
 ${f("ep_c","Cédula",`<input id="ep_c" value="${esc(p.c||"")}">`)}
-${f("ep_tl","Teléfono",`<input id="ep_tl" value="${esc(p.tl||"")}" placeholder="809-000-0000">${telTipoGroup("ep_tt",p.tt)}`)}
+${f("ep_tl","Teléfono",`<div class="tb" style="gap:6px"><span style="flex:0 0 auto;min-width:124px">${telTipoSelect("ep_tt",p.tt||"Celular")}</span><input id="ep_tl" style="flex:1;min-width:0" value="${esc(p.tl||"")}" placeholder="809-000-0000"></div>`)}
 ${f("ep_em","Correo",`<input id="ep_em" type="email" value="${esc(p.em||"")}">`)}
 ${f("ep_s","Seguro",segSelect("ep_s",p.s||""))}
 ${f("ep_na","N° afiliado",`<input id="ep_na" value="${esc(p.na||"")}">`)}
@@ -1416,11 +1414,9 @@ o.querySelector("#ep_g").onclick=async()=>{
   if(fn==="invalid")return er("La fecha de nacimiento no es válida.");
   if(!fn)return er("Elige la fecha de nacimiento (día, mes y año).");
   if(!v("#ep_sx"))return er("Selecciona el sexo.");
-  const ttTel=telTipoVal("ep_tt");
-  if(v("#ep_tl")&&!ttTel)return er("Confirma si el teléfono es celular o línea fija.");
   const ocVal=v("#ep_oc")==="__otro__"?v("#ep_oc_other"):v("#ep_oc");
   const segVal=v("#ep_s")==="Otros"?(v("#ep_s_other")||"Otros"):v("#ep_s");
-  Object.assign(p,{n,fn,e:edadDe(fn),sx:v("#ep_sx"),c:v("#ep_c"),tl:v("#ep_tl"),tt:ttTel,em:v("#ep_em"),s:segVal,na:v("#ep_na"),oc:ocVal,al:v("#ep_al"),dx:v("#ep_dx")});
+  Object.assign(p,{n,fn,e:edadDe(fn),sx:v("#ep_sx"),c:v("#ep_c"),tl:v("#ep_tl"),tt:v("#ep_tt"),em:v("#ep_em"),s:segVal,na:v("#ep_na"),oc:ocVal,al:v("#ep_al"),dx:v("#ep_dx")});
   p.v=null;
   try{await editarK("P",p);const idx=DB.P.findIndex(x=>x.id==p.id);if(idx>=0)DB.P[idx]=p;toast("Datos del paciente actualizados");o.remove();draw()}catch(e){er(e.message)}};
 }
