@@ -53,12 +53,13 @@ TABLAS = {
     "pacientes": ["codigo", "expediente", "nombre", "edad", "cedula", "seguro", "alergias", "diagnostico", "etapa",
                   "antecedentes_morbidos", "antecedentes_quirurgicos", "medicamentos",
                   "antecedentes_familiares", "habitos", "fecha_nacimiento", "sexo", "telefono",
+                  "telefono_tipo",
                   "estado_civil",
                   "ocupacion",
                   "correo", "numero_afiliado",
                   "estado_atencion", "estado_autorizacion", "autorizacion", "historial"],
     "citas": ["paciente_id", "fecha", "hora", "duracion", "tipo", "motivo", "medico",
-              "estado", "motivo_cancelacion"],
+              "estado", "motivo_cancelacion", "recordatorio_en"],
     "evaluaciones": ["paciente_id", "fecha", "texto", "tipo", "medico", "detalle"],
     "estudios_imagenes": ["paciente_id", "fecha", "tipo", "region", "lado", "estado", "informe",
                           "miniatura"],
@@ -1064,9 +1065,11 @@ def guardar(g: Guardar, u=Depends(usuario_actual)):
     vals = [Jsonb(g.datos[k]) if k in JSONB else g.datos[k] for k in cols]
     with pool.connection() as c:
         if g.id:
-            r = c.execute(f"update {g.tabla} set {','.join(k + '=%s' for k in cols)} "
-                          f"{', verificado_por=null, verificado_en=null' if g.tabla in VERIFICABLES else ''} "
-                          "where id=%s returning id", vals + [g.id]).fetchone()
+            extra = ", verificado_por=null, verificado_en=null" if g.tabla in VERIFICABLES else ""
+            if g.tabla == "citas":  # al mover o cambiar una cita, el recordatorio vuelve a pendiente
+                extra += ", recordatorio_en=null"
+            r = c.execute(f"update {g.tabla} set {','.join(k + '=%s' for k in cols)}"
+                          f"{extra} where id=%s returning id", vals + [g.id]).fetchone()
             if not r:
                 raise HTTPException(404, "Registro no encontrado")
             accion = "editar"
@@ -1076,6 +1079,24 @@ def guardar(g: Guardar, u=Depends(usuario_actual)):
             accion = "crear"
         auditar(c, u, accion, g.tabla, r["id"])
     return {"ok": True, "id": r["id"]}
+
+
+class Recordatorio(BaseModel):
+    cita_id: int
+    enviado: bool = True  # False borra la marca y deja el recordatorio pendiente
+
+
+@app.post("/api/recordatorio")
+def recordatorio(r: Recordatorio, u=Depends(usuario_actual)):
+    """Marca (o desmarca) una cita como recordada por WhatsApp."""
+    exigir(u, "escribir", "citas")
+    with pool.connection() as c:
+        x = c.execute("update citas set recordatorio_en=" + ("now()" if r.enviado else "null") +
+                      " where id=%s returning id", (r.cita_id,)).fetchone()
+        if not x:
+            raise HTTPException(404, "Cita no encontrada")
+        auditar(c, u, "recordatorio" if r.enviado else "recordatorio_anulado", "citas", r.cita_id)
+    return {"ok": True}
 
 
 @app.get("/api/buscar")

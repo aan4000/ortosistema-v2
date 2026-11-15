@@ -340,6 +340,7 @@ chevr:"<path d='M9.6 5.6 16 12l-6.4 6.4'/>",
 rx:"<path d='M6 4h4a3 3 0 0 1 0 6H6zM6 10v10M10 10l6 10'/>",
 mail:"<rect width='20' height='16' x='2' y='4' rx='2'/><path d='m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7'/>",
 phone:"<path d='M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z'/>",
+wa:"<path d='M20.5 11.6a8.4 8.4 0 0 1-12.4 7.4L3.5 20.5l1.6-4.6A8.4 8.4 0 1 1 20.5 11.6Z'/><path d='M9 8.6c.2-.4.4-.4.6-.4h.5c.2 0 .3 0 .5.4l.6 1.5c.1.2 0 .4-.1.6l-.4.4c-.1.1-.2.3 0 .5.4.7 1.1 1.3 1.8 1.7.2.1.4.1.5-.1l.4-.5c.1-.2.3-.2.5-.1l1.5.7c.2.1.3.2.3.4 0 .3-.2 1.1-.6 1.4-.4.3-.9.5-1.5.4-1.3-.2-3-1.2-4-2.2-.9-.9-1.6-2.1-1.8-3.2-.1-.6 0-.9.2-1.4Z'/>",
 "message-circle":"<path d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/>",
 paperclip:"<path d='m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48'/>",
 copy:"<rect width='14' height='14' x='8' y='8' rx='2' ry='2'/><path d='M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2'/>",
@@ -456,14 +457,14 @@ function fromK(k,r){
   let o;
   if(k=="P")o={id:r.id,cd:r.codigo||"",n:r.nombre||"",e:r.edad??"",c:r.cedula||"",s:r.seguro||"",al:r.alergias||"",
     dx:r.diagnostico||"",fn:r.fecha_nacimiento?String(r.fecha_nacimiento).slice(0,10):"",
-    sx:r.sexo||"",tl:r.telefono||"",em:r.correo||"",na:r.numero_afiliado||"",xp:r.expediente||"",oc:r.ocupacion||"",ec:r.estado_civil||"",
+    sx:r.sexo||"",tl:r.telefono||"",tt:r.telefono_tipo||"",em:r.correo||"",na:r.numero_afiliado||"",xp:r.expediente||"",oc:r.ocupacion||"",ec:r.estado_civil||"",
     am:r.antecedentes_morbidos||"",aq:r.antecedentes_quirurgicos||"",
     me:r.medicamentos||"",af:r.antecedentes_familiares||"",ha:r.habitos||"",
     ea:r.estado_atencion||"Por agendar",eu:r.estado_autorizacion||"Por solicitar",
     au:r.autorizacion||{},hs:r.historial||[]};
   else if(k=="Q")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),h:hh(r.hora),du:r.duracion||30,
     ty:r.tipo||"Control",t:r.motivo||"",dr:r.medico||"",e:r.estado||"Programada",
-    mot:r.motivo_cancelacion||""};
+    mot:r.motivo_cancelacion||"",rc:r.recordatorio_en?String(r.recordatorio_en).slice(0,10):""};
   else if(k=="E")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),t:r.texto||"",tp:r.tipo||"Médica",
     dr:r.medico||"",d:r.detalle||{}};
   else if(k=="I")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),t:(r.tipo||"")+(r.region?" · "+r.region:"")+(r.lado&&r.lado!="No aplica"?" � "+r.lado:""),
@@ -496,7 +497,7 @@ function fromK(k,r){
 function toK(k,o){
   if(k=="P")return{nombre:o.n,edad:o.e===""||o.e==null?null:+o.e,cedula:o.c||null,seguro:o.s||null,
     alergias:o.al||null,diagnostico:o.dx||null,fecha_nacimiento:o.fn||null,sexo:o.sx||null,
-    telefono:o.tl||null,correo:o.em||null,numero_afiliado:o.na||null,expediente:o.xp||null,ocupacion:o.oc||null,estado_civil:o.ec||null,
+    telefono:o.tl||null,telefono_tipo:o.tt||null,correo:o.em||null,numero_afiliado:o.na||null,expediente:o.xp||null,ocupacion:o.oc||null,estado_civil:o.ec||null,
     antecedentes_morbidos:o.am||null,antecedentes_quirurgicos:o.aq||null,
     medicamentos:o.me||null,antecedentes_familiares:o.af||null,habitos:o.ha||null,
     estado_atencion:o.ea||"Por agendar",estado_autorizacion:o.eu||"Por solicitar",
@@ -788,7 +789,7 @@ ${card("5. Expediente del paciente (pestañas)",`<ul class="mu" style="line-heig
   <li><b>Gestión:</b> referimientos, autorizaciones, cargos/facturación.</li>
   <li><b>Documentos:</b> documentos adjuntos.</li>
 </ul>`)}
-${card("6. Nuevo paciente",`<p class="mu">Formulario con: datos personales (nombre, fecha de nacimiento, edad, sexo, cédula, teléfono, correo, ocupación), seguro médico, información clínica (alergias con catálogo incluyendo AINES, motivo de consulta), antecedentes (quirúrgicos, mórbidos, familiares, hábitos). La ocupación se selecciona por categoría o se escribe manualmente. Al guardar, si el nombre coincide con un paciente existente, se pregunta si agregas la info al existente o creas uno nuevo.</p>`)}
+${card("6. Nuevo paciente",`<p class="mu">Formulario con: datos personales (nombre, fecha de nacimiento en día/mes/año, edad, sexo, cédula, teléfono con su tipo —celular o línea fija—, correo, ocupación), seguro médico (incluye "Otros" para escribir la aseguradora), información clínica (alergias con catálogo incluyendo AINES, motivo de consulta), antecedentes (quirúrgicos, mórbidos, familiares, hábitos). La ocupación se selecciona por categoría o se escribe manualmente. Al guardar, si el nombre coincide con un paciente existente, se pregunta si agregas la info al existente o creas uno nuevo.</p>`)}
 ${card("7. Quirófano",`<p class="mu">Pacientes candidatos a cirugía (procedimientos indicados) y cirugías programadas/realizadas. Programar cirugía desde un candidato o manualmente. Campos: paciente, procedimiento, lado, fecha, hora, duración, sala, cirujano, anestesia, tipo de sangre, implantes, estado, checklist preoperatorio. Las cirugías se agrupan por paciente.</p>`)}
 ${card("8. Estudios e imágenes",`<p class="mu">Galería de estudios por paciente. Subir imágenes: paciente (bloqueado al activo), tipo de estudio (por categorías: Radiografía, Ecografía, RM, TAC, Medicina nuclear, Otros), región anatómica y lado (Izq/Der/Bilateral), fecha, observaciones. Las imágenes se optimizan y guardan en el navegador. Visor con zoom, giro, brillo, contraste.</p>`)}
 ${card("9. Procedimientos",`<p class="mu">Catálogo de procedimientos (código, nombre, categoría, fuente, precio). Asignar procedimientos a un paciente activo (con opción de generar cargo en facturación). Selección múltiple con "Seleccionar todos"/"Limpiar".</p>`)}
@@ -813,9 +814,10 @@ ${card("19. Atajos y tips",`<ul class="mu" style="line-height:1.8">
   <li>Botón "Actualizar datos": recarga todo desde la nube.</li>
   <li>Los datos se guardan en Neon (nube) y persisten entre sesiones.</li>
 </ul>`)}
+${card("20. Recordatorios por WhatsApp",`<p class="mu">En el teléfono del paciente se elige <b>Celular</b> o <b>Línea fija</b>. Si es celular, al agendar una cita el sistema programa un recordatorio. Dos días antes de la cita aparece en <b>Inicio → Recordatorios por WhatsApp</b>; el botón "Enviar recordatorio" abre WhatsApp con el mensaje ya escrito (fecha, hora y médico). Al enviarlo, la cita sale de la lista pendiente. Si se cambia la fecha u hora de la cita, el recordatorio vuelve a pendiente. El envío automático sin abrir WhatsApp requiere la API de WhatsApp Business.</p>`)}
 `;
 }
-function vInicio(){const{C,I,M,B,R,F,P}=DB,Q=DB.Q.filter(q=>q.f==hoy&&q.e!="Cancelada"),n=pend();
+function vInicio(){const{C,I,M,B,R,F,P}=DB,Q=DB.Q.filter(q=>q.f==hoy&&q.e!="Cancelada"),n=pend(),recs=recordatorios();
 const last=id=>F.filter(x=>x.p==id).pop(),est=P.filter(p=>{const l=last(p.id);return l&&l.d>=6}).length;
 const pc=B.filter(x=>x.e=="Pendiente").reduce((s,x)=>s+x.m,0),co=B.filter(x=>x.e=="Cobrado").reduce((s,x)=>s+x.m,0);
 const kp={medico:[["Citas hoy",Q.length,"agenda"],["Cirugías programadas",C.filter(x=>x.e=="Programada").length,"quirofano"],["Estudios por revisar",I.filter(x=>x.r=="Por revisar").length,"estudios"],["PROMs bajos",M.filter(x=>x.s<50).length,"rehab"]],
@@ -829,6 +831,7 @@ return `<div class="row"><div class="sh"><h2>Mi día · ${RL[S.user.rol]}</h2><p
 <div class="grid">${kp.map(k=>`<a class="card k" href="#" data-r="${k[2]}"><span class="ki">${ic(KI[k[2]]||"chart",20)}</span><b>${k[1]}</b>${k[0]}</a>`).join("")}</div>
 <div class="grid g2">${card("Agenda de hoy",tbl(["Hora","Paciente","Motivo","Atención"],Q.map(q=>[q.h,pl(q.p),esc(q.t),chip(EA,pk(q.p).ea)])))}
 ${card("Alertas",tbl(["Prioridad","Detalle"],al.map(a=>[`<span class="b ${a[0]}">${{er:"Urgente",wa:"Pendiente","in":"Aviso"}[a[0]]}</span>`,a[1]])))}</div>
+<br>${card(`Recordatorios por WhatsApp (${recs.length})`,recs.length?`<p class="mu">Citas de los próximos 2 días de pacientes con <b>celular</b>. Al enviar el mensaje, la cita sale de esta lista.</p>`+tbl(["Cita","Hora","Paciente","Teléfono",""],recs.map(({q,p})=>[`${esc(q.f)} · ${{0:"hoy",1:"mañana",2:"en 2 días"}[dias(iso(q.f))]||""}`,q.h,pl(p.id),esc(p.tl),`<button class="btn p" data-a="warec:${q.id}">${ic("wa",16)} Enviar recordatorio</button>`])):`<p class="mu">No hay recordatorios pendientes. Cuando agendes una cita a un paciente con celular, aparecerá aquí 2 días antes de la cita.</p>`)}
 ${card("Cirugías próximas",tbl(["Fecha","Paciente","Procedimiento","Estado"],C.filter(x=>x.e=="Programada").map(x=>[x.f,pl(x.p),esc(x.t),bd(x.e)])))}`}
 const DS={inicio:"Resumen de tu jornada: indicadores, agenda y alertas que requieren atención.",agenda:"Citas del día y cirugías programadas, en un solo lugar.",pacientes:"Directorio de pacientes con los estados de atención y autorización. Abre un expediente para ver su historia clínica completa.",quirofano:"Cirugías programadas y realizadas, con los implantes utilizados en cada una.",estudios:"Sube radiografías, ecografías y otros estudios, y ábrelos en el visor con zoom, giro y contraste.",rehab:"Sesiones de fisioterapia, nivel de dolor y cuestionarios de resultados (PROMs).",referimientos:"Pacientes enviados a otros especialistas y recibidos de ellos, con su estado.",autorizaciones:"Preautorizaciones de las aseguradoras: qué falta solicitar, qué está en trámite y qué ya fue aprobado.",facturacion:"Cargos por servicios con el médico responsable, y el catálogo de procedimientos con sus precios aprobados.",admin:"Crea usuarios y define qué secciones puede usar cada rol.",nuevo:"Registro completo de un paciente nuevo: datos personales, seguro, información clínica y antecedentes.",procedimientos:"Elige procedimientos del catálogo y asígnalos al paciente. Puedes generar el cargo de facturación al mismo tiempo.",documentos:"Consentimientos, informes, recetas y otros archivos del paciente. Súbelos, descárgalos o elimínalos.",ortesis:"Elige órtesis (férulas, rodilleras, collarines, fajas y más), define lado y talla, y asígnalas al paciente activo.",evaluacion:"Formulario clínico estructurado: elige opciones, marca hallazgos y guarda la evaluación en el expediente.",ayuda:"Manual de usuario y ayuda del sistema."};
 const TD={resumen:"Datos clave, antecedentes y todo lo ocurrido con el paciente, de lo más reciente a lo más antiguo.",clinica:"Evaluaciones médicas y estudios de imagen.",procedimientos:"Cirugías del paciente y los implantes utilizados.",rehab:"Sesiones de fisioterapia y cuestionarios de resultados (PROMs).",gestion:"Referimientos, preautorizaciones y cargos de este paciente.",documentos:"Archivos y documentos del paciente.",ortesis:"Órtesis indicadas al paciente, con lado, talla e indicaciones de uso."};
@@ -987,7 +990,7 @@ const f=a=>DB[a].filter(x=>x.p==id),E=f("E"),I=f("I"),C=f("C"),F=f("F"),M=f("M")
 const T=[["resumen","Resumen",0],["clinica","Clínica",E.length+I.length],["procedimientos","Procedimientos",C.length+PPn.length],["ortesis","Órtesis",OPn.length],["rehab","Rehabilitación",F.length+M.length],["gestion","Gestión",R.length+A.length+B.length],["documentos","Documentos",Dd.length]];
 const tlRaw=[...E.map(x=>[x.f,"Evaluación: "+x.t]),...I.map(x=>[x.f,x.t]),...C.map(x=>[x.f,"Cirugía: "+x.t]),...F.map(x=>[x.f,"Fisioterapia: "+x.t]),...M.map(x=>[x.f,`${x.t} (${x.s}%)`]),...R.map(x=>[x.f,"Referimiento: "+x.t]),...B.map(x=>[x.f,"Cargo: "+x.t]),...PPn.map(x=>[x.f,"Procedimiento: "+x.t]),...OPn.map(x=>[x.f,"Órtesis: "+x.n])];
 const _seen=new Set();const tl=tlRaw.filter(x=>{const k=x[0]+"|"+x[1];if(_seen.has(k))return false;_seen.add(k);return true}).sort((a,b)=>d8(b[0]).localeCompare(d8(a[0])));
-const B2={resumen:()=>`${card("Estado del paciente",estCard(p))}<br><p><button class="btn p" data-a="ep:${id}">${ic("edit",14)} Editar datos del paciente</button></p><div class="grid g2">${card("Datos del paciente",tbl(["Dato","Detalle"],[["Diagnóstico activo",esc(p.dx||"—")],["Fecha de nacimiento",p.fn?esc(dmy(p.fn))+" ("+edadDe(p.fn)+" años)":"—"],["Sexo",esc(p.sx||"—")],["Alergias",esc(p.al||"Ninguna registrada")],["Aseguradora",esc((p.s||"—")+(p.na?" · afiliado "+p.na:""))],["Cédula",esc(p.c||"—")],["Teléfono",esc(p.tl||"—")],["Correo",esc(p.em||"—")]]))}${card("Antecedentes",tbl(["Tipo","Detalle"],[["Mórbidos",esc(p.am||"No registrados")],["Quirúrgicos",esc(p.aq||"No registrados")],["Medicamentos actuales",esc(p.me||"No registrados")],["Familiares",esc(p.af||"No registrados")],["Hábitos",esc(p.ha||"No registrados")]])+'<p><button class="btn" data-a="ant">Editar antecedentes</button></p>')}</div>${card("Historia en orden cronológico",tbl(["Fecha","Actividad"],tl.map(x=>[x[0],esc(x[1])])))}<br>${card("Historial de estados",tbl(["Fecha y hora","Tipo","Cambio","Usuario","Nota"],(p.hs||[]).slice().reverse().map(x=>[x.f+" "+x.h,esc(x.t),esc(x.de)+" → "+esc(x.a),esc(x.u),esc(x.n||"—")])))}`,
+const B2={resumen:()=>`${card("Estado del paciente",estCard(p))}<br><p><button class="btn p" data-a="ep:${id}">${ic("edit",14)} Editar datos del paciente</button></p><div class="grid g2">${card("Datos del paciente",tbl(["Dato","Detalle"],[["Diagnóstico activo",esc(p.dx||"—")],["Fecha de nacimiento",p.fn?esc(dmy(p.fn))+" ("+edadDe(p.fn)+" años)":"—"],["Sexo",esc(p.sx||"—")],["Alergias",esc(p.al||"Ninguna registrada")],["Aseguradora",esc((p.s||"—")+(p.na?" · afiliado "+p.na:""))],["Cédula",esc(p.c||"—")],["Teléfono",esc((p.tl||"—")+(p.tl&&p.tt?" · "+p.tt:""))],["Correo",esc(p.em||"—")]]))}${card("Antecedentes",tbl(["Tipo","Detalle"],[["Mórbidos",esc(p.am||"No registrados")],["Quirúrgicos",esc(p.aq||"No registrados")],["Medicamentos actuales",esc(p.me||"No registrados")],["Familiares",esc(p.af||"No registrados")],["Hábitos",esc(p.ha||"No registrados")]])+'<p><button class="btn" data-a="ant">Editar antecedentes</button></p>')}</div>${card("Historia en orden cronológico",tbl(["Fecha","Actividad"],tl.map(x=>[x[0],esc(x[1])])))}<br>${card("Historial de estados",tbl(["Fecha y hora","Tipo","Cambio","Usuario","Nota"],(p.hs||[]).slice().reverse().map(x=>[x.f+" "+x.h,esc(x.t),esc(x.de)+" → "+esc(x.a),esc(x.u),esc(x.n||"—")])))}`,
 clinica:()=>card("Evaluaciones",tk("E",id,["Fecha","Tipo","Resumen"],x=>[x.f,esc(x.tp||"General"),esc(x.t)]))+"<br>"+`<p><button class="btn p" data-a="ui:${id}">${ic("up",16)} Subir imagen</button></p>`+card("Imágenes",tbl(["Imagen","Fecha","Estudio","Estado",""],DB.I.map((x,i)=>[x,i]).filter(([x])=>x.p==id).map(([x,i])=>[x.th?`<img class="thm" src="${x.th}" alt="Vista previa" data-a="vw:${i}">`:'<span class="mu">Sin imagen</span>',x.f,esc(x.t),bd(x.r),x.im?`<div class="acts"><button class="icb" data-a="vw:${i}" data-tip="Ver imagen" aria-label="Ver imagen">${ic("eye",17)}</button><button class="icb d" data-a="delimg:${i}" data-tip="Eliminar imagen" aria-label="Eliminar imagen">${ic("trash",17)}</button></div>`:""]))),
 procedimientos:()=>`<p><button class="btn p" data-a="ap:${id}">${ic("plus",16)} Asignar procedimientos</button> <button class="btn" data-a="cx">Programar cirugía</button></p>`+card("Procedimientos indicados",tk("PP",id,["Fecha","Procedimiento","Categoría","Médico","Precio","Estado"],x=>[x.f,esc(x.t),esc(x.g||"General"),esc(x.dr||"—"),x.pr?mon(x.pr):"—",bd(x.e)]))+"<br>"+card("Cirugías e implantes",tk("C",id,["Fecha","Procedimiento","Implante","Estado"],x=>[x.f,esc(x.t),esc(x.i||"—"),bd(x.e)])),
 rehab:()=>`<p class="tb"><button class="btn p" data-a="fs">${ic("plus",16)} Nueva sesión</button> <button class="btn" data-a="fp">${ic("plus",16)} Nuevo PROM</button></p>`+card("Fisioterapia",tk("F",id,["Fecha","Sesión","Dolor"],x=>[x.f,esc(x.t),x.d+"/10"]))+"<br>"+card("PROMs",tk("M",id,["Fecha","Cuestionario","Resultado"],x=>[x.f,esc(x.t),x.s+"%"])),
@@ -1278,9 +1281,45 @@ function fNacSet(id, val){
   set("_m", mm?String(+mm[2]):"");
   set("_d", mm?String(+mm[3]):"");
 }
+/* Tipo de teléfono: solo el celular recibe recordatorios por WhatsApp */
+const TEL_TIPOS=["Celular","Línea fija"];
+function telTipoSelect(id, val){
+  return '<select id="'+id+'" aria-label="Tipo de teléfono">'+
+    '<option value=""'+(val?"":" selected")+'>Sin especificar</option>'+
+    opt(TEL_TIPOS, val||"__")+'</select>';
+}
+const esCelular=p=>/celular/i.test((p&&p.tt)||"");
+/* Número para wa.me: 10 dígitos -> se le agrega el 1 de República Dominicana */
+function telWa(t){
+  const d=String(t||"").replace(/\D/g,"");
+  if(d.length==10)return "1"+d;
+  if(d.length==11&&d[0]=="1")return d;
+  return "";
+}
+function citaTexto(p,q){
+  return `Hola ${p.n}, le recordamos su cita en OrtoSistema el ${q.f} a las ${q.h}`+
+    (q.dr?` con ${q.dr}`:"")+`. Si no puede asistir, responda a este mensaje. ¡Gracias!`;
+}
+/* Citas de los próximos 2 días de pacientes con celular y sin recordatorio enviado */
+function recordatorios(){
+  return DB.Q.filter(q=>q.e!="Cancelada"&&!q.rc&&dias(iso(q.f))>=0&&dias(iso(q.f))<=2)
+    .map(q=>({q,p:pk(q.p)})).filter(x=>x.p.n&&esCelular(x.p)&&x.p.tl)
+    .sort((a,b)=>(iso(a.q.f)+a.q.h).localeCompare(iso(b.q.f)+b.q.h));
+}
+async function enviarRecordatorio(id){
+  const q=DB.Q.find(x=>x.id==id); if(!q)return;
+  const p=pk(q.p); const num=telWa(p.tl);
+  if(!num)return toast("El teléfono del paciente no es válido (deben ser 10 dígitos).");
+  window.open("https://wa.me/"+num+"?text="+encodeURIComponent(citaTexto(p,q)),"_blank");
+  try{
+    await api("/api/recordatorio",{method:"POST",body:{cita_id:q.id}});
+    q.rc=hoy; draw();
+    toast("Recordatorio de WhatsApp enviado a "+p.n);
+  }catch(e){toast(e.message)}
+}
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
-${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",fNac("nf",""))}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",'<input id="nt" type="tel">')}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
+${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",fNac("nf",""))}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",`<div class="tb" style="gap:6px"><span style="flex:0 0 auto;min-width:124px">${telTipoSelect("nt_tipo","Celular")}</span><input id="nt" type="tel" style="flex:1;min-width:0" placeholder="809-000-0000"></div>`)}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
 <br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",segSelect("ns",""))}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
 <br>${card("Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}</div>`)}
 <br>${card("Antecedentes",`${mbSel([])}
@@ -1317,7 +1356,7 @@ if(!v("nx"))return er("Selecciona el sexo.");
 const mb=[...document.querySelectorAll(".mb")].filter(x=>x.checked).map(x=>x.value).concat(v("no")?[v("no")]:[]);
 const ocVal=v("oc")==="__otro__"?v("oc_other"):v("oc");
  const segVal=v("ns")==="Otros"?(v("ns_other")||"Otros"):v("ns");
-const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),em:v("nm"),s:segVal,na:v("na"),al:v("nl"),dx:v("ni"),oc:ocVal,am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,ea:"Por agendar",eu:/Privado/i.test(segVal)?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
+const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),tt:v("nt_tipo"),em:v("nm"),s:segVal,na:v("na"),al:v("nl"),dx:v("ni"),oc:ocVal,am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,ea:"Por agendar",eu:/Privado/i.test(segVal)?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
 const dupByCode = rec.c?null: (rec.cd ? DB.P.find(x=>x.cd && x.cd===rec.cd) : null);
 const dupByCed = rec.c ? DB.P.find(x=>x.c && x.c===rec.c) : null;
 const dupByName = DB.P.filter(x=>(x.n||"").toLowerCase()===(rec.n||"").toLowerCase());
@@ -1355,7 +1394,7 @@ ${f("ep_fn","Fecha de nacimiento *",fNac("ep_fn",p.fn))}
 ${f("ep_e","Edad",`<input id="ep_e" inputmode="numeric" value="${esc(p.e||"")}">`)}
 ${f("ep_sx","Sexo *",`<select id="ep_sx"><option value="">Selecciona</option>`+opt(["Femenino","Masculino"],p.sx)+`</select>`)}
 ${f("ep_c","Cédula",`<input id="ep_c" value="${esc(p.c||"")}">`)}
-${f("ep_tl","Teléfono",`<input id="ep_tl" value="${esc(p.tl||"")}">`)}
+${f("ep_tl","Teléfono",`<div class="tb" style="gap:6px"><span style="flex:0 0 auto;min-width:124px">${telTipoSelect("ep_tt",p.tt)}</span><input id="ep_tl" style="flex:1;min-width:0" value="${esc(p.tl||"")}" placeholder="809-000-0000"></div>`)}
 ${f("ep_em","Correo",`<input id="ep_em" type="email" value="${esc(p.em||"")}">`)}
 ${f("ep_s","Seguro",segSelect("ep_s",p.s||""))}
 ${f("ep_na","N° afiliado",`<input id="ep_na" value="${esc(p.na||"")}">`)}
@@ -1373,7 +1412,7 @@ o.querySelector("#ep_g").onclick=async()=>{
   if(!v("#ep_sx"))return er("Selecciona el sexo.");
   const ocVal=v("#ep_oc")==="__otro__"?v("#ep_oc_other"):v("#ep_oc");
   const segVal=v("#ep_s")==="Otros"?(v("#ep_s_other")||"Otros"):v("#ep_s");
-  Object.assign(p,{n,fn,e:edadDe(fn),sx:v("#ep_sx"),c:v("#ep_c"),tl:v("#ep_tl"),em:v("#ep_em"),s:segVal,na:v("#ep_na"),oc:ocVal,al:v("#ep_al"),dx:v("#ep_dx")});
+  Object.assign(p,{n,fn,e:edadDe(fn),sx:v("#ep_sx"),c:v("#ep_c"),tl:v("#ep_tl"),tt:v("#ep_tt"),em:v("#ep_em"),s:segVal,na:v("#ep_na"),oc:ocVal,al:v("#ep_al"),dx:v("#ep_dx")});
   p.v=null;
   try{await editarK("P",p);const idx=DB.P.findIndex(x=>x.id==p.id);if(idx>=0)DB.P[idx]=p;toast("Datos del paciente actualizados");o.remove();draw()}catch(e){er(e.message)}};
 }
@@ -1743,7 +1782,7 @@ const v=s=>o.querySelector(s).value.trim(),er=m=>{o.querySelector("#ci_e").textC
 o.querySelector("#ci_g").onclick=async()=>{const fi=v("#ci_f");if(!fi)return er("Elige la fecha en el calendario.");if(nu&&fi<iso(hoy))return er("La fecha ya pasó. Elige hoy o una fecha futura.");
 const c={p:+v("#ci_p"),f:dmy(fi),h:readTime("cih"),du:+v("#ci_d"),ty:v("#ci_t"),t:v("#ci_r")||v("#ci_t"),dr:v("#ci_m"),e:"Programada"};
 if(!c.p)return er("Primero crea un paciente.");
-try{if(nu){const e=await crearCita(c);if(e)return er(e)}else{const e=citaErr(c,i);if(e)return er(e);Object.assign(x,c);await editarK("Q",x)}}catch(e){return er(e.message)}
+try{if(nu){const e=await crearCita(c);if(e)return er(e);const pp=pk(c.p);if(esCelular(pp)&&pp.tl)toast("Cita guardada · recordatorio de WhatsApp programado para 2 días antes")}else{const e=citaErr(c,i);if(e)return er(e);Object.assign(x,c);x.rc="";await editarK("Q",x)}}catch(e){return er(e.message)}
 S.ag=fi;o.remove();go("agenda")}}
 function cancelarCita(i){const x=DB.Q[i],p=pk(x.p);if(!x)return;
 const o=modal(`<h3>Cancelar cita</h3><p>${esc(p.n)} · ${x.f} ${x.h}</p><label class="mu" for="cc_m">Motivo (obligatorio)</label><textarea id="cc_m" rows="2"></textarea><div class="er2" id="cc_e" role="alert"></div><div class="tb"><button class="btn" id="cc_n">Volver</button><button class="btn d" id="cc_s">Cancelar cita</button></div>`);
@@ -2109,6 +2148,7 @@ else if(a=="adminsec"){e.preventDefault();api("/api/admin/resumen").then(r=>{S.a
 else if(a=="delimg"){e.preventDefault();borrarImagen(+v)}
 else if(a=="cx_cancel"||a=="ci_cancel"||a=="es_cancel"||a=="rx_cancel"){e.preventDefault();const o=document.querySelector(".ov");if(o)o.remove()}
 else if(a=="buscarpadron"){e.preventDefault();const c=(document.getElementById("nc")||{}).value||"";const num=c.replace(/\D/g,"");window.open("https://www.pai.do/padron","_blank","noopener")}
+else if(a=="warec"){e.preventDefault();enviarRecordatorio(+v)}
 });
 addEventListener("keydown",e=>{if(!S.user)return;const g=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
 if((e.ctrlKey||e.metaKey)&&e.key=="k"){e.preventDefault();pal()}

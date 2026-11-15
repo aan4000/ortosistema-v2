@@ -37,6 +37,8 @@ alter table pacientes add column if not exists habitos text;
 alter table pacientes add column if not exists fecha_nacimiento date;
 alter table pacientes add column if not exists sexo text;
 alter table pacientes add column if not exists telefono text;
+-- Celular (recibe recordatorios por WhatsApp) o línea fija.
+alter table pacientes add column if not exists telefono_tipo text;
 alter table pacientes add column if not exists correo text;
 alter table pacientes add column if not exists numero_afiliado text;
 -- Estado del episodio: atención, autorización, datos de la autorización e historial de cambios.
@@ -54,6 +56,8 @@ alter table citas add column if not exists tipo text default 'Control';
 alter table citas add column if not exists medico text;
 alter table citas add column if not exists estado text not null default 'Programada';
 alter table citas add column if not exists motivo_cancelacion text;
+-- Fecha y hora en que se envió el recordatorio por WhatsApp (null = pendiente).
+alter table citas add column if not exists recordatorio_en timestamptz;
 
 create table if not exists evaluaciones(
   id serial primary key,
