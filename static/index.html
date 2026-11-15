@@ -108,6 +108,7 @@ td .btn{min-height:32px;padding:0 10px;font-size:13px}
 .fg{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:12px 0}.fg label{display:block;margin-bottom:4px}
 .fdate{display:grid;grid-template-columns:74px minmax(90px,1fr) 82px;gap:6px}.fdate select{width:100%}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.ck{display:flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:13px}.ck input,.ck input[type="checkbox"]{width:14px;height:14px;min-height:0}table input[type="checkbox"]{width:14px;height:14px}
+.telop{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}.telop .mu{margin:0}
 body{font-family:Inter,Roboto,system-ui,sans-serif}
 .card{border-radius:12px}.btn{border-radius:10px;font-weight:500}.side{width:248px}
 .lg2{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:var(--pri);color:var(--onp);box-shadow:0 2px 8px rgba(15,108,189,.28)}
@@ -1283,11 +1284,14 @@ function fNacSet(id, val){
 }
 /* Tipo de teléfono: solo el celular recibe recordatorios por WhatsApp */
 const TEL_TIPOS=["Celular","Línea fija"];
-function telTipoSelect(id, val){
-  return '<select id="'+id+'" aria-label="Tipo de teléfono">'+
-    '<option value=""'+(val?"":" selected")+'>Sin especificar</option>'+
-    opt(TEL_TIPOS, val||"__")+'</select>';
+/* Un solo número y dos opciones: se confirma si es celular o línea fija. */
+function telTipoGroup(id, val){
+  return '<div class="telop" role="radiogroup" aria-label="Tipo de teléfono">'+
+    '<span class="mu">Tipo:</span>'+
+    TEL_TIPOS.map(t=>'<label class="ck"><input type="radio" name="'+id+'" value="'+t+'"'+
+      (t==val?' checked':'')+'> '+t+'</label>').join("")+'</div>';
 }
+const telTipoVal=id=>{const e=document.querySelector('input[name="'+id+'"]:checked');return e?e.value:""};
 const esCelular=p=>/celular/i.test((p&&p.tt)||"");
 /* Número para wa.me: 10 dígitos -> se le agrega el 1 de República Dominicana */
 function telWa(t){
@@ -1319,7 +1323,7 @@ async function enviarRecordatorio(id){
 }
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
-${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",fNac("nf",""))}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",`<div class="tb" style="gap:6px"><span style="flex:0 0 auto;min-width:124px">${telTipoSelect("nt_tipo","Celular")}</span><input id="nt" type="tel" style="flex:1;min-width:0" placeholder="809-000-0000"></div>`)}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
+${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",fNac("nf",""))}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${f("nt","Teléfono",`<input id="nt" type="tel" placeholder="809-000-0000">${telTipoGroup("nt_tipo","Celular")}`)}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
 <br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",segSelect("ns",""))}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
 <br>${card("Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}</div>`)}
 <br>${card("Antecedentes",`${mbSel([])}
@@ -1353,10 +1357,12 @@ if(!n)return er("Escribe el nombre completo.");
  if(fn0==="invalid")return er("La fecha de nacimiento no es válida.");
 if(!fn)return er("Elige la fecha de nacimiento (día, mes y año).");
 if(!v("nx"))return er("Selecciona el sexo.");
+const ttTel=telTipoVal("nt_tipo");
+if(v("nt")&&!ttTel)return er("Confirma si el teléfono es celular o línea fija.");
 const mb=[...document.querySelectorAll(".mb")].filter(x=>x.checked).map(x=>x.value).concat(v("no")?[v("no")]:[]);
 const ocVal=v("oc")==="__otro__"?v("oc_other"):v("oc");
  const segVal=v("ns")==="Otros"?(v("ns_other")||"Otros"):v("ns");
-const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),tt:v("nt_tipo"),em:v("nm"),s:segVal,na:v("na"),al:v("nl"),dx:v("ni"),oc:ocVal,am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,ea:"Por agendar",eu:/Privado/i.test(segVal)?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
+const rec={id:null,n,fn,e:edadDe(fn),sx:v("nx"),c:v("nc"),tl:v("nt"),tt:ttTel,em:v("nm"),s:segVal,na:v("na"),al:v("nl"),dx:v("ni"),oc:ocVal,am:mb.join(", "),aq:v("nq"),me:v("nu"),af:v("nh"),ha:`Tabaquismo: ${v("nb")} · Alcohol: ${v("nal")} · Actividad: ${v("nac")}`,ea:"Por agendar",eu:/Privado/i.test(segVal)?"No requiere":"Por solicitar",au:{n:"",ven:"",cob:0},hs:[]};
 const dupByCode = rec.c?null: (rec.cd ? DB.P.find(x=>x.cd && x.cd===rec.cd) : null);
 const dupByCed = rec.c ? DB.P.find(x=>x.c && x.c===rec.c) : null;
 const dupByName = DB.P.filter(x=>(x.n||"").toLowerCase()===(rec.n||"").toLowerCase());
@@ -1394,7 +1400,7 @@ ${f("ep_fn","Fecha de nacimiento *",fNac("ep_fn",p.fn))}
 ${f("ep_e","Edad",`<input id="ep_e" inputmode="numeric" value="${esc(p.e||"")}">`)}
 ${f("ep_sx","Sexo *",`<select id="ep_sx"><option value="">Selecciona</option>`+opt(["Femenino","Masculino"],p.sx)+`</select>`)}
 ${f("ep_c","Cédula",`<input id="ep_c" value="${esc(p.c||"")}">`)}
-${f("ep_tl","Teléfono",`<div class="tb" style="gap:6px"><span style="flex:0 0 auto;min-width:124px">${telTipoSelect("ep_tt",p.tt)}</span><input id="ep_tl" style="flex:1;min-width:0" value="${esc(p.tl||"")}" placeholder="809-000-0000"></div>`)}
+${f("ep_tl","Teléfono",`<input id="ep_tl" value="${esc(p.tl||"")}" placeholder="809-000-0000">${telTipoGroup("ep_tt",p.tt)}`)}
 ${f("ep_em","Correo",`<input id="ep_em" type="email" value="${esc(p.em||"")}">`)}
 ${f("ep_s","Seguro",segSelect("ep_s",p.s||""))}
 ${f("ep_na","N° afiliado",`<input id="ep_na" value="${esc(p.na||"")}">`)}
@@ -1410,9 +1416,11 @@ o.querySelector("#ep_g").onclick=async()=>{
   if(fn==="invalid")return er("La fecha de nacimiento no es válida.");
   if(!fn)return er("Elige la fecha de nacimiento (día, mes y año).");
   if(!v("#ep_sx"))return er("Selecciona el sexo.");
+  const ttTel=telTipoVal("ep_tt");
+  if(v("#ep_tl")&&!ttTel)return er("Confirma si el teléfono es celular o línea fija.");
   const ocVal=v("#ep_oc")==="__otro__"?v("#ep_oc_other"):v("#ep_oc");
   const segVal=v("#ep_s")==="Otros"?(v("#ep_s_other")||"Otros"):v("#ep_s");
-  Object.assign(p,{n,fn,e:edadDe(fn),sx:v("#ep_sx"),c:v("#ep_c"),tl:v("#ep_tl"),tt:v("#ep_tt"),em:v("#ep_em"),s:segVal,na:v("#ep_na"),oc:ocVal,al:v("#ep_al"),dx:v("#ep_dx")});
+  Object.assign(p,{n,fn,e:edadDe(fn),sx:v("#ep_sx"),c:v("#ep_c"),tl:v("#ep_tl"),tt:ttTel,em:v("#ep_em"),s:segVal,na:v("#ep_na"),oc:ocVal,al:v("#ep_al"),dx:v("#ep_dx")});
   p.v=null;
   try{await editarK("P",p);const idx=DB.P.findIndex(x=>x.id==p.id);if(idx>=0)DB.P[idx]=p;toast("Datos del paciente actualizados");o.remove();draw()}catch(e){er(e.message)}};
 }
