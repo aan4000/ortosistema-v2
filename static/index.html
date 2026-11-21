@@ -602,7 +602,8 @@ const mon=n=>"RD$ "+n.toLocaleString("es-DO");
 const pend=()=>DB.A.filter(x=>x.e=="Por solicitar"||x.e=="Enviada").length;
 const d8=s=>{const p=String(s||"").split("/");return p.length===3?p[2]+p[1].padStart(2,"0")+p[0].padStart(2,"0"):String(s||"")};
 /* Los cambios se guardan en el servidor con crearK, editarK y borrarK. */
-function toast(m){const t=document.createElement("div");t.className="ts";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1400)}
+function toast(m,dur=1400){const t=document.createElement("div");t.className="ts";t.textContent=m;document.body.appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transform="translateX(-50%) translateY(10px)";setTimeout(()=>t.remove(),300)},dur)}
+function sugerir(msg,accion){const t=document.createElement("div");t.className="ts";t.style.cursor="pointer";t.style.display="flex";t.style.alignItems="center";t.style.gap="8px";t.innerHTML="<span>"+msg+"</span><span style='opacity:.7;font-size:12px'>→</span>";t.onclick=()=>{t.remove();if(accion)accion()};document.body.appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transform="translateX(-50%) translateY(10px)";setTimeout(()=>t.remove(),300)},3500)}
 const ovx=()=>document.querySelectorAll(".ov").forEach(x=>x.remove());
 function modal(h,c=""){const o=document.createElement("div");o.className="ov "+c;o.innerHTML=`<div class="md">${h}</div>`;o.onclick=e=>{if(e.target===o)o.remove()};document.body.appendChild(o);return o}
 
@@ -1393,7 +1394,7 @@ if (dups.length) {
     try{ await editarK("P",dup); const idx=DB.P.findIndex(x=>x.id==dup.id); if(idx>=0) DB.P[idx]=dup; toast("Informacion actualizada en el paciente existente"); go("pacientes") }catch(e){er(e.message)} };
   return;
   }
-try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id)}catch(e){er(e.message)}}
+try{const id=await crearK("P",rec);DB.P.push({...rec,id});S.ap=id;S.pa.p=id;go("p-"+id);sugerir("Paciente creado. Agendar una cita?",()=>go("agenda"))}catch(e){er(e.message)}}
 
 function fEditPac(id){const p=pk(id);if(!p.n)return toast("Paciente no encontrado.");
 const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`;
@@ -1792,7 +1793,7 @@ const v=s=>o.querySelector(s).value.trim(),er=m=>{o.querySelector("#ci_e").textC
 o.querySelector("#ci_g").onclick=async()=>{const fi=v("#ci_f");if(!fi)return er("Elige la fecha en el calendario.");if(nu&&fi<iso(hoy))return er("La fecha ya pasó. Elige hoy o una fecha futura.");
 const c={p:+v("#ci_p"),f:dmy(fi),h:readTime("cih"),du:+v("#ci_d"),ty:v("#ci_t"),t:v("#ci_r")||v("#ci_t"),dr:v("#ci_m"),e:"Programada"};
 if(!c.p)return er("Primero crea un paciente.");
-try{if(nu){const e=await crearCita(c);if(e)return er(e);const pp=pk(c.p);if(esCelular(pp)&&pp.tl)toast("Cita guardada · recordatorio de WhatsApp programado para 2 días antes")}else{const e=citaErr(c,i);if(e)return er(e);Object.assign(x,c);x.rc="";await editarK("Q",x)}}catch(e){return er(e.message)}
+try{if(nu){const e=await crearCita(c);if(e)return er(e);const pp=pk(c.p);if(esCelular(pp)&&pp.tl)toast("Cita guardada · recordatorio de WhatsApp programado para 2 días antes");sugerir("Cita agendada. ¿Ver el expediente del paciente?",()=>go("p-"+c.p+"-resumen"))}else{const e=citaErr(c,i);if(e)return er(e);Object.assign(x,c);x.rc="";await editarK("Q",x)}}catch(e){return er(e.message)}
 S.ag=fi;o.remove();go("agenda")}}
 function cancelarCita(i){const x=DB.Q[i],p=pk(x.p);if(!x)return;
 const o=modal(`<h3>Cancelar cita</h3><p>${esc(p.n)} · ${x.f} ${x.h}</p><label class="mu" for="cc_m">Motivo (obligatorio)</label><textarea id="cc_m" rows="2"></textarea><div class="er2" id="cc_e" role="alert"></div><div class="tb"><button class="btn" id="cc_n">Volver</button><button class="btn d" id="cc_s">Cancelar cita</button></div>`);
