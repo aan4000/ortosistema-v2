@@ -861,7 +861,7 @@ ${card("19. Atajos y tips",`<ul class="mu" style="line-height:1.8">
   <li>Botón "Actualizar datos": recarga todo desde la nube.</li>
   <li>Los datos se guardan en Neon (nube) y persisten entre sesiones.</li>
 </ul>`)}
-${card("20. Recordatorios por WhatsApp",`<p class="mu">En el teléfono del paciente se elige <b>Celular</b> o <b>Línea fija</b>. Si es celular, al agendar una cita el sistema programa un recordatorio. Dos días antes de la cita aparece en <b>Inicio → Recordatorios por WhatsApp</b>; el botón "Enviar recordatorio" abre WhatsApp con el mensaje ya escrito (fecha, hora y médico). Al enviarlo, la cita sale de la lista pendiente. Si se cambia la fecha u hora de la cita, el recordatorio vuelve a pendiente. El envío automático sin abrir WhatsApp requiere la API de WhatsApp Business.</p>`)}
+${card("20. Recordatorios por WhatsApp",`<p class="mu">En el teléfono del paciente se elige <b>Celular</b> o <b>Línea fija</b>. Si es celular, al agendar una cita el sistema programa un recordatorio. Dos días antes de la cita aparece en <b>Inicio → Recordatorios por WhatsApp</b>; el botón "Enviar recordatorio" abre WhatsApp con el mensaje ya escrito (fecha, hora y médico). Al enviarlo, la cita sale de la lista pendiente. Si se cambia la fecha u hora de la cita, el recordatorio vuelve a pendiente. El mensaje se envía con el nombre "Recordatorio de cita del hospital" e incluye los datos de la Dra. Heydy Rodriguez (+1 829-373-8765). El envío automático sin abrir WhatsApp requiere la API de WhatsApp Business.</p>`)}
 `;
 }
 function vInicio(){const{C,I,M,B,R,F,P}=DB,Q=DB.Q.filter(q=>q.f==hoy&&q.e!="Cancelada"),n=pend(),recs=recordatorios();
@@ -1339,6 +1339,11 @@ function telTipoGroup(id, val){
 }
 const telTipoVal=id=>{const e=document.querySelector('input[name="'+id+'"]:checked');return e?e.value:""};
 const esCelular=p=>/celular/i.test((p&&p.tt)||"");
+/* Contacto del hospital/doctora para los recordatorios de WhatsApp */
+const HOSPITAL_NOMBRE="Recordatorio de cita del hospital";
+const DOCTORA_NOMBRE="Dra. Heydy Rodriguez";
+const DOCTORA_TEL="+1 829-373-8765";
+const DOCTORA_WA="18293738765";
 /* Número para wa.me: 10 dígitos -> se le agrega el 1 de República Dominicana */
 function telWa(t){
   const d=String(t||"").replace(/\D/g,"");
@@ -1347,8 +1352,8 @@ function telWa(t){
   return "";
 }
 function citaTexto(p,q){
-  return `Hola ${p.n}, le recordamos su cita en OrtoSistema el ${q.f} a las ${q.h}`+
-    (q.dr?` con ${q.dr}`:"")+`. Si no puede asistir, responda a este mensaje. ¡Gracias!`;
+  return `${HOSPITAL_NOMBRE}\n\nHola ${p.n}, le recordamos su cita en OrtoSistema el ${q.f} a las ${q.h}`+
+    (q.dr?` con ${q.dr}`:"")+`.\n\nPara confirmar o reprogramar, contacte a ${DOCTORA_NOMBRE}: ${DOCTORA_TEL}.\n\nSi no puede asistir, responda a este mensaje. ¡Gracias!`;
 }
 /* Citas de los próximos 2 días de pacientes con celular y sin recordatorio enviado */
 function recordatorios(){
