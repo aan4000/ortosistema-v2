@@ -27,8 +27,8 @@ a{color:var(--pri)}h2{font-size:24px;margin:8px 0}h3{font-size:18px;margin:0 0 8
 .nav{display:flex;align-items:center;gap:12px;min-height:46px;padding:9px 14px;margin:2px 0;border-radius:var(--radius-sm);color:var(--tx);text-decoration:none;font-size:14.5px;font-weight:500;transition:background var(--transition-fast),color var(--transition-fast),transform var(--transition-fast),box-shadow var(--transition-fast)}
 .nav:hover{background:var(--pri2);transform:translateX(2px)}
 .nav.on{background:var(--pri2);color:var(--pri);font-weight:600;box-shadow:inset 3px 0 var(--pri);transform:none}
-.nav .ic{opacity:.72;transition:opacity .18s ease,transform .22s cubic-bezier(.2,.7,.3,1)}
-.nav:hover .ic{opacity:1;transform:translateY(-.5px) scale(1.06)}
+.nav .ic{opacity:.7;transition:opacity var(--transition-base),transform var(--transition-base),filter var(--transition-base);width:20px;height:20px}
+.nav:hover .ic{opacity:1;transform:translateX(2px) scale(1.15);filter:drop-shadow(0 2px 6px rgba(13,110,253,.25))}
 .nav.on .ic{opacity:1;transform:scale(1.04)}
 .sub{margin-left:16px}.sp{flex:1}
 .bd{margin-left:auto;background:var(--er);color:#fff;border-radius:10px;font-size:11px;padding:2px 8px;font-weight:600;min-width:20px;text-align:center;box-shadow:0 2px 6px rgba(220,53,69,.25)}
@@ -40,6 +40,12 @@ a{color:var(--pri)}h2{font-size:24px;margin:8px 0}h3{font-size:18px;margin:0 0 8
 @keyframes secUp{0%{opacity:0;transform:translate3d(0,14px,0)}100%{opacity:1;transform:none}}
 @keyframes secDer{0%{opacity:0;transform:translate3d(46px,0,0)}45%{opacity:1}100%{opacity:1;transform:none}}
 @keyframes secIzq{0%{opacity:0;transform:translate3d(-46px,0,0)}45%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes fadeInUp{0%{opacity:0;transform:translate3d(0,20px,0)}100%{opacity:1;transform:none}}
+@keyframes slideInLeft{0%{opacity:0;transform:translate3d(-20px,0,0)}100%{opacity:1;transform:none}}
+@keyframes scaleIn{0%{opacity:0;transform:scale(.92)}100%{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes bounceIn{0%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.05)}70%{transform:scale(.9)}100%{transform:scale(1)}}
 @keyframes fadeInUp{0%{opacity:0;transform:translate3d(0,20px,0)}100%{opacity:1;transform:none}}
 @keyframes slideInLeft{0%{opacity:0;transform:translate3d(-20px,0,0)}100%{opacity:1;transform:none}}
 @keyframes scaleIn{0%{opacity:0;transform:scale(.92)}100%{opacity:1;transform:scale(1)}}
@@ -209,7 +215,9 @@ tr:hover td{background:var(--pri2)}
 .nm{display:grid;gap:8px}.nm .btn{justify-content:flex-start;width:100%}
 .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700;flex:none;box-shadow:0 2px 6px rgba(13,110,253,.25)}
 .tdt{margin-left:auto;white-space:nowrap}
-.card.k{transition:transform .15s,box-shadow .15s}.card.k:hover{transform:translateY(-3px);box-shadow:var(--sh-hover)}
+.card.k{transition:transform .15s,box-shadow .15s}.card.k:hover{transform:translateY(-4px);box-shadow:var(--sh-hover)}
+.k::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.08) 50%,transparent 70%);background-size:200% 100%;opacity:0;transition:opacity .3s}
+.k:hover::after{opacity:1;animation:shimmer 1.5s infinite}
 .k:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(15,40,70,.12)}
 @media(max-width:800px){.tdt{display:none}}
 @media(prefers-reduced-motion:reduce){.card.k{transition:none}}
@@ -218,7 +226,9 @@ tr:hover td{background:var(--pri2)}
 :root{--rad:10px;--rad-sm:8px;--rad-lg:14px;--gap:18px;--sh2:0 2px 8px rgba(15,40,70,.07),0 8px 24px rgba(15,40,70,.06)}
 .card{border-radius:var(--rad);box-shadow:var(--sh2);padding:18px 20px}
 .card.k{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
-.card.k:hover{transform:translateY(-3px);box-shadow:var(--sh-hover)}
+.card.k:hover{transform:translateY(-4px);box-shadow:var(--sh-hover)}
+.k::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.08) 50%,transparent 70%);background-size:200% 100%;opacity:0;transition:opacity .3s}
+.k:hover::after{opacity:1;animation:shimmer 1.5s infinite}
 .k:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,40,70,.1);border-color:var(--pri)}
 .grid,.g2,.kb,.kpi{gap:18px;margin:18px 0}
 .k b{font-size:30px;letter-spacing:-.02em;line-height:1}
@@ -289,7 +299,9 @@ h1,h2,h3{letter-spacing:-.01em}
 .sk{background:linear-gradient(90deg,var(--bg) 0%,var(--sf) 50%,var(--bg) 100%);background-size:200% 100%;animation:shimmer 1.4s linear infinite;border-radius:var(--rad-sm)}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @media(max-width:800px){.pg{padding:14px 16px 48px}.card{padding:14px 16px}.top{padding:8px 12px}}
-@media(prefers-reduced-motion:reduce){.sk{animation:none}.card.k:hover{transform:translateY(-3px);box-shadow:var(--sh-hover)}
+@media(prefers-reduced-motion:reduce){.sk{animation:none}.card.k:hover{transform:translateY(-4px);box-shadow:var(--sh-hover)}
+.k::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.08) 50%,transparent 70%);background-size:200% 100%;opacity:0;transition:opacity .3s}
+.k:hover::after{opacity:1;animation:shimmer 1.5s infinite}
 .k:hover{transform:none}.btn:hover{transform:none}.ov{backdrop-filter:none}}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--sh2:none}tbody tr:nth-child(even){background:rgba(255,255,255,.035)}}
 :root[data-theme="dark"]{--sh2:none}
@@ -853,7 +865,7 @@ ${card("Cirugías próximas",tbl(["Fecha","Paciente","Procedimiento","Estado"],C
 const DS={inicio:"Resumen de tu jornada: indicadores, agenda y alertas que requieren atención.",agenda:"Citas del día y cirugías programadas, en un solo lugar.",pacientes:"Directorio de pacientes con los estados de atención y autorización. Abre un expediente para ver su historia clínica completa.",quirofano:"Cirugías programadas y realizadas, con los implantes utilizados en cada una.",estudios:"Sube radiografías, ecografías y otros estudios, y ábrelos en el visor con zoom, giro y contraste.",rehab:"Sesiones de fisioterapia, nivel de dolor y cuestionarios de resultados (PROMs).",referimientos:"Pacientes enviados a otros especialistas y recibidos de ellos, con su estado.",autorizaciones:"Preautorizaciones de las aseguradoras: qué falta solicitar, qué está en trámite y qué ya fue aprobado.",facturacion:"Cargos por servicios con el médico responsable, y el catálogo de procedimientos con sus precios aprobados.",admin:"Crea usuarios y define qué secciones puede usar cada rol.",nuevo:"Registro completo de un paciente nuevo: datos personales, seguro, información clínica y antecedentes.",procedimientos:"Elige procedimientos del catálogo y asígnalos al paciente. Puedes generar el cargo de facturación al mismo tiempo.",documentos:"Consentimientos, informes, recetas y otros archivos del paciente. Súbelos, descárgalos o elimínalos.",ortesis:"Elige órtesis (férulas, rodilleras, collarines, fajas y más), define lado y talla, y asígnalas al paciente activo.",evaluacion:"Formulario clínico estructurado: elige opciones, marca hallazgos y guarda la evaluación en el expediente.",ayuda:"Manual de usuario y ayuda del sistema."};
 const TD={resumen:"Datos clave, antecedentes y todo lo ocurrido con el paciente, de lo más reciente a lo más antiguo.",clinica:"Evaluaciones médicas y estudios de imagen.",procedimientos:"Cirugías del paciente y los implantes utilizados.",rehab:"Sesiones de fisioterapia y cuestionarios de resultados (PROMs).",gestion:"Referimientos, preautorizaciones y cargos de este paciente.",documentos:"Archivos y documentos del paciente.",ortesis:"Órtesis indicadas al paciente, con lado, talla e indicaciones de uso."};
 const SI={agenda:"cal",pacientes:"users",procedimientos:"bone",ortesis:"bandage",quirofano:"syringe",estudios:"scan",documentos:"filetext",rehab:"footprints",referimientos:"swap",autorizaciones:"shieldcheck",facturacion:"usd",admin:"cog",nuevo:"plus",evaluacion:"stethoscope",ayuda:"question"},KI={agenda:"cal",quirofano:"syringe",estudios:"scan",rehab:"footprints",autorizaciones:"shieldcheck",facturacion:"usd",pacientes:"users",referimientos:"swap"};
-const sec=t=>{const k=S.route.split("-")[0];return`<div class="sh"><h2><span class="hi" style="display:inline-grid;place-items:center;width:38px;height:38px;border-radius:10px;background:var(--pri2);color:var(--pri);margin-right:10px;vertical-align:middle">${ic(SI[k]||"chart",20)}</span>${t}</h2><p class="mu">${DS[k]||""}</p></div>`};
+const sec=t=>{const k=S.route.split("-")[0];return`<div class="sh"><h2><span class="hi" style="display:inline-grid;place-items:center;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--pri2),var(--hmb));color:var(--pri);margin-right:12px;vertical-align:middle;box-shadow:0 2px 8px rgba(13,110,253,.12);transition:transform .3s ease">${ic(SI[k]||"chart",22)}</span>${t}</h2><p class="mu">${DS[k]||""}</p></div>`};
 const listaP=q=>tbl(["","Código","Paciente","Edad","Seguro","Diagnóstico","Atención","Autorización",""],DB.P.filter(p=>(p.n+(p.c||"")+(p.s||"")+(p.cd||"")).toLowerCase().includes(q.toLowerCase())&&(!S.pe.a||p.ea==S.pe.a)&&(!S.pe.u||effAu(p)==S.pe.u)).map(p=>[`<input type="checkbox" data-psel="${p.id}" ${S.psel.has(p.id)?"checked":""} aria-label="Seleccionar ${esc(p.n)}">`,`<span class="code">${esc(p.cd||"—")}</span>`,`<span class="pcell">${avSexo(p.sx,"xs")}${pl(p.id)}${S.ap==p.id?' <span class="b in">Activo</span>':""}</span>`,p.e,esc(p.s),esc(p.dx||"—"),chip(EA,p.ea),chip(EU,effAu(p)),`<button class="btn${S.ap==p.id?"":" p"}" data-a="ac:${p.id}">${S.ap==p.id?"Activo":"Activar"}</button> <button class="btn" data-r="p-${p.id}">${ic("folder",14)} Abrir expediente</button> <button class="btn d" data-a="delp:${p.id}" title="Eliminar paciente" aria-label="Eliminar paciente">${ic("trash",14)}</button>`]));
 const vPac=()=>`<div class="row">${sec("Pacientes")}<button class="btn p" data-a="np">${ic("plus",16)} Nuevo paciente</button><button class="btn d" data-a="delpsel">${ic("trash",14)} Eliminar seleccionados</button></div><div class="fg"><div><label class="mu" for="ps">Buscar</label><input id="ps" placeholder="Nombre, cédula o seguro"></div><div><label class="mu" for="pe1">Estado de atención</label><select id="pe1" data-pe="a"><option value="">Todos</option>${Object.keys(EA).map(s=>`<option${s==S.pe.a?" selected":""}>${s}</option>`).join("")}</select></div><div><label class="mu" for="pe2">Autorización</label><select id="pe2" data-pe="u"><option value="">Todas</option>${Object.keys(EU).map(s=>`<option${s==S.pe.u?" selected":""}>${s}</option>`).join("")}</select></div></div><div id="pl">${listaP("")}</div>`;
 const vRehab=()=>sec("Rehabilitación")+`<p class="tb"><button class="btn p" data-a="fs">${ic("plus",16)} Nueva sesión</button> <button class="btn" data-a="fp">${ic("plus",16)} Nuevo PROM</button></p>`+card("Sesiones de fisioterapia",tbl(["Fecha","Paciente","Sesión","Dolor"],fa(DB.F).map(x=>[x.f,pl(x.p),esc(x.t),x.d+"/10"])))+"<br>"+card("Cuestionarios de resultados reportados por el paciente (PROMs)",tbl(["Fecha","Paciente","Cuestionario","Resultado",""],DB.M.map((x,i)=>[x,i]).filter(([x])=>!S.ap||!S.only||x.p==S.ap).sort((a,b)=>b[0].f.localeCompare(a[0].f)).map(([x,i])=>[x.f,pl(x.p),esc(x.t),`<span class="b ${x.s<50?"er":"ok"}">${x.s}%</span>`,`<button class="btn" data-a="fp:${i}">${ic("edit",14)} Editar</button> <button class="btn d" data-a="dprom:${i}">${ic("trash",14)} Eliminar</button>`])));
