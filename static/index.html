@@ -25,9 +25,12 @@ a{color:var(--pri)}h2{font-size:24px;margin:8px 0}h3{font-size:18px;margin:0 0 8
 .side::-webkit-scrollbar{display:none;width:0;height:0}
 .side h1{font-size:18px;margin:4px 10px 12px;color:var(--pri)}
 .nav{display:flex;align-items:center;gap:12px;min-height:46px;padding:9px 14px;margin:2px 0;border-radius:var(--radius-sm);color:var(--tx);text-decoration:none;font-size:14.5px;font-weight:500;transition:background var(--transition-fast),color var(--transition-fast),transform var(--transition-fast),box-shadow var(--transition-fast)}
-.nav:hover{background:var(--pri2);transform:translateX(2px)}
+.nav:hover{background:var(--pri2);transform:translateX(4px);padding-left:18px;box-shadow:0 2px 8px rgba(13,110,253,.06)}
 .nav.on{background:var(--pri2);color:var(--pri);font-weight:600;box-shadow:inset 3px 0 var(--pri);transform:none}
 .nav .ic{opacity:.75;transition:opacity var(--transition-base),transform var(--transition-base),filter var(--transition-base);width:22px;height:22px;stroke-width:1.8}
+.nav-ic{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;background:transparent;transition:background var(--transition-base),transform var(--transition-base)}
+.nav:hover .nav-ic{background:color-mix(in srgb,var(--pri) 12%,transparent);transform:scale(1.08)}
+.nav.on .nav-ic{background:color-mix(in srgb,var(--pri) 15%,transparent)}
 .nav:hover .ic{opacity:1;transform:translateX(2px) scale(1.15);filter:drop-shadow(0 2px 6px rgba(13,110,253,.25))}
 .nav.on .ic{opacity:1;transform:scale(1.04)}
 .sub{margin-left:16px}.sp{flex:1}
@@ -784,7 +787,7 @@ try{const r=await api("/api/cambiar-clave",{method:"POST",body:{actual:S.tmp,nue
 catch(e){$("#fpb").disabled=false;er(e.message)}};$("#fp1").focus()}
 
 function menu(a){let h=`<h1 class="lb"><span class="lg2">${ic("shield",18)}</span> OrtoSistema</h1>`;
-const nv=(k,i,l,s="")=>`<a class="nav${s}${a==k||(k=="pacientes"&&(a=="p"||a=="nuevo"||a=="evaluacion"))?" on":""}" href="#" data-r="${k}" title="${esc(DS[k]||"")}">${ic(i,20)} ${l}</a>`;
+const nv=(k,i,l,s="")=>`<a class="nav${s}${a==k||(k=="pacientes"&&(a=="p"||a=="nuevo"||a=="evaluacion"))?" on":""}" href="#" data-r="${k}" title="${esc(DS[k]||"")}"><span class="nav-ic">${ic(i,20)}</span> ${l}</a>`;
 let gl=false;M.forEach(([k,i,l])=>{if(can(k)){if(!gl&&!["inicio","agenda","pacientes"].includes(k)){gl=true;h+='<div class="gl">Atención clínica</div>'}h+=nv(k,i,l)}});
 const ad=AD.filter(x=>can(x[0]));
 if(ad.length){h+='<div class="gl">Gestión</div>';const n=pend(),op=S.open||ad.some(x=>x[0]==a);
