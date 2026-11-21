@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--pri:#0B61A8;--onp:#fff;--pri2:#E7F1FB;--acc:#0B8C7C;--sec:#4F6474;--bg:#EDF2F8;--sf:#fff;--tx:#0E1D29;--bd:#D5E0EB;--ok:#137A3F;--wa:#9A5600;--er:#B3261E;--hm:#2A6DAE;--hmb:#E4EFFA;--hf:#A33C72;--hfb:#FBE7F1;--hn:#67798A;--hnb:#EBF1F7;--sh:0 1px 2px rgba(11,50,90,.07),0 6px 18px rgba(11,50,90,.06);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--pri:#0D6EFD;--onp:#fff;--pri2:#E8F0FE;--acc:#00B894;--sec:#5A6B7C;--bg:#F0F4F8;--sf:#FFFFFF;--tx:#1A2332;--bd:#D8E2EC;--ok:#198754;--wa:#D68910;--er:#DC3545;--hm:#3B7DD8;--hmb:#EAF1FA;--hf:#C2185B;--hfb:#FCE4EC;--hn:#6C757D;--hnb:#F1F3F5;--sh:0 1px 3px rgba(10,40,80,.06),0 4px 12px rgba(10,40,80,.05),0 12px 32px rgba(10,40,80,.04);--sh-hover:0 4px 12px rgba(10,40,80,.1),0 12px 32px rgba(10,40,80,.08);--radius:12px;--radius-sm:8px;--radius-xs:6px;--transition-fast:.15s ease;--transition-base:.25s cubic-bezier(.4,0,.2,1);--transition-slow:.4s cubic-bezier(.16,.84,.28,1);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--pri:#6FB3F2;--onp:#07131F;--pri2:#12314C;--acc:#31C3AE;--sec:#9DB1C4;--bg:#0A131C;--sf:#111D27;--tx:#E9F1F8;--bd:#213243;--ok:#5CC98A;--wa:#F0A63C;--er:#F08C83;--hm:#85BCEF;--hmb:#13283C;--hf:#E895C1;--hfb:#331B29;--hn:#9DB1C4;--hnb:#182634;--sh:none}}
 :root[data-theme="dark"]{--pri:#6FB3F2;--onp:#07131F;--pri2:#12314C;--acc:#31C3AE;--sec:#9DB1C4;--bg:#0A131C;--sf:#111D27;--tx:#E9F1F8;--bd:#213243;--ok:#5CC98A;--wa:#F0A63C;--er:#F08C83;--hm:#85BCEF;--hmb:#13283C;--hf:#E895C1;--hfb:#331B29;--hn:#9DB1C4;--hnb:#182634;--sh:none}
 *,*::before,*::after{box-sizing:inherit}
@@ -21,19 +21,19 @@ body{font:15px/1.5 Inter,Roboto,system-ui,sans-serif;background:var(--bg);color:
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--sf);z-index:10}
 a{color:var(--pri)}h2{font-size:24px;margin:8px 0}h3{font-size:18px;margin:0 0 8px}
 .app{display:flex;height:100%}
-.side{width:236px;flex:none;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:12px 8px;overflow:auto;scrollbar-width:none;-ms-overflow-style:none}
+.side{width:252px;flex:none;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:14px 10px;overflow:auto;scrollbar-width:none;-ms-overflow-style:none;box-shadow:2px 0 8px rgba(10,40,80,.03)}
 .side::-webkit-scrollbar{display:none;width:0;height:0}
 .side h1{font-size:18px;margin:4px 10px 12px;color:var(--pri)}
-.nav{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 12px;margin:1px 0;border-radius:8px;color:var(--tx);text-decoration:none;font-size:15px;transition:background .18s ease,color .18s ease,box-shadow .18s ease}
-.nav:hover{background:var(--bg)}
-.nav.on{background:var(--pri2);color:var(--pri);font-weight:600;box-shadow:inset 3px 0 var(--pri)}
+.nav{display:flex;align-items:center;gap:12px;min-height:46px;padding:9px 14px;margin:2px 0;border-radius:var(--radius-sm);color:var(--tx);text-decoration:none;font-size:14.5px;font-weight:500;transition:background var(--transition-fast),color var(--transition-fast),transform var(--transition-fast),box-shadow var(--transition-fast)}
+.nav:hover{background:var(--pri2);transform:translateX(2px)}
+.nav.on{background:var(--pri2);color:var(--pri);font-weight:600;box-shadow:inset 3px 0 var(--pri);transform:none}
 .nav .ic{opacity:.72;transition:opacity .18s ease,transform .22s cubic-bezier(.2,.7,.3,1)}
 .nav:hover .ic{opacity:1;transform:translateY(-.5px) scale(1.06)}
 .nav.on .ic{opacity:1;transform:scale(1.04)}
 .sub{margin-left:16px}.sp{flex:1}
-.bd{margin-left:auto;background:var(--er);color:#fff;border-radius:10px;font-size:11px;padding:1px 7px}
+.bd{margin-left:auto;background:var(--er);color:#fff;border-radius:10px;font-size:11px;padding:2px 8px;font-weight:600;min-width:20px;text-align:center;box-shadow:0 2px 6px rgba(220,53,69,.25)}
 .main{flex:1;min-width:0;overflow:auto;scroll-behavior:smooth}
-.top{position:sticky;top:0;z-index:5;display:flex;gap:8px;align-items:center;padding:8px 16px;background:var(--sf);border-bottom:1px solid var(--bd)}
+.top{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;padding:10px 20px;background:color-mix(in srgb,var(--sf) 85%,transparent);border-bottom:1px solid var(--bd);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .pg{padding:16px 24px 48px;max-width:1200px}
 /* Transición al cambiar de sección/submenú (1 s en total): la página entra y su contenido se escalona. */
 @keyframes secIn{0%{opacity:0;transform:translate3d(0,26px,0) scale(.982)}42%{opacity:1}100%{opacity:1;transform:none}}
@@ -53,20 +53,20 @@ a{color:var(--pri)}h2{font-size:24px;margin:8px 0}h3{font-size:18px;margin:0 0 8
 .pg.entra>:nth-child(6),.pg.entra-der>:nth-child(6),.pg.entra-izq>:nth-child(6){animation-delay:.25s}
 .pg.entra>:nth-child(n+7),.pg.entra-der>:nth-child(n+7),.pg.entra-izq>:nth-child(n+7){animation-delay:.28s}
 .mb{display:none}
-input,select,textarea{width:100%;min-height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+input,select,textarea{width:100%;min-height:42px;padding:9px 12px;border:1px solid var(--bd);border-radius:var(--radius-sm);background:var(--sf);color:var(--tx);font:inherit;transition:border-color var(--transition-fast),box-shadow var(--transition-fast),background var(--transition-fast)}
 .top input{max-width:420px;flex:1}
-.btn{min-height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;cursor:pointer}
-.btn.p{background:var(--pri);border-color:var(--pri);color:var(--onp)}
-:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
-.card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;box-shadow:var(--sh);padding:16px}
-.grid{display:grid;gap:16px;margin:16px 0;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.btn{min-height:40px;padding:0 16px;border-radius:var(--radius-sm);border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;font-weight:500;cursor:pointer;transition:background var(--transition-fast),border-color var(--transition-fast),transform var(--transition-fast),box-shadow var(--transition-fast)}
+.btn.p{background:var(--pri);border-color:var(--pri);color:var(--onp);box-shadow:0 2px 8px rgba(13,110,253,.25)}
+:focus-visible{outline:2px solid var(--pri);outline-offset:2px}input:focus,select:focus,textarea:focus{border-color:var(--pri);box-shadow:0 0 0 3px color-mix(in srgb,var(--pri) 15%,transparent);background:var(--sf)}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--radius);box-shadow:var(--sh);padding:20px 22px;transition:box-shadow var(--transition-base),transform var(--transition-base)}
+.grid{display:grid;gap:18px;margin:18px 0;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
 .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 .k{display:block;text-decoration:none;color:var(--tx)}.k b{display:block;font-size:28px;color:var(--pri)}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .mu{color:var(--sec);font-size:13px}
 .tw{overflow-x:auto}table{width:100%;border-collapse:collapse}
-th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--bd);font-size:14px}th{color:var(--sec);font-weight:600}
-.b{border:1px solid currentColor;border-radius:10px;padding:1px 8px;font-size:12px;white-space:nowrap}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--bd);font-size:14px}th{color:var(--sec);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;background:var(--bg)}td{transition:background .15s ease}
+.b{border:0;border-radius:6px;padding:3px 9px;font-size:11.5px;white-space:nowrap;font-weight:600;letter-spacing:.2px}
 .b.ok,.dot.ok{color:var(--ok)}.b.wa,.dot.wa{color:var(--wa)}.b.er,.dot.er{color:var(--er)}.b.in,.dot.in{color:var(--pri)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;background:currentColor}
 ul.l{list-style:none;margin:0;padding:0}ul.l li{padding:6px 0;border-bottom:1px solid var(--bd)}
@@ -75,15 +75,15 @@ ul.l{list-style:none;margin:0;padding:0}ul.l li{padding:6px 0;border-bottom:1px 
 .tabs button{border:0;border-bottom:3px solid transparent;background:none;min-height:44px;padding:0 14px;color:var(--sec);font:inherit;cursor:pointer;white-space:nowrap}
 .tabs .on{color:var(--pri);border-color:var(--pri);font-weight:600}
 .kb{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.kb .card{margin-bottom:8px}
-.ov{position:fixed;inset:0;z-index:9999;display:flex;justify-content:center;align-items:flex-start;padding:10vh 12px;background:rgba(0,0,0,.45)}
+.ov{position:fixed;inset:0;z-index:9999;display:flex;justify-content:center;align-items:flex-start;padding:10vh 12px;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);animation:overlayIn .2s ease}@keyframes overlayIn{from{opacity:0}to{opacity:1}}@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .ov.r{justify-content:flex-end;padding:0}.ov.r .md{border-radius:0;width:min(360px,100%);max-height:none}
-.md{width:min(480px,100%);max-height:80%;overflow:auto;background:var(--sf);border-radius:8px;padding:16px}
+.md{width:min(520px,100%);max-height:85%;overflow:auto;background:var(--sf);border-radius:var(--radius);padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:modalIn .25s cubic-bezier(.16,.84,.28,1)}
 .md label{display:block;margin:8px 0;font-size:13px;color:var(--sec)}
 .pre{white-space:pre-wrap}.al2{color:var(--er);margin:4px 0}
-.ts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--tx);color:var(--bg);padding:8px 16px;border-radius:8px}
+.ts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--tx);color:var(--bg);padding:10px 20px;border-radius:var(--radius-sm);box-shadow:0 8px 24px rgba(0,0,0,.2);font-weight:500;animation:toastIn .3s cubic-bezier(.16,.84,.28,1)}@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @media(max-width:800px){.side{position:fixed;z-index:15;height:100%;transform:translateX(-100%);transition:transform .2s;padding-top:calc(12px + env(safe-area-inset-top,0px))}.side.open{transform:none}.mb{display:inline-flex;align-items:center}.pg{padding:12px}}
 @media(prefers-reduced-motion:reduce){.side{transition:none}html,.main{scroll-behavior:auto}.pg.entra,.pg.entra-der,.pg.entra-izq,.pg.entra>*,.pg.entra-der>*,.pg.entra-izq>*{animation:none}}
-.ic{flex:none;vertical-align:-3px}
+.ic{flex:none;vertical-align:-3px;transition:transform .2s ease,opacity .2s ease}
 .lb{display:flex;align-items:center;gap:10px;color:var(--pri)}
 .lg{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .45s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -91,16 +91,16 @@ ul.l{list-style:none;margin:0;padding:0}ul.l li{padding:6px 0;border-bottom:1px 
 .er2{color:var(--er);min-height:20px;margin:6px 0}
 .mx td,.mx th{text-align:center}.mx td:first-child,.mx th:first-child{text-align:left}
 .mx input{width:20px;min-height:20px}
-th{background:var(--bg);white-space:nowrap}
+th{background:var(--bg);white-space:nowrap;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
 tr:hover td{background:var(--pri2)}
 td .btn{min-height:32px;padding:0 10px;font-size:13px}
-.btn:hover{background:var(--pri2)}.btn.p:hover{background:var(--pri);filter:brightness(1.1)}
+.btn:hover{background:var(--pri2);transform:translateY(-1px)}.btn.p:hover{background:var(--pri);filter:brightness(1.08);transform:translateY(-1px)}.btn:active{transform:translateY(0)}
 .pn{border:0;background:none;padding:4px 8px;margin:-4px -8px;border-radius:6px;font:inherit;font-weight:600;color:var(--tx);cursor:pointer;text-align:left}
 .pn:hover{background:var(--pri2);color:var(--pri)}
 .bc{border:0;background:none;padding:2px 6px;border-radius:6px;font:inherit;font-size:13px;color:var(--sec);cursor:pointer}
 .bc:hover{background:var(--pri2);color:var(--pri)}
-.sh{margin:8px 0 16px}.sh h2{margin:0 0 4px}.sh p{margin:0;max-width:72ch}
-.card h3{font-size:16px}.td{margin:0 0 12px}
+.sh{margin:8px 0 20px}.sh h2{margin:0 0 4px;font-size:26px;font-weight:700;letter-spacing:-.02em}.sh p{margin:0;max-width:72ch;color:var(--sec)}
+.card h3{font-size:16px;font-weight:600;letter-spacing:-.01em;margin:0 0 10px}.td{margin:0 0 12px}
 .ov.w{padding:4vh 12px}.ov.w .md{width:min(920px,100%);max-height:92%}
 .pie{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.pie .tw{flex:1;min-width:200px}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px}
@@ -189,7 +189,7 @@ tr:hover td{background:var(--pri2)}
 .b{display:inline-flex;align-items:center;gap:4px}.b svg{flex:none}
 .hi{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:10px;background:var(--pri2);color:var(--pri);margin-right:10px;vertical-align:middle}
 .ki{float:right;color:var(--pri);opacity:.85}
-.gl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--sec);padding:14px 12px 4px}
+.gl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sec);padding:16px 14px 6px;opacity:.7}
 .em{display:grid;justify-items:center;gap:6px;padding:24px;color:var(--sec);text-align:center}.em p{margin:0}
 .btn{white-space:nowrap}.btn:disabled{opacity:.55;cursor:not-allowed}.btn:active{transform:translateY(1px)}
 .btn.d{color:var(--er);border-color:color-mix(in srgb,var(--er) 40%,var(--bd))}.btn.d:hover{background:color-mix(in srgb,var(--er) 10%,transparent)}
@@ -200,7 +200,7 @@ tr:hover td{background:var(--pri2)}
 .sg input:checked+span{background:var(--pri);border-color:var(--pri);color:var(--onp)}.sg input:focus-visible+span{outline:2px solid var(--pri);outline-offset:2px}
 .rg{display:flex;align-items:center;gap:10px}.rg input{padding:0;min-height:0}.rg output{min-width:42px;text-align:center;font-weight:600;color:var(--pri)}
 .nm{display:grid;gap:8px}.nm .btn{justify-content:flex-start;width:100%}
-.av{width:30px;height:30px;border-radius:50%;background:var(--pri2);color:var(--pri);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+.av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700;flex:none;box-shadow:0 2px 6px rgba(13,110,253,.25)}
 .tdt{margin-left:auto;white-space:nowrap}
 .card.k{transition:transform .15s,box-shadow .15s}.card.k:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(15,40,70,.12)}
 @media(max-width:800px){.tdt{display:none}}
@@ -842,7 +842,7 @@ ${card("Cirugías próximas",tbl(["Fecha","Paciente","Procedimiento","Estado"],C
 const DS={inicio:"Resumen de tu jornada: indicadores, agenda y alertas que requieren atención.",agenda:"Citas del día y cirugías programadas, en un solo lugar.",pacientes:"Directorio de pacientes con los estados de atención y autorización. Abre un expediente para ver su historia clínica completa.",quirofano:"Cirugías programadas y realizadas, con los implantes utilizados en cada una.",estudios:"Sube radiografías, ecografías y otros estudios, y ábrelos en el visor con zoom, giro y contraste.",rehab:"Sesiones de fisioterapia, nivel de dolor y cuestionarios de resultados (PROMs).",referimientos:"Pacientes enviados a otros especialistas y recibidos de ellos, con su estado.",autorizaciones:"Preautorizaciones de las aseguradoras: qué falta solicitar, qué está en trámite y qué ya fue aprobado.",facturacion:"Cargos por servicios con el médico responsable, y el catálogo de procedimientos con sus precios aprobados.",admin:"Crea usuarios y define qué secciones puede usar cada rol.",nuevo:"Registro completo de un paciente nuevo: datos personales, seguro, información clínica y antecedentes.",procedimientos:"Elige procedimientos del catálogo y asígnalos al paciente. Puedes generar el cargo de facturación al mismo tiempo.",documentos:"Consentimientos, informes, recetas y otros archivos del paciente. Súbelos, descárgalos o elimínalos.",ortesis:"Elige órtesis (férulas, rodilleras, collarines, fajas y más), define lado y talla, y asígnalas al paciente activo.",evaluacion:"Formulario clínico estructurado: elige opciones, marca hallazgos y guarda la evaluación en el expediente.",ayuda:"Manual de usuario y ayuda del sistema."};
 const TD={resumen:"Datos clave, antecedentes y todo lo ocurrido con el paciente, de lo más reciente a lo más antiguo.",clinica:"Evaluaciones médicas y estudios de imagen.",procedimientos:"Cirugías del paciente y los implantes utilizados.",rehab:"Sesiones de fisioterapia y cuestionarios de resultados (PROMs).",gestion:"Referimientos, preautorizaciones y cargos de este paciente.",documentos:"Archivos y documentos del paciente.",ortesis:"Órtesis indicadas al paciente, con lado, talla e indicaciones de uso."};
 const SI={agenda:"cal",pacientes:"users",procedimientos:"clip",ortesis:"ort",quirofano:"act",estudios:"img",documentos:"doc",rehab:"ref",referimientos:"swap",autorizaciones:"ok",facturacion:"usd",admin:"cog",nuevo:"plus",evaluacion:"act",ayuda:"question"},KI={agenda:"cal",quirofano:"act",estudios:"img",rehab:"ref",autorizaciones:"ok",facturacion:"usd",pacientes:"users",referimientos:"swap"};
-const sec=t=>{const k=S.route.split("-")[0];return`<div class="sh"><h2><span class="hi">${ic(SI[k]||"chart",22)}</span>${t}</h2><p class="mu">${DS[k]||""}</p></div>`};
+const sec=t=>{const k=S.route.split("-")[0];return`<div class="sh"><h2><span class="hi" style="display:inline-grid;place-items:center;width:38px;height:38px;border-radius:10px;background:var(--pri2);color:var(--pri);margin-right:10px;vertical-align:middle">${ic(SI[k]||"chart",20)}</span>${t}</h2><p class="mu">${DS[k]||""}</p></div>`};
 const listaP=q=>tbl(["","Código","Paciente","Edad","Seguro","Diagnóstico","Atención","Autorización",""],DB.P.filter(p=>(p.n+(p.c||"")+(p.s||"")+(p.cd||"")).toLowerCase().includes(q.toLowerCase())&&(!S.pe.a||p.ea==S.pe.a)&&(!S.pe.u||effAu(p)==S.pe.u)).map(p=>[`<input type="checkbox" data-psel="${p.id}" ${S.psel.has(p.id)?"checked":""} aria-label="Seleccionar ${esc(p.n)}">`,`<span class="code">${esc(p.cd||"—")}</span>`,`<span class="pcell">${avSexo(p.sx,"xs")}${pl(p.id)}${S.ap==p.id?' <span class="b in">Activo</span>':""}</span>`,p.e,esc(p.s),esc(p.dx||"—"),chip(EA,p.ea),chip(EU,effAu(p)),`<button class="btn${S.ap==p.id?"":" p"}" data-a="ac:${p.id}">${S.ap==p.id?"Activo":"Activar"}</button> <button class="btn" data-r="p-${p.id}">${ic("folder",14)} Abrir expediente</button> <button class="btn d" data-a="delp:${p.id}" title="Eliminar paciente" aria-label="Eliminar paciente">${ic("trash",14)}</button>`]));
 const vPac=()=>`<div class="row">${sec("Pacientes")}<button class="btn p" data-a="np">${ic("plus",16)} Nuevo paciente</button><button class="btn d" data-a="delpsel">${ic("trash",14)} Eliminar seleccionados</button></div><div class="fg"><div><label class="mu" for="ps">Buscar</label><input id="ps" placeholder="Nombre, cédula o seguro"></div><div><label class="mu" for="pe1">Estado de atención</label><select id="pe1" data-pe="a"><option value="">Todos</option>${Object.keys(EA).map(s=>`<option${s==S.pe.a?" selected":""}>${s}</option>`).join("")}</select></div><div><label class="mu" for="pe2">Autorización</label><select id="pe2" data-pe="u"><option value="">Todas</option>${Object.keys(EU).map(s=>`<option${s==S.pe.u?" selected":""}>${s}</option>`).join("")}</select></div></div><div id="pl">${listaP("")}</div>`;
 const vRehab=()=>sec("Rehabilitación")+`<p class="tb"><button class="btn p" data-a="fs">${ic("plus",16)} Nueva sesión</button> <button class="btn" data-a="fp">${ic("plus",16)} Nuevo PROM</button></p>`+card("Sesiones de fisioterapia",tbl(["Fecha","Paciente","Sesión","Dolor"],fa(DB.F).map(x=>[x.f,pl(x.p),esc(x.t),x.d+"/10"])))+"<br>"+card("Cuestionarios de resultados reportados por el paciente (PROMs)",tbl(["Fecha","Paciente","Cuestionario","Resultado",""],DB.M.map((x,i)=>[x,i]).filter(([x])=>!S.ap||!S.only||x.p==S.ap).sort((a,b)=>b[0].f.localeCompare(a[0].f)).map(([x,i])=>[x.f,pl(x.p),esc(x.t),`<span class="b ${x.s<50?"er":"ok"}">${x.s}%</span>`,`<button class="btn" data-a="fp:${i}">${ic("edit",14)} Editar</button> <button class="btn d" data-a="dprom:${i}">${ic("trash",14)} Eliminar</button>`])));
@@ -1094,7 +1094,7 @@ function recPrint(id){
     return blk;
   };
   const renderText=blk=>blk.map(b=>b.s?("\n"+b.s):b.p?b.p:b.l?b.l.map(x=>"  - "+x).join("\n"):"").join("\n").replace(/\n{3,}/g,"\n\n").trim();
-  const renderHtml=blk=>"<!doctype html><html lang='es'><head><meta charset='utf-8'><title>Expediente - "+esc(p.n)+"</title><style>*{box-sizing:border-box}body{font-family:'Segoe UI',system-ui,Arial,sans-serif;margin:0;padding:32px;color:#1a2a3a;font-size:14px;line-height:1.5}@page{margin:18mm}@media print{body{padding:0}}.hdr{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #0f6cbd;padding-bottom:10px;margin-bottom:16px}.hdr h1{margin:0;font-size:22px;color:#0f6cbd}.hdr .sub{font-size:12px;color:#586a7c;margin-top:2px}.hdr .meta{text-align:right;font-size:12px;color:#586a7c}.sec{font-size:13px;font-weight:700;color:#0f6cbd;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px;padding-bottom:4px;border-bottom:1px solid #dce4ec}.p{margin:3px 0}.mu{color:#586a7c;font-size:12px}ul{margin:4px 0 8px;padding-left:18px}li{margin:3px 0}.foot{margin-top:24px;padding-top:8px;border-top:1px solid #e6edf5;font-size:11px;color:#9aa8b8;text-align:center}@media print{h2{page-break-after:avoid}}</style></head><body><div class='hdr'><div><h1>EXPEDIENTE CLÍNICO</h1><div class='sub'>OrtoSistema · Ortopedia y Traumatología</div></div><div class='meta'><div><b>Paciente:</b> "+esc(p.n)+"</div><div><b>Código:</b> "+esc(p.cd||"—")+"</div></div></div>"+blk.map(b=>b.s?"<div class='sec'>"+esc(b.s)+"</div>":b.p?"<p class='p'>"+esc(b.p)+"</p>":b.l?"<ul>"+b.l.map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>":"").join("")+"<div class='foot'>Documento generado por OrtoSistema · "+new Date().toLocaleDateString("es-DO",{day:"2-digit",month:"long",year:"numeric"})+"</div></body></html>";
+  const renderHtml=blk=>"<!doctype html><html lang='es'><head><meta charset='utf-8'><title>Expediente - "+esc(p.n)+"</title><style>*{box-sizing:border-box}body{font-family:'Segoe UI',system-ui,Arial,sans-serif;margin:0;padding:28px;color:#1a2a3a;font-size:13.5px;line-height:1.55}@page{margin:16mm}@media print{body{padding:0}}.hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #0d6efd;padding-bottom:12px;margin-bottom:18px;gap:16px}.hdr-left h1{margin:0;font-size:20px;color:#0d6efd;font-weight:700;letter-spacing:-.02em}.hdr-left .sub{font-size:11.5px;color:#586a7c;margin-top:3px;font-weight:500}.hdr-right{text-align:right;font-size:11.5px;color:#586a7c;line-height:1.6}.hdr-right b{color:#1a2a3a}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;margin-bottom:16px;padding:12px 16px;background:#f5f8fc;border-radius:8px;border:1px solid #e2eaf2}.info-grid .row{display:flex;gap:6px;font-size:12.5px}.info-grid .lbl{color:#586a7c;font-weight:600;min-width:90px}.info-grid .val{color:#1a2a3a}.sec{font-size:12.5px;font-weight:700;color:#0d6efd;text-transform:uppercase;letter-spacing:.08em;margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid #e2eaf2;display:flex;align-items:center;gap:8px}.sec::before{content:'';width:4px;height:14px;background:#0d6efd;border-radius:2px}.p{margin:4px 0;font-size:13.5px}.mu{color:#586a7c;font-size:12px}ul{margin:4px 0 8px;padding-left:20px}li{margin:3px 0;font-size:13px}.foot{margin-top:28px;padding-top:10px;border-top:1px solid #e6edf5;font-size:10.5px;color:#9aa8b8;text-align:center}@media print{h2{page-break-after:avoid}.sec{page-break-after:avoid}table{page-break-inside:avoid}}</style></head><body><div class='hdr'><div class='hdr-left'><h1>EXPEDIENTE CLÍNICO</h1><div class='sub'>OrtoSistema · Ortopedia y Traumatología</div></div><div class='hdr-right'><div><b>Paciente:</b> "+esc(p.n)+"</div><div><b>Código:</b> "+esc(p.cd||"—")+"</div><div><b>Fecha:</b> "+new Date().toLocaleDateString("es-DO",{day:"2-digit",month:"long",year:"numeric"})+"</div></div></div>"+blk.map(b=>b.s?"<div class='sec'>"+esc(b.s)+"</div>":b.p?"<p class='p'>"+esc(b.p)+"</p>":b.l?"<ul>"+b.l.map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>":"").join("")+"<div class='foot'>Documento generado por OrtoSistema · "+new Date().toLocaleDateString("es-DO",{day:"2-digit",month:"long",year:"numeric"})+"</div></body></html>";
   const prep=()=>{const blk=blocks();if(!blk.length){o.querySelector("#rc_er").textContent="Marca al menos una sección.";return null}o.querySelector("#rc_er").textContent="";return blk};
   o.querySelector("#rc_view").onclick=()=>{const blk=prep();if(!blk)return;const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para ver");return}w.document.write(renderHtml(blk));w.document.close();w.focus()};
   o.querySelector("#rc_print").onclick=()=>{const blk=prep();if(!blk)return;const w=window.open("","_blank");if(!w){toast("Permite ventanas emergentes para imprimir");return}w.document.write(renderHtml(blk));w.document.close();w.focus();setTimeout(()=>{w.print()},250)};
