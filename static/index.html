@@ -702,12 +702,44 @@ if(!u||!p)return er("Escribe tu usuario y contraseña.");
 b.disabled=true;er("");
 try{await entrar(u,p)}catch(e){b.disabled=false;er(e.message)}};
 $("#lb2").onclick=go2;$("#lp").onkeydown=e=>{if(e.key=="Enter")go2()};$("#lu").focus()}
-function vAdmin(b){const tabs=[["admin","Usuarios","users"],["admin-funciones","Funciones por rol","shield"],["admin-seguridad","Seguridad y actividad","act"]];
+function vAdmin(b){const tabs=[["admin","Usuarios","users"],["admin-funciones","Funciones por rol","shield"],["admin-seguridad","Seguridad y actividad","act"],["admin-whatsapp","WhatsApp","wa"]];
 const T=`<div class="tabs">${tabs.map(([r,l,i])=>`<button class="${(b||"admin")==r?"on":""}" data-r="${r}">${ic(i,14)} ${l}</button>`).join("")}</div>`,R3=["medico","enfermeria","secretaria","fisio","facturacion"];
 if(b=="funciones")return sec("Administración")+T+card("Accesos por rol",`<p class="mu">Marca las secciones que usa cada rol. <b>Inicio</b> siempre está activo y el administrador ve todo. Los cambios se aplican de inmediato al menú y a la API.</p><div class="tw"><table class="mx"><tr><th>Sección</th>${R3.map(r=>`<th>${RL[r]}</th>`).join("")}</tr>${MOD.map(([k,l])=>`<tr><td>${l}</td>${R3.map(r=>`<td><input type="checkbox" data-pm="${r}:${k}" ${(DB.PM[r]||[]).includes(k)?"checked":""} aria-label="${l} para ${RL[r]}"></td>`).join("")}</tr>`).join("")}</table></div><div class="tb" style="margin-top:12px"><button class="btn" data-a="restaurar" title="Volver a los accesos recomendados">${ic("reset",16)} Restaurar recomendados</button></div>`)+"<br>"+card("Qué incluye cada perfil",`<div class="fg">${R3.map(r=>`<div><b style="display:flex;align-items:center;gap:6px">${ic("shieldcheck",15)} ${RL[r]}</b><p class="mu" style="margin:4px 0">${esc((DB.RDESC&&DB.RDESC[r])||RD[r])}</p></div>`).join("")}</div>`);
 if(b=="seguridad"){const a=S.adm||{},u=a.datos||{},ev=a.ultimos||[];
 return sec("Administración")+T+`<div class="grid">${[["Cuentas activas",a.activos||0,"users","ok"],["Sin preguntas de seguridad",a.sin_preguntas||0,"shieldx","wa"],["Deben cambiar contraseña",a.deben_cambiar||0,"key","in"],["Recuperaciones (7 días)",a.recuperaciones_7d||0,"hist","pri"]].map(([l,n,i,c])=>`<div class="card k"><span class="ki">${ic(i,26)}</span><div class="mu">${l}</div><b>${n}</b></div>`).join("")}</div>`+`<br>`+card("Actividad reciente",tbl(["Fecha","Usuario","Acción","Tabla","Registro"],ev.map(e=>[fmtFecha(e.fecha),esc(e.usuario),esc(e.accion),esc(e.tabla||"—"),e.registro_id??"—"])))+`<br>`+card("Buenas prácticas",`<ul class="mu" style="margin:0;padding-left:18px;line-height:1.8"><li>Cada persona debe tener su propia cuenta: así la auditoría es confiable.</li><li>Pide a cada usuario configurar sus 3 preguntas de seguridad desde <b>Mi perfil</b>.</li><li>Desactiva de inmediato las cuentas de personal que ya no labora.</li><li>El sistema nunca guarda respuestas ni contraseñas en texto plano: solo hashes bcrypt.</li></ul><div class="tb" style="margin-top:10px"><button class="btn" data-a="adminsec">${ic("reset",16)} Actualizar resumen</button></div>`)}
 const a=S.adm||{},d=a.datos||{};
+if(b=="whatsapp"){
+  // Load config
+  api("/api/whatsapp-config").then(cfg=>{
+    const box=document.getElementById("wa_cfg_box");
+    if(!box)return;
+    box.innerHTML=`
+      <div class="fg">
+        <div><label class="mu">Phone Number ID (Meta)</label><input id="wa_pnid" value="${esc(cfg.phone_number_id||"")}" placeholder="123456789012345"></div>
+        <div><label class="mu">Access Token (Meta)</label><input id="wa_token" type="password" placeholder="EAAxxxxxxx..." value=""></div>
+        <div><label class="mu">Nombre de plantilla</label><input id="wa_tmpl" value="${esc(cfg.template_name||"recordatorio_cita")}" placeholder="recordatorio_cita"></div>
+      </div>
+      <div class="tb" style="margin-top:8px">
+        <label class="ck"><input type="checkbox" id="wa_auto" ${cfg.auto_send?"checked":""}> Envío automático (sin abrir WhatsApp)</label>
+      </div>
+      <div class="er2" id="wa_er" role="alert"></div>
+      <div class="tb" style="margin-top:8px">
+        <button class="btn p" id="wa_save">Guardar configuración</button>
+        <span class="mu" style="margin-left:8px">${cfg.configured?'<span class="b ok">Configurado</span>':'<span class="b wa">No configurado (usa envío manual)</span>'}</span>
+      </div>
+      <br>
+      <div class="card"><h3>Instrucciones</h3>
+        <ul class="mu" style="line-height:1.8">
+          <li>Crea una cuenta en <b>Meta Business Suite</b> y verifica tu número de WhatsApp Business.</li>
+          <li>Obtén el <b>Phone Number ID</b> y un <b>Access Token</b> permanente desde el panel de Meta for Developers.</li>
+          <li>Crea una plantilla de mensaje aprobada llamada <b>recordatorio_cita</b> con parámetros: nombre, fecha, hora, médico.</li>
+          <li>Define las variables de entorno en Render: WA_PHONE_NUMBER_ID, WA_ACCESS_TOKEN, WA_TEMPLATE_NAME, WA_AUTO_SEND=true.</li>
+          <li>Si no configuras las credenciales, el sistema usa el envío manual (se abre WhatsApp con el mensaje listo).</li>
+        </ul>
+      </div>`;
+  }).catch(e=>{const box=document.getElementById("wa_cfg_box");if(box)box.innerHTML='<p class="mu">Error: '+esc(e.message)+'</p>'});
+  return sec("Administración")+T+`<div class="row"><h3 style="margin:0">${ic("wa",20)} Configuración de WhatsApp Business API</h3></div>`+`<div id="wa_cfg_box"><p class="mu">Cargando...</p></div>`;
+}
 return sec("Administración")+`<div class="row">${T}<button class="btn p" data-a="nu">${ic("userplus",16)} Nuevo usuario</button></div>`+`<div class="grid">${[["Usuarios activos",a.activos||0,"users"],["Pacientes",d.pacientes||0,"users"],["Estudios de imagen",d.estudios_imagenes||0,"scan"],["Pendientes de contraseña",a.deben_cambiar||0,"key"]].map(([l,n,i])=>`<div class="card k"><span class="ki">${ic(i,24)}</span><div class="mu">${l}</div><b>${n}</b></div>`).join("")}</div>`+`<br>`+card("Usuarios",tbl(["Usuario","Nombre","Rol","Seguridad","Último ingreso","Estado",""],DB.users.map((x,i)=>[esc(x.u),esc(x.nombre),`<span class="b in">${ic("shield",12)} ${RL[x.rol]||x.rol}</span>`,x.preguntas>=3?`<span class="b ok">${ic("shieldcheck",13)} Configurada</span>`:`<span class="b wa">${ic("shieldx",13)} Pendiente</span>`,fmtFecha(x.ultimo),bd(x.on?"Activo":"Inactivo")+(x.cp?' <span class="b wa">Cambiar clave</span>':""),`<div class="acts"><button class="icb" data-a="eu:${i}" data-tip="Editar perfil" aria-label="Editar ${esc(x.u)}">${ic("edit",17)}</button><button class="icb" data-a="rp:${i}" data-tip="Restablecer contraseña" aria-label="Restablecer contraseña de ${esc(x.u)}">${ic("key",17)}</button><button class="icb" data-a="rsec:${i}" data-tip="Borrar preguntas de seguridad" aria-label="Borrar preguntas de ${esc(x.u)}">${ic("shieldq",17)}</button><button class="icb" data-a="unlock:${i}" data-tip="Desbloquear intentos" aria-label="Desbloquear ${esc(x.u)}">${ic("unlock",17)}</button><button class="icb d" data-a="delu:${i}" data-tip="Eliminar cuenta" aria-label="Eliminar ${esc(x.u)}">${ic("trash",17)}</button></div>`])))}
 const fmtFecha=s=>{if(!s)return'<span class="mu">Nunca</span>';try{return new Date(s).toLocaleString("es-DO",{dateStyle:"short",timeStyle:"short"})}catch(e){return esc(s)}};
 function fUs(i){const nu=i==null,x=nu?{u:"",nombre:"",rol:"medico",on:true,correo:"",telefono:"",cargo:"",preguntas:0,modulos:null}:DB.users[i];
@@ -861,7 +893,7 @@ ${card("19. Atajos y tips",`<ul class="mu" style="line-height:1.8">
   <li>Botón "Actualizar datos": recarga todo desde la nube.</li>
   <li>Los datos se guardan en Neon (nube) y persisten entre sesiones.</li>
 </ul>`)}
-${card("20. Recordatorios por WhatsApp",`<p class="mu">En el teléfono del paciente se elige <b>Celular</b> o <b>Línea fija</b>. Si es celular, al agendar una cita el sistema programa un recordatorio. Dos días antes de la cita aparece en <b>Inicio → Recordatorios por WhatsApp</b>; el botón "Enviar recordatorio" abre WhatsApp con el mensaje ya escrito (fecha, hora y médico). Al enviarlo, la cita sale de la lista pendiente. Si se cambia la fecha u hora de la cita, el recordatorio vuelve a pendiente. El mensaje se envía con el nombre "Recordatorio de cita del hospital" e incluye los datos de la Dra. Heydy Rodriguez (+1 829-373-8765). El envío automático sin abrir WhatsApp requiere la API de WhatsApp Business.</p>`)}
+${card("20. Recordatorios por WhatsApp",`<p class="mu">En el teléfono del paciente se elige <b>Celular</b> o <b>Línea fija</b>. Si es celular, al agendar una cita el sistema programa un recordatorio. Dos días antes de la cita aparece en <b>Inicio → Recordatorios por WhatsApp</b>; el botón "Enviar recordatorio" abre WhatsApp con el mensaje ya escrito (fecha, hora y médico). Al enviarlo, la cita sale de la lista pendiente. Si se cambia la fecha u hora de la cita, el recordatorio vuelve a pendiente. El mensaje se envía con el nombre "Recordatorio de cita del hospital" e incluye los datos de la Dra. Heydy Rodriguez (+1 829-373-8765). Si el administrador configura las credenciales de WhatsApp Business API (en Administración), el envío es AUTOMÁTICO. Si no, la secretaria envía manualmente con el botón (se abre WhatsApp con el mensaje listo).</p>`)}
 `;
 }
 function vInicio(){const{C,I,M,B,R,F,P}=DB,Q=DB.Q.filter(q=>q.f==hoy&&q.e!="Cancelada"),n=pend(),recs=recordatorios();
@@ -1361,18 +1393,33 @@ function recordatorios(){
     .map(q=>({q,p:pk(q.p)})).filter(x=>x.p.n&&esCelular(x.p)&&x.p.tl)
     .sort((a,b)=>(iso(a.q.f)+a.q.h).localeCompare(iso(b.q.f)+b.q.h));
 }
-async function enviarRecordatorio(id){
+async function enviarRecordatorio(id, manual=false){
   const q=DB.Q.find(x=>x.id==id); if(!q)return;
   const p=pk(q.p); const num=telWa(p.tl);
   if(!num)return toast("El teléfono del paciente no es válido (deben ser 10 dígitos).");
-  // Marcar como enviado inmediatamente (optimista) y abrir WhatsApp
+  // Intentar envio automatico primero (si hay credenciales configuradas)
+  if(!manual){
+    try{
+      const cfg=await api("/api/whatsapp-config");
+      if(cfg.configured && cfg.auto_send){
+        // Envio automatico via WhatsApp Business API
+        await api("/api/whatsapp-send",{method:"POST",body:{cita_id:q.id}});
+        q.rc=hoy; draw();
+        toast("Recordatorio enviado AUTOMATICAMENTE a "+p.n);
+        return;
+      }
+    }catch(e){
+      // Si falla el automatico, caer al manual
+      console.warn("Auto-send failed, falling back to manual:", e.message);
+    }
+  }
+  // Envio manual via wa.me (secretaria abre WhatsApp y envia)
   q.rc=hoy; draw();
   window.open("https://wa.me/"+num+"?text="+encodeURIComponent(citaTexto(p,q)),"_blank");
   try{
     await api("/api/recordatorio",{method:"POST",body:{cita_id:q.id}});
-    toast("Recordatorio enviado a "+p.n+" · "+DOCTORA_TEL);
+    toast("Recordatorio enviado (manual) a "+p.n+" · "+DOCTORA_TEL);
   }catch(e){
-    // Revertir si falla el servidor
     q.rc=""; draw();
     toast("Error al registrar: "+e.message);
   }
@@ -2209,6 +2256,7 @@ else if(a=="unlock"){e.preventDefault();unlockUser(+v)}
 else if(a=="delu"){e.preventDefault();delUser(+v)}
 else if(a=="restaurar"){e.preventDefault();restaurarFunciones()}
 else if(a=="adminsec"){e.preventDefault();api("/api/admin/resumen").then(r=>{S.adm=r;draw()}).catch(x=>toast(x.message))}
+else if(a=="wasave"){e.preventDefault();const pnid=(document.getElementById("wa_pnid")||{}).value||"",tok=(document.getElementById("wa_token")||{}).value||"",tmpl=(document.getElementById("wa_tmpl")||{}).value||"",auto=document.getElementById("wa_auto")&&document.getElementById("wa_auto").checked;toast("Guarda las variables en Render: WA_PHONE_NUMBER_ID, WA_ACCESS_TOKEN, WA_TEMPLATE_NAME, WA_AUTO_SEND="+(auto?"true":"false"))}
 else if(a=="delimg"){e.preventDefault();borrarImagen(+v)}
 else if(a=="cx_cancel"||a=="ci_cancel"||a=="es_cancel"||a=="rx_cancel"){e.preventDefault();const o=document.querySelector(".ov");if(o)o.remove()}
 else if(a=="buscarpadron"){e.preventDefault();const c=(document.getElementById("nc")||{}).value||"";const num=c.replace(/\D/g,"");window.open("https://www.pai.do/padron","_blank","noopener")}

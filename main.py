@@ -1105,6 +1105,81 @@ def recordatorio(r: Recordatorio, u=Depends(usuario_actual)):
     return {"ok": True}
 
 
+class WhatsAppConfig(BaseModel):
+    phone_number_id: str | None = None
+    access_token: str | None = None
+    template_name: str | None = None
+    auto_send: bool = False
+
+
+@app.get("/api/whatsapp-config")
+def whatsapp_config_get(u=Depends(solo_admin)):
+    """Obtiene la configuracion de WhatsApp Business API."""
+    return {
+        "phone_number_id": os.getenv("WA_PHONE_NUMBER_ID", ""),
+        "template_name": os.getenv("WA_TEMPLATE_NAME", "recordatorio_cita"),
+        "auto_send": os.getenv("WA_AUTO_SEND", "false").lower() == "true",
+        "configured": bool(os.getenv("WA_PHONE_NUMBER_ID") and os.getenv("WA_ACCESS_TOKEN")),
+    }
+
+
+@app.post("/api/whatsapp-send")
+def whatsapp_send(r: Recordatorio, u=Depends(usuario_actual)):
+    """Envia recordatorio via WhatsApp Business Cloud API (automatico).
+    Si no hay credenciales configuradas, retorna error para usar fallback manual."""
+    exigir(u, "escribir", "citas")
+    phone_number_id = os.getenv("WA_PHONE_NUMBER_ID")
+    access_token = os.getenv("WA_ACCESS_TOKEN")
+    template_name = os.getenv("WA_TEMPLATE_NAME", "recordatorio_cita")
+    if not phone_number_id or not access_token:
+        raise HTTPException(400, "WhatsApp Business API no configurado. Usa envio manual.")
+    with pool.connection() as c:
+        cita = c.execute("select c.*, p.nombre, p.telefono, p.telefono_tipo from citas c join pacientes p on p.id=c.paciente_id where c.id=%s", (r.cita_id,)).fetchone()
+        if not cita:
+            raise HTTPException(404, "Cita no encontrada")
+        telefono = (cita["telefono"] or "").replace("-", "").replace(" ", "")
+        if not telefono or len(telefono) < 10:
+            raise HTTPException(400, "Telefono del paciente invalido")
+        # Formatear numero con codigo de pais
+        if len(telefono) == 10:
+            telefono = "1" + telefono
+        # Enviar via WhatsApp Business Cloud API
+        import urllib.request, json as _json
+        url = f"https://graph.facebook.com/v21.0/{phone_number_id}/messages"
+        payload = {
+            "messaging_product": "whatsapp",
+            "to": telefono,
+            "type": "template",
+            "template": {
+                "name": template_name,
+                "language": {"code": "es"},
+                "components": [{
+                    "type": "body",
+                    "parameters": [
+                        {"type": "text", "text": cita["nombre"]},
+                        {"type": "text", "text": str(cita["fecha"])},
+                        {"type": "text", "text": str(cita["hora"])[:5]},
+                        {"type": "text", "text": cita["medico"] or "el medico"},
+                    ]
+                }]
+            }
+        }
+        req = urllib.request.Request(url, data=_json.dumps(payload).encode(), headers={
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json",
+        })
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                result = _json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+            body = e.read().decode()
+            raise HTTPException(400, f"Error de WhatsApp API: {body}")
+        # Marcar como enviado
+        c.execute("update citas set recordatorio_en=now() where id=%s", (r.cita_id,))
+        auditar(c, u, "recordatorio_auto", "citas", r.cita_id)
+    return {"ok": True, "method": "automatico", "result": result}
+
+
 @app.get("/api/buscar")
 def buscar(q: str = Query(min_length=2), u=Depends(usuario_actual)):
     exigir(u, "leer", "pacientes")
