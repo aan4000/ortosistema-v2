@@ -1365,12 +1365,17 @@ async function enviarRecordatorio(id){
   const q=DB.Q.find(x=>x.id==id); if(!q)return;
   const p=pk(q.p); const num=telWa(p.tl);
   if(!num)return toast("El teléfono del paciente no es válido (deben ser 10 dígitos).");
+  // Marcar como enviado inmediatamente (optimista) y abrir WhatsApp
+  q.rc=hoy; draw();
   window.open("https://wa.me/"+num+"?text="+encodeURIComponent(citaTexto(p,q)),"_blank");
   try{
     await api("/api/recordatorio",{method:"POST",body:{cita_id:q.id}});
-    q.rc=hoy; draw();
-    toast("Recordatorio de WhatsApp enviado a "+p.n);
-  }catch(e){toast(e.message)}
+    toast("Recordatorio enviado a "+p.n+" · "+DOCTORA_TEL);
+  }catch(e){
+    // Revertir si falla el servidor
+    q.rc=""; draw();
+    toast("Error al registrar: "+e.message);
+  }
 }
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,fw=(id,l,i)=>`<div style="grid-column:1/-1"><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
