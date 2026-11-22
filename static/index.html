@@ -328,6 +328,12 @@ h1,h2,h3{letter-spacing:-.01em}
 .k:hover{transform:none}.btn:hover{transform:none}.ov{backdrop-filter:none}}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--sh2:none}tbody tr:nth-child(even){background:rgba(255,255,255,.035)}}
 :root[data-theme="dark"]{--sh2:none}
+
+/* Skeleton loading for tab transitions */
+.skel{background:linear-gradient(90deg,var(--bg) 25%,var(--bd) 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:var(--radius-sm);min-height:60px;margin:8px 0}
+.skel-line{height:14px;margin:6px 0;border-radius:4px;background:linear-gradient(90deg,var(--bg) 25%,var(--bd) 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite}
+.skel-title{height:20px;width:40%;margin:8px 0;border-radius:4px;background:linear-gradient(90deg,var(--bg) 25%,var(--bd) 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite}
+.tab-content{animation:fadeInUp .25s cubic-bezier(.16,.84,.28,1) both}
 </style>
 </head>
 <body>
@@ -337,7 +343,7 @@ window.onerror=function(m,s,l){document.body.insertAdjacentHTML("afterbegin",'<p
 </script>
 <script>
 let $=s=>document.querySelector(s),K="orto_v1",d0=new Date(),hoy=String(d0.getDate()).padStart(2,"0")+"/"+String(d0.getMonth()+1).padStart(2,"0")+"/"+d0.getFullYear();
-const CLINICAS=["Clínica Principal","Clínica Norte","Clínica Sur","Clínica Este","Clínica Oeste"];
+const CLINICAS=["Centro Médico Corominas Pepín","Clínica SID (Clisid)","Castrocard Center","Centro de Especialidades Médicas San Antonio de Guerra","Alcántara y González","Plaza de la Salud","Traumatólogo Nay Arias Lora"];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const IC={
 home:"<path d='M3.5 10.6 12 3.5l8.5 7.1'/><path d='M5.6 9.7V20a1 1 0 0 0 1 1h10.8a1 1 0 0 0 1-1V9.7'/><path d='M9.6 21v-5.4h4.8V21'/>",
@@ -609,7 +615,7 @@ async function cargar(){
   for(const k of Object.keys(TABLA))DB[k]=(todo[TABLA[k]]||[]).map(r=>fromK(k,r));
   const imgs={};(todo["_imagenes"]||[]).forEach(i=>{if(!imgs[i.estudio_id])imgs[i.estudio_id]=i.id});
   DB.I.forEach(x=>x.im=imgs[x.id]||null);
-  S.clinica=S.clinica||localStorage.getItem("orto_clinica")||"Clínica Principal";
+  S.clinica=S.clinica||localStorage.getItem("orto_clinica")||"Centro Médico Corominas Pepín";
   S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config,modulos:yo.modulos||null,procedimientos:yo.procedimientos||[],clinica:S.clinica};
   if(yo.es_admin){
     const[f,us,med,adm]=await Promise.all([api("/api/funciones"),api("/api/usuarios"),api("/api/medicos"),api("/api/admin/resumen").catch(()=>null)]);
@@ -641,7 +647,7 @@ async function subirImagen(estudioId,dataUrl){
   const r=await api("/api/imagenes",{method:"POST",body:{estudio_id:estudioId,mime,datos_base64:String(dataUrl).split(",")[1]}});
   return r.id;
 }
-const S={user:null,open:false,sel:new Set(),clinica:localStorage.getItem("orto_clinica")||"Clínica Principal",psel:new Set(),pf:{g:"",q:"",pr:false,dr:""},pa:{p:null,dr:"",f:"",e:"Indicado",cg:true},ef:{p:"",t:""},upP:null,ap:null,only:true,ag:null,evi:null,of:{g:"",q:""},pe:{a:"",u:""},os:new Set(),ox:{},oa:{p:null,dr:"",f:"",e:"Indicada",ind:""},route:(location.hash||"#inicio").slice(1)||"inicio",segcat:null,adm:null,aud:[]};
+const S={user:null,open:false,sel:new Set(),clinica:localStorage.getItem("orto_clinica")||"Centro Médico Corominas Pepín",psel:new Set(),pf:{g:"",q:"",pr:false,dr:""},pa:{p:null,dr:"",f:"",e:"Indicado",cg:true},ef:{p:"",t:""},upP:null,ap:null,only:true,ag:null,evi:null,of:{g:"",q:""},pe:{a:"",u:""},os:new Set(),ox:{},oa:{p:null,dr:"",f:"",e:"Indicada",ind:""},route:(location.hash||"#inicio").slice(1)||"inicio",segcat:null,adm:null,aud:[]};
 const RL={medico:"Médico",enfermeria:"Enfermería",secretaria:"Secretaría",fisio:"Fisioterapeuta",facturacion:"Facturación",admin:"Administrador"};
 const RD={medico:"Historia clínica completa: evaluaciones, cirugías, estudios, recetas y autorizaciones.",enfermeria:"Apoyo clínico: consulta el expediente y adjunta estudios, documentos y órtesis.",secretaria:"Recepción y gestión: agenda, pacientes, documentos, referimientos, cobros y recetas.",fisio:"Rehabilitación: sesiones, PROMs, órtesis y consulta de documentos y estudios.",facturacion:"Cobros y autorizaciones: cargos, tarifario y preautorizaciones, sin editar la clínica.",admin:"Control total: usuarios, perfiles, seguridad, auditoría y todas las secciones."};
 const M=[["inicio","home","Inicio"],["agenda","cal","Agenda"],["pacientes","users","Pacientes"],["procedimientos","bone-fracture","Procedimientos"],["recetas","pill","Recetas"],["ortesis","bandage","Órtesis"],["quirofano","syringe","Quirófano"],["estudios","scan-heart","Estudios"],["documentos","clipboard-plus","Documentos"],["rehab","activity","Rehabilitación"]];
@@ -674,7 +680,7 @@ async function entrar(usuario,password){
   const r=await api("/api/login",{method:"POST",body:{usuario,password}});
   localStorage.setItem(TK,r.token);
   localStorage.setItem("orto_landing_done","1");
-  localStorage.setItem("orto_clinica",S.clinica||localStorage.getItem("orto_clinica")||"Clínica Principal");
+  localStorage.setItem("orto_clinica",S.clinica||localStorage.getItem("orto_clinica")||"Centro Médico Corominas Pepín");
   if(r.debe_cambiar_clave){S.tmp=password;S.user={u:usuario,nombre:r.nombre,rol:r.rol};return vForzar()}
   await cargar();
   aplicarTema();
@@ -715,9 +721,9 @@ function rst(){
       }catch(ex){b.disabled=false;e(ex.message)}}};
   paso1();
 }
-function vLogin(){if(S.nuevo)return vSetup();$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb" style="flex-direction:column;align-items:center;gap:8px;margin-bottom:12px"><span style="display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;box-shadow:0 6px 20px rgba(13,110,253,.35)">${ic("shield",32)}</span><div style="text-align:center"><b style="font-size:24px;font-weight:700;letter-spacing:-.02em;display:block">OrtoSistema</b><span class="mu" style="font-size:12px">Gestión Ortopédica</span></div></div><h1>Iniciar sesión</h1><p class="mu">Entra con tu usuario y contraseña.</p><label class="mu">Clínica<select id="lc" style="margin-bottom:4px"><option value="Clínica Principal">Clínica Principal</option><option value="Clínica Norte">Clínica Norte</option><option value="Clínica Sur">Clínica Sur</option><option value="Clínica Este">Clínica Este</option><option value="Clínica Oeste">Clínica Oeste</option></select></label><label class="mu">Usuario<input id="lu" autocomplete="username" placeholder="tu_usuario"></label><label class="mu">Contraseña<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••••"></label><div class="er2" id="le" role="alert"></div><button class="btn p" id="lb2" style="width:100%">${ic("unlock",16)} Entrar</button><button class="btn" data-a="rst">${ic("key",16)} ¿Olvidaste tu contraseña?</button></div></div>`;
+function vLogin(){if(S.nuevo)return vSetup();$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb" style="flex-direction:column;align-items:center;gap:8px;margin-bottom:12px"><span style="display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;box-shadow:0 6px 20px rgba(13,110,253,.35)">${ic("shield",32)}</span><div style="text-align:center"><b style="font-size:24px;font-weight:700;letter-spacing:-.02em;display:block">OrtoSistema</b><span class="mu" style="font-size:12px">Gestión Ortopédica</span></div></div><h1>Iniciar sesión</h1><p class="mu">Entra con tu usuario y contraseña.</p><label class="mu">Clínica<select id="lc" style="margin-bottom:4px"><option value="Centro Médico Corominas Pepín">Centro Médico Corominas Pepín</option><option value="Clínica SID (Clisid)">Clínica SID (Clisid)</option><option value="Castrocard Center">Castrocard Center</option><option value="Centro de Especialidades Médicas San Antonio de Guerra">Centro de Especialidades Médicas San Antonio de Guerra</option><option value="Alcántara y González">Alcántara y González</option><option value="Plaza de la Salud">Plaza de la Salud</option><option value="Traumatólogo Nay Arias Lora">Traumatólogo Nay Arias Lora</option></select></label><label class="mu">Usuario<input id="lu" autocomplete="username" placeholder="tu_usuario"></label><label class="mu">Contraseña<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••••"></label><div class="er2" id="le" role="alert"></div><button class="btn p" id="lb2" style="width:100%">${ic("unlock",16)} Entrar</button><button class="btn" data-a="rst">${ic("key",16)} ¿Olvidaste tu contraseña?</button></div></div>`;
 const go2=async()=>{const b=$("#lb2"),er=m=>{$("#le").textContent=m};
-const u=$("#lu").value.trim().toLowerCase(),p=$("#lp").value,clinica=$("#lc")?$("#lc").value:"Clínica Principal";localStorage.setItem("orto_clinica",clinica);S.clinica=clinica;
+const u=$("#lu").value.trim().toLowerCase(),p=$("#lp").value,clinica=$("#lc")?$("#lc").value:"Centro Médico Corominas Pepín";localStorage.setItem("orto_clinica",clinica);S.clinica=clinica;
 if(!u||!p)return er("Escribe tu usuario y contraseña.");
 b.disabled=true;er("");
 try{await entrar(u,p)}catch(e){b.disabled=false;er(e.message)}};
@@ -865,7 +871,7 @@ $("#fpb").disabled=true;
 try{const r=await api("/api/cambiar-clave",{method:"POST",body:{actual:S.tmp,nueva:a}});if(r.token)localStorage.setItem(TK,r.token);S.tmp=null;await cargar();S.route="inicio";draw()}
 catch(e){$("#fpb").disabled=false;er(e.message)}};$("#fp1").focus()}
 
-function menu(a){let h=`<h1 class="lb"><span class="lg2">${ic("shield",18)}</span> OrtoSistema</h1><p class="mu" style="margin:0 0 8px 10px;font-size:11px;font-weight:600;color:var(--pri)">${esc((S.user&&S.user.clinica)||S.clinica||localStorage.getItem("orto_clinica")||"Clínica Principal")}</p>`;
+function menu(a){let h=`<h1 class="lb"><span class="lg2">${ic("shield",18)}</span> OrtoSistema</h1><p class="mu" style="margin:0 0 8px 10px;font-size:11px;font-weight:600;color:var(--pri)">${esc((S.user&&S.user.clinica)||S.clinica||localStorage.getItem("orto_clinica")||"Centro Médico Corominas Pepín")}</p>`;
 const nv=(k,i,l,s="")=>`<a class="nav${s}${a==k||(k=="pacientes"&&(a=="p"||a=="nuevo"||a=="evaluacion"))?" on":""}" href="#" data-r="${k}" title="${esc(DS[k]||"")}"><span class="nav-ic">${ic(i,20)}</span> ${l}</a>`;
 let gl=false;M.forEach(([k,i,l])=>{if(can(k)){if(!gl&&!["inicio","agenda","pacientes"].includes(k)){gl=true;h+='<div class="gl">Atención clínica</div>'}h+=nv(k,i,l)}});
 const ad=AD.filter(x=>can(x[0]));
@@ -1111,8 +1117,16 @@ gestion:()=>card("Referimientos",tk("R",id,["Fecha","Detalle","Estado"],x=>[x.f,
 ortesis:()=>`<div class="row" style="margin-bottom:12px"><button class="btn p" data-a="ao:${id}">${ic("plus",16)} Asignar órtesis</button><button class="btn" data-r="ortesis">${ic("bandage",14)} Ir a sección de Órtesis</button></div>`+card("Órtesis indicadas",tk("OP",id,["Fecha","Órtesis","Lado","Talla","Médico","Estado"],x=>[x.f,`<span class="ocell">${ortImg(x.n,"sm")}<span>${esc(x.n)}</span></span>`,esc(x.lado||"—"),esc(x.talla||"—"),esc(x.dr||"—"),bd(x.e)])),
 documentos:()=>`<p><button class="btn p" data-a="ud:${id}">${ic("up",16)} Subir documento</button></p>`+card("Documentos del paciente",tDocs(DB.D.map((x,i)=>[x,i]).filter(([x])=>x.p==id),false))
 };
+const _tabOrder=["resumen","citas","clinica","evaluacion","procedimientos","ortasis","rehab","gestion","documentos"];
+const _tabIdx=_tabOrder.indexOf(tab);
+const _nextTab=_tabIdx>=0&&_tabIdx<_tabOrder.length-1?_tabOrder[_tabIdx+1]:null;
+const _prevTab=_tabIdx>0?_tabOrder[_tabIdx-1]:null;
+const _navBtns=`<div class="tb" style="margin-top:16px;justify-content:space-between">
+  ${_prevTab?`<button class="btn" data-r="p-${id}-${_prevTab}">${ic("chevl",14)} Anterior</button>`:'<span></span>'}
+  ${_nextTab?`<button class="btn p" data-r="p-${id}-${_nextTab}">Siguiente ${ic("chevr",14)}</button>`:''}
+</div>`;
 return `<div class="card ph"><div class="ph-head"><div class="ph-id">${avSexo(p.sx,"lg")}<div class="ph-info"><div class="ph-name-row"><h2>${esc(p.n)}</h2>${p.cd?`<span class="code">${esc(p.cd)}</span>`:""}${p.xp?`<span class="code">${esc(p.xp)}</span>`:""}</div><div class="ph-meta">${p.e} años · Cédula ${esc(p.c||"—")} · ${p.oc?p.oc+" · ":""}${esc(p.s||"Sin seguro")}${p.ec?" \u00b7 "+esc(p.ec):""}${p.xp?" \u00b7 Expediente "+esc(p.xp):""}</div><div class="ph-chips">${chip(EA,p.ea)}${chip(EU,effAu(p))}${p.al?`<span class="b er">${ic("alert",13)} Alergia</span>`:""}</div></div></div><div class="ph-actions"><button class="btn p" data-a="ev:med" data-ic="1">${ic(DB.E.some(e=>e.p==p.id&&e.tp=="Médica")?"usercheck":"stethoscope",14)} Evaluación médica</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
-<div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="${k=="ortasis"?"ortasis":"p-"+id+"-"+k}" ${k=="ortasis"?`data-ap="${id}"`:""}>${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p>${(B2[tab]||B2.resumen)()}`}
+<div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="${k=="ortasis"?"ortasis":"p-"+id+"-"+k}" ${k=="ortasis"?`data-ap="${id}"`:""}>${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p><div class="tab-content">${(B2[tab]||B2.resumen)()}</div>${_navBtns}`}
 function fDelP(id){
   const p=pk(id);if(!p||!p.n)return;
   const nE=DB.E.filter(x=>x.p==id).length,nX=DB.X.filter(x=>x.p==id).length,nB=DB.B.filter(x=>x.p==id).length,nD=DB.D.filter(x=>x.p==id).length;
