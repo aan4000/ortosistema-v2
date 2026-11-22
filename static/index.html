@@ -616,7 +616,7 @@ async function cargar(){
   const imgs={};(todo["_imagenes"]||[]).forEach(i=>{if(!imgs[i.estudio_id])imgs[i.estudio_id]=i.id});
   DB.I.forEach(x=>x.im=imgs[x.id]||null);
   S.clinica=S.clinica||localStorage.getItem("orto_clinica")||"Centro Médico Corominas Pepín";
-  S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config,modulos:yo.modulos||null,procedimientos:yo.procedimientos||[],clinica:S.clinica};
+  S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config,modulos:yo.modulos||null,procedimientos:yo.procedimientos||[],estudios:yo.estudios||[],clinica:S.clinica};
   if(yo.es_admin){
     const[f,us,med,adm]=await Promise.all([api("/api/funciones"),api("/api/usuarios"),api("/api/medicos"),api("/api/admin/resumen").catch(()=>null)]);
     Object.entries(f.roles).forEach(([r,m])=>DB.PM[r]=m);
