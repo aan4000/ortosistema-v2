@@ -64,7 +64,7 @@ al hacer clic en la barra lateral:
     S.route = clave de sección principal   # única salida permitida
 ```
 
-**Implementación:** `_tabRuta(k)` devuelve siempre `"p-"+id+"-"+k`. `_tabApAttr(k)` ya no inyecta `data-ap` porque `draw()` fija `S.ap` al abrir `p-<id>`. Los botones "Ir a sección de …" se eliminaron de `B2.ortesis` y `B2.recetas` para que ningún control interno rompa la regla.
+**Implementación:** `_tabRuta(k)` devuelve siempre `"p-"+id+"-"+k`. `_tabApAttr(k)` ya no inyecta `data-ap` porque `draw()` fija `S.ap` al abrir `p-<id>`. Los botones "Ir a sección de …" se eliminaron de `B2.ortesis` y `B2.recetas`. El breadcrumb del expediente ("Inicio › Pacientes › nombre") se renderiza como **texto plano** (sin `data-r`) para que ningún control dentro del perfil permita salir. Las únicas salidas son la barra lateral y las acciones explícitas del encabezado (por ejemplo "Cerrar paciente").
 
 **Recorrido completo (admin):** Resumen → Evaluación → Recetas → Citas → Órtesis → Clínica → Procedimientos → Rehabilitación → Gestión → Documentos. En la primera pestaña solo aparece "Siguiente"; en la última solo "Anterior". Los roles sin un módulo omiten esa pestaña y el flujo la salta automáticamente.
 
