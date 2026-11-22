@@ -60,8 +60,10 @@ a{color:var(--pri)}h2{font-size:24px;margin:8px 0}h3{font-size:18px;margin:0 0 8
 @keyframes bounceIn{0%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.05)}70%{transform:scale(.9)}100%{transform:scale(1)}}
 @keyframes secUpH{0%{opacity:0;transform:translate3d(12px,0,0)}100%{opacity:1;transform:none}}
 .pg.entra{animation:secIn 1s cubic-bezier(.16,.84,.28,1) both;will-change:transform,opacity}
-.pg.entra-der{animation:secDer .55s cubic-bezier(.2,.8,.2,1) both;will-change:transform,opacity}
-.pg.entra-izq{animation:secIzq .55s cubic-bezier(.2,.8,.2,1) both;will-change:transform,opacity}
+.pg.entra-der{will-change:transform,opacity}
+.pg.entra-der>:not(.ph){animation:secUpH .4s cubic-bezier(.2,.8,.2,1) both}
+.pg.entra-izq{will-change:transform,opacity}
+.pg.entra-izq>:not(.ph){animation:secUpH .4s cubic-bezier(.2,.8,.2,1) both}
 .pg.entra>:not(.ph){animation:secUp .7s cubic-bezier(.16,.84,.28,1) both}
 .pg.entra-der>:not(.ph),.pg.entra-izq>:not(.ph){animation:secUpH .45s cubic-bezier(.2,.8,.2,1) both}
 .pg.entra>:nth-child(2),.pg.entra-der>:nth-child(2),.pg.entra-izq>:nth-child(2){animation-delay:.05s}
