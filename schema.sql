@@ -13,6 +13,8 @@ alter table usuarios add column if not exists debe_cambiar_clave boolean not nul
 alter table usuarios add column if not exists modulos jsonb;
 -- Procedimientos del catálogo que realiza cada médico (lista de nombres).
 alter table usuarios add column if not exists procedimientos jsonb;
+-- Tipos de estudio del catálogo que puede indicar cada médico (lista de nombres).
+alter table usuarios add column if not exists estudios jsonb;
 
 create sequence if not exists paciente_codigo_seq start 1;
 create sequence if not exists paciente_expediente_seq start 1;

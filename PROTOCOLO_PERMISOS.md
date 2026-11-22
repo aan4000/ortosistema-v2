@@ -95,6 +95,25 @@ guardar receta      -> p-<id>-procedimientos
 
 Estas transiciones usan la misma `ruta(k) = "p-" + id + "-" + k` del algoritmo de navegación, por lo que respetan la regla de única salida por barra lateral y el filtrado por rol.
 
+## Tipos de estudio por médico
+
+En **Administración → Usuarios → Editar perfil**, un usuario con rol `medico` puede marcar
+**Tipos de estudio que puede indicar**, agrupados por categoría (`TIPOS`). La selección se
+guarda en `usuarios.estudios` (jsonb) y se devuelve en `/api/yo` como `S.user.estudios`.
+
+- En **Estudios → Indicar estudio**, el selector `ip_t` (y el de **Subir imágenes**, `up_t`)
+  solo ofrece los tipos marcados en el perfil del médico.
+- Si el médico **no marca ninguno**, se ofrecen todos los tipos del catálogo (`TIPOS_FLAT`).
+- El paciente sigue bloqueado al paciente activo: los selectores `ip_p` y `up_p` permanecen
+  deshabilitados y no permiten buscar otros pacientes.
+- Los tipos se validan por nombre exacto contra el catálogo; no se crean tipos nuevos desde
+  el formulario de estudios.
+
+**Correctivo aplicado:** el bloque "Indicar estudio (sin imágenes)" se construía pero no se
+incluía en el `return` de `vSubir()`, por lo que la pestaña no mostraba el formulario y
+`ip_t` no existía en el DOM. Además, el ayudante `sl()` generaba selectores `disabled` y,
+en `ip_t`, un `<select>` anidado. Ahora `sl()` acepta `dis` y los tipos son seleccionables.
+
 ## Actualización automática por sesión
 1. Al iniciar sesión, `cargar()` guarda en `S.user.modulos` los módulos del perfil que entró (o `null` para admin, que implica acceso total).
 2. `draw()` se ejecuta en **cada navegación** y vuelve a generar `$("#side").innerHTML = menu(a)` y `$("#main").innerHTML = ... vExp(...)`.
