@@ -526,7 +526,7 @@ function fromK(k,r){
     mot:r.motivo_cancelacion||"",rc:r.recordatorio_en?String(r.recordatorio_en).slice(0,10):""};
   else if(k=="E")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),t:r.texto||"",tp:r.tipo||"Médica",
     dr:r.medico||"",d:r.detalle||{}};
-  else if(k=="I")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),t:(r.tipo||"")+(r.region?" · "+r.region:"")+(r.lado&&r.lado!="No aplica"?" � "+r.lado:""),
+  else if(k=="I")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),t:(r.tipo||"")+(r.region?" · "+r.region:"")+(r.lado&&r.lado!="No aplica"?" → "+r.lado:""),
     tp:r.tipo||"",rg:r.region||"",ld:r.lado||"No aplica",r:r.estado||"Por revisar",inf:r.informe||"",im:null,th:r.miniatura||""};
   else if(k=="C")o={id:r.id,p:r.paciente_id,f:f2d(r.fecha),h:hh(r.hora),t:r.procedimiento||"",
     lado:r.lado||"No aplica",du:r.duracion||"",sala:r.sala||"",cir:r.cirujano||"",an:r.anestesia||"",
@@ -1340,7 +1340,7 @@ const FAMH=["Diabetes mellitus","Hipertension arterial","Cardiopatia isquemica",
 const antField=(id,label,catalog,groups,hint)=>`<div class="af"><label class="mu">${label}</label><select id="${id}_sel" data-ant="${id}" class="ant-sel"><option value="">Selecciona...</option>${groups?groups.map(([g,items])=>`<optgroup label="${esc(g)}">${items.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}</optgroup>`).join(""):catalog.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}<option value="__otros__">Otros</option></select><textarea id="${id}_other" rows="2" style="display:none;margin-top:6px" placeholder="Especifica..."></textarea><input type="hidden" id="${id}">${hint?`<p class="mu" style="margin:6px 0 0">${hint}</p>`:""}</div>`;
 const OCUPACIONES={
 "Hogar y personal":["Ama de casa","Estudiante","Desempleado/a","Jubilado/a","Pensionado/a","Nino/a"],
-"Salud":["Medico/a","Enfermero/a","Farmaceutico/a","Odontologo/a","Fisioterapeuta","Psicologo/a","Nutricionista","Veterinario/a","Tecnico de laboratorio"],
+"Salud":["Médico/a","Enfermero/a","Farmaceutico/a","Odontologo/a","Fisioterapeuta","Psicologo/a","Nutricionista","Veterinario/a","Tecnico de laboratorio"],
 "Educacion":["Profesor/a","Maestro/a","Educador/a","Investigador/a"],
 "Ingenieria y tecnologia":["Ingeniero/a","Arquitecto/a","Informatico/a","Programador/a","Tecnico/a"],
 "Legal y administracion":["Abogado/a","Contador/a","Administrador/a","Secretario/a","Gerente","Empresario/a","Funcionario/a publico"],
@@ -1459,7 +1459,7 @@ async function enviarRecordatorio(id, manual=false){
 }
 function vNuevo(){const f=(id,l,i)=>`<div><label class="mu" for="${id}">${l}</label>${i}</div>`,fw=(id,l,i)=>`<div style="grid-column:1/-1"><label class="mu" for="${id}">${l}</label>${i}</div>`,tx=(id,l)=>f(id,l,`<textarea id="${id}" rows="2"></textarea>`);
 return`<div class="sh"><h2>Nuevo paciente</h2><p class="mu">${DS.nuevo}</p></div>
-${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",fNac("nf",""))}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupacion", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${fw("nt","Teléfono",`<div class="tb" style="gap:8px;align-items:center;flex-wrap:nowrap"><input id="nt" type="tel" style="width:180px;max-width:180px" placeholder="809-000-0000">${telTipoGroup("nt_tipo","Celular")}</div>`)}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
+${card("Datos personales",`<div class="avrow" id="nvrow" style="display:none"><span class="avp neu" id="nvav">${SILUETA_M}</span><div><b id="nvaT"></b></div></div><div class="fg">${f("nn","Nombre completo *",'<input id="nn" autocomplete="off">')}${f("nf","Fecha de nacimiento *",fNac("nf",""))}${f("ne","Edad",'<input id="ne" inputmode="numeric" placeholder="Se calcula o escribe">')}${f("nx","Sexo *",'<select id="nx"><option value="">Selecciona…</option>'+opt(["Femenino","Masculino"])+"</select>")}${f("ec","Estado civil",'<select id="ec"><option value="">Seleccione</option>'+opt(["Soltero/a","Casado/a","Divorciado/a","Unión libre","Viudo/a","Separado/a"])+"</select>")}${f("oc","Ocupación", occSelect("oc",""))}${f("nc","Cédula",'<input id="nc" inputmode="numeric" placeholder="000-0000000-0"> <span id="nc_status" class="mu" style="font-size:12px"></span>')}${fw("nt","Teléfono",`<div class="tb" style="gap:8px;align-items:center;flex-wrap:nowrap"><input id="nt" type="tel" style="width:180px;max-width:180px" placeholder="809-000-0000">${telTipoGroup("nt_tipo","Celular")}</div>`)}${f("nm","Correo electrónico",'<input id="nm" type="email">')}</div>`)}
 <br>${card("Seguro médico",`<div class="fg">${f("ns","Aseguradora",segSelect("ns",""))}${f("na","Número de afiliado",'<input id="na">')}</div>`)}
 <br>${card("Información clínica",`<div class="fg">${f("nl","Alergias",'<input id="nl" list="alergias-list" placeholder="Medicamentos, látex, alimentos"><datalist id="alergias-list">'+ALG.map(a=>`<option value="${esc(a)}">`).join("")+'</datalist>')}</div>`)}
 <br>${card("Antecedentes",`${mbSel([])}
@@ -1576,7 +1576,7 @@ function fRx(i){
   const nu=i==null,x=nu?{p:S.ap,f:hoy,t:S.rxTab||"medicamento",ti:"",it:[],n:"",dr:dms()[0]}:DB.X[i];
   S.rxItems=(x.it||[]).map(o=>({...o}));
   const o=modal(`<h3>${nu?"Nueva receta":"Editar receta"}</h3>
-    <div class="fg">${fx("rx_t","Tipo",`<select id="rx_t"><option value="medicamento"${x.t=="medicamento"?" selected":""}>Medicamento ortopedico</option><option value="protesis"${x.t=="protesis"?" selected":""}>Protesis</option></select>`)}${fx("rx_f","Fecha",`<input id="rx_f" type="date" value="${iso(x.f)}">`)}${fx("rx_dr","Medico",fsel("rx_dr",dms(),x.dr))}</div>
+    <div class="fg">${fx("rx_t","Tipo",`<select id="rx_t"><option value="medicamento"${x.t=="medicamento"?" selected":""}>Medicamento ortopedico</option><option value="protesis"${x.t=="protesis"?" selected":""}>Protesis</option></select>`)}${fx("rx_f","Fecha",`<input id="rx_f" type="date" value="${iso(x.f)}">`)}${fx("rx_dr","Médico",fsel("rx_dr",dms(),x.dr))}</div>
     <p class="mu" style="margin:10px 0 4px">Items</p><div id="rx_items"></div>
     <p><button class="btn" id="rx_add">${ic("plus",14)} Agregar</button></p>
     <label class="mu" style="display:block;margin:8px 0">Notas<textarea id="rx_n" rows="2">${esc(x.n||"")}</textarea></label>
@@ -1757,7 +1757,7 @@ function facPrint(idx){
     const incPac=o.querySelector("#fac_pac").checked;
     const incMed=o.querySelector("#fac_med").checked;
     let txt="FACTURA - OrtoSistema\n";
-    if(incPac) txt+="Paciente: "+p.n+"\n"+(p.e?p.e+" anos\n":"")+(p.c?"Cedula: "+p.c+"\n":"")+(p.s?"Seguro: "+p.s+"\n":"")+(p.al?"Alergias: "+p.al+"\n":"");
+    if(incPac) txt+="Paciente: "+p.n+"\n"+(p.e?p.e+" anos\n":"")+(p.c?"Cédula: "+p.c+"\n":"")+(p.s?"Seguro: "+p.s+"\n":"")+(p.al?"Alergias: "+p.al+"\n":"");
     txt+="\nConcepto: "+x.t+"\n";
     if(x.c) txt+="Codigo: "+x.c+"\n";
     txt+="Monto: RD$ "+x.m.toLocaleString("es-DO")+"\n";
@@ -1990,7 +1990,7 @@ t=`Examen físico ${d.rg}${d.ld&&d.ld!="No aplica"?" "+d.ld.toLowerCase():""} ·
 if(!x){const existing=DB.E.find(e=>e.p==pid && e.f==dmy(f) && e.tp==tp);if(existing){S.evi=DB.E.indexOf(existing);x=existing}}
 const dr=gv("ev_d"),rec={p:pid,f:dmy(f),t,tp,d,dr};
 try{
-if(x){Object.assign(x,rec);await editarK("E",x);toast("Evaluacion actualizada")}else{const nid=await crearK("E",rec);DB.E.push({...rec,id:nid});toast("Evaluacion guardada")}
+if(x){Object.assign(x,rec);await editarK("E",x);toast("Evaluación actualizada")}else{const nid=await crearK("E",rec);DB.E.push({...rec,id:nid});toast("Evaluación guardada")}
 if(med&&dxs){const pp=pk(pid);if(pp.dx!=dxs){pp.dx=dxs;await editarK("P",pp)}}
 }catch(e){return er(e.message)}
 let aviso="";if(med&&!x&&gv("ev_pc")){const e=await crearCita({p:pid,f:dmy(gv("ev_pc")),h:gv("ev_ph"),du:30,ty:"Control",t:"Control: "+dxs,dr,e:"Programada"});aviso=e?" (la cita de control no se creó: "+e+")":" y cita de control agendada"}
