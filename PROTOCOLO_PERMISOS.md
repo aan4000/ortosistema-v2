@@ -39,11 +39,34 @@ const tabVisible = k => {
 |---|---|---|
 | Barra lateral (iconos) | `menu(a)` | Filtra `M` y `AD` con `can(k)`. El grupo "Atención clínica" solo aparece si hay algún módulo visible. El grupo "Gestión"/"Administrativo" solo aparece si hay módulos de gestión permitidos. |
 | Pestañas del paciente | `vExp(id, tab)` | Construye `T` con `.filter(([k]) => tabVisible(k))`. Orden: Resumen → Evaluación → **Recetas** → Citas → Órtesis → Clínica → Procedimientos → Rehabilitación → Gestión → Documentos. |
-| Botones Anterior/Siguiente | `_tabOrder` | Usa el mismo `.filter(tabVisible)`, por lo que la secuencia salta las pestañas sin acceso. Además usan `_tabRuta()`/`_tabApAttr()`, por lo que al avanzar a Órtesis o Recetas van **directo a la sección principal** con `data-ap="<id>"`, igual que al hacer clic en la pestaña. |
+| Botones Anterior/Siguiente | `_tabOrder` | Usa el mismo `.filter(tabVisible)`, por lo que la secuencia salta las pestañas sin acceso. `_tabRuta()` garantiza que **siempre** se permanece en `p-<id>-<pestaña>`. |
 | Ruta directa | `draw()` | Si alguien escribe `p-71-ortasis` y el rol no tiene `ortesis`, se normaliza a la primera pestaña visible (Resumen). |
 | Registro de paciente | `gp()` | Al crear un paciente (o elegir "Crear como nuevo" ante un duplicado) se navega directo a `p-<id>-evaluacion`. El aviso posterior ofrece continuar a Citas. |
-| Pestaña Recetas | `vExp()` | Al hacer clic navega a la sección principal `recetas` con `data-ap="<id>"`, igual que Órtesis, preservando el paciente activo. Desde el expediente se puede crear la receta directamente con "Nueva receta". |
+| Pestañas Órtesis y Recetas | `vExp()` | Muestran el contenido de esa sección **dentro del expediente** (listado filtrado al paciente + acciones "Asignar órtesis" / "Nueva receta"). No existe botón que saque al usuario de la sección. |
 | Acceso a sección | `draw()` | Bloquea rutas completas (`can(a)`) y redirige a `inicio` si no hay permiso. |
+
+## Algoritmo de navegación (una sección lleva a la otra)
+
+**Regla:** el expediente del paciente es una sección autocontenida. Todas sus pestañas y sus botones Anterior/Siguiente navegan **dentro** de ella. Solo un clic en la **barra lateral** puede sacar al usuario de la sección.
+
+```
+para cada pestaña visible k en _tabOrder:
+    ruta(k) = "p-" + id + "-" + k        # SIEMPRE dentro del expediente
+    anterior(k) = _tabOrder[idx(k) - 1]  # omitida si es la primera
+    siguiente(k) = _tabOrder[idx(k) + 1] # omitida si es la última
+
+al hacer clic en una pestaña o en Anterior/Siguiente:
+    S.route = ruta(destino)
+    draw() -> S.ap = id, se renderiza ph-head + pestañas + B2[destino]
+    NO se cambia la ruta a una sección principal (ortesis, recetas, etc.)
+
+al hacer clic en la barra lateral:
+    S.route = clave de sección principal   # única salida permitida
+```
+
+**Implementación:** `_tabRuta(k)` devuelve siempre `"p-"+id+"-"+k`. `_tabApAttr(k)` ya no inyecta `data-ap` porque `draw()` fija `S.ap` al abrir `p-<id>`. Los botones "Ir a sección de …" se eliminaron de `B2.ortesis` y `B2.recetas` para que ningún control interno rompa la regla.
+
+**Recorrido completo (admin):** Resumen → Evaluación → Recetas → Citas → Órtesis → Clínica → Procedimientos → Rehabilitación → Gestión → Documentos. En la primera pestaña solo aparece "Siguiente"; en la última solo "Anterior". Los roles sin un módulo omiten esa pestaña y el flujo la salta automáticamente.
 
 ## Actualización automática por sesión
 1. Al iniciar sesión, `cargar()` guarda en `S.user.modulos` los módulos del perfil que entró (o `null` para admin, que implica acceso total).

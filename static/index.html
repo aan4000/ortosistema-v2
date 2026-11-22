@@ -1133,17 +1133,20 @@ clinica:()=>card("Evaluaciones",tk("E",id,["Fecha","Tipo","Resumen"],x=>[x.f,esc
 procedimientos:()=>`<p><button class="btn p" data-a="ap:${id}">${ic("plus",16)} Asignar procedimientos</button> <button class="btn" data-a="cx">Programar cirugía</button></p>`+card("Procedimientos indicados",tk("PP",id,["Fecha","Procedimiento","Categoría","Médico","Precio","Estado"],x=>[x.f,esc(x.t),esc(x.g||"General"),esc(x.dr||"—"),x.pr?mon(x.pr):"—",bd(x.e)]))+"<br>"+card("Cirugías e implantes",tk("C",id,["Fecha","Procedimiento","Implante","Estado"],x=>[x.f,esc(x.t),esc(x.i||"—"),bd(x.e)])),
 rehab:()=>`<p class="tb"><button class="btn p" data-a="fs">${ic("plus",16)} Nueva sesión</button> <button class="btn" data-a="fp">${ic("plus",16)} Nuevo PROM</button></p>`+card("Fisioterapia",tk("F",id,["Fecha","Sesión","Dolor"],x=>[x.f,esc(x.t),x.d+"/10"]))+"<br>"+card("PROMs",tk("M",id,["Fecha","Cuestionario","Resultado"],x=>[x.f,esc(x.t),x.s+"%"])),
 gestion:()=>card("Referimientos",tk("R",id,["Fecha","Detalle","Estado"],x=>[x.f,esc(x.t),bd(x.e)]))+"<br>"+card("Autorizaciones",tk("A",id,["Procedimiento","Seguro","Estado"],x=>[esc(x.t),esc(x.s),bd(x.e)]))+"<br>"+card("Facturación",tk("B",id,["Fecha","Concepto","Médico","Monto","Estado"],x=>[x.f,esc(x.t),esc(x.dr||"—"),mon(x.m),bd(x.e)])),
-ortesis:()=>`<div class="row" style="margin-bottom:12px"><button class="btn p" data-a="ao:${id}">${ic("plus",16)} Asignar órtesis</button><button class="btn" data-r="ortesis">${ic("bandage",14)} Ir a sección de Órtesis</button></div>`+card("Órtesis indicadas",tk("OP",id,["Fecha","Órtesis","Lado","Talla","Médico","Estado"],x=>[x.f,`<span class="ocell">${ortImg(x.n,"sm")}<span>${esc(x.n)}</span></span>`,esc(x.lado||"—"),esc(x.talla||"—"),esc(x.dr||"—"),bd(x.e)])),
-recetas:()=>`<div class="row" style="margin-bottom:12px"><button class="btn p" data-a="rxn">${ic("plus",16)} Nueva receta</button><button class="btn" data-r="recetas">${ic("rx",14)} Ir a sección de Recetas</button></div>`+card("Recetas del paciente",tbl(["Fecha","Tipo","Ítems","Verificación"],X.map(x=>[x.f,x.t=="medicamento"?"Medicamento":"Prótesis",x.it.length+" ítem(s)",vb(x)]))),
+ortesis:()=>`<div class="row" style="margin-bottom:12px"><button class="btn p" data-a="ao:${id}">${ic("plus",16)} Asignar órtesis</button></div>`+card("Órtesis indicadas",tk("OP",id,["Fecha","Órtesis","Lado","Talla","Médico","Estado"],x=>[x.f,`<span class="ocell">${ortImg(x.n,"sm")}<span>${esc(x.n)}</span></span>`,esc(x.lado||"—"),esc(x.talla||"—"),esc(x.dr||"—"),bd(x.e)])),
+recetas:()=>`<div class="row" style="margin-bottom:12px"><button class="btn p" data-a="rxn">${ic("plus",16)} Nueva receta</button></div>`+card("Recetas del paciente",tbl(["Fecha","Tipo","Ítems","Verificación"],X.map(x=>[x.f,x.t=="medicamento"?"Medicamento":"Prótesis",x.it.length+" ítem(s)",vb(x)]))),
 documentos:()=>`<p><button class="btn p" data-a="ud:${id}">${ic("up",16)} Subir documento</button></p>`+card("Documentos del paciente",tDocs(DB.D.map((x,i)=>[x,i]).filter(([x])=>x.p==id),false))
 };
 const _tabOrder=["resumen","evaluacion","recetas","citas","ortasis","clinica","procedimientos","rehab","gestion","documentos"].filter(k=>tabVisible(k));
 const _tabIdx=_tabOrder.indexOf(tab);
 const _nextTab=_tabIdx>=0&&_tabIdx<_tabOrder.length-1?_tabOrder[_tabIdx+1]:null;
 const _prevTab=_tabIdx>0?_tabOrder[_tabIdx-1]:null;
-/* Ruta directa: Órtesis y Recetas llevan a su sección principal con el paciente activo */
-const _tabRuta=k=>k=="ortasis"?"ortesis":k=="recetas"?"recetas":"p-"+id+"-"+k;
-const _tabApAttr=k=>(k=="ortasis"||k=="recetas")?` data-ap="${id}"`:"";
+/* ALGORITMO DE NAVEGACIÓN DENTRO DEL EXPEDIENTE:
+   Toda pestaña y todo Anterior/Siguiente permanecen en la ruta p-<id>-<pestaña>.
+   El contenido de la sección se muestra DENTRO del perfil del paciente.
+   Solo la barra lateral (menu) puede sacar al usuario de la sección. */
+const _tabRuta=k=>"p-"+id+"-"+k;
+const _tabApAttr=k=>"";
 const _navBtns=`<div class="tb" style="margin-top:16px;justify-content:space-between">
   ${_prevTab?`<button class="btn" data-r="${_tabRuta(_prevTab)}"${_tabApAttr(_prevTab)}>${ic("chevl",14)} Anterior</button>`:'<span></span>'}
   ${_nextTab?`<button class="btn p" data-r="${_tabRuta(_nextTab)}"${_tabApAttr(_nextTab)}>Siguiente ${ic("chevr",14)}</button>`:''}
