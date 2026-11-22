@@ -38,11 +38,11 @@ const tabVisible = k => {
 | Lugar | Función | Comportamiento |
 |---|---|---|
 | Barra lateral (iconos) | `menu(a)` | Filtra `M` y `AD` con `can(k)`. El grupo "Atención clínica" solo aparece si hay algún módulo visible. El grupo "Gestión"/"Administrativo" solo aparece si hay módulos de gestión permitidos. |
-| Pestañas del paciente | `vExp(id, tab)` | Construye `T` con `.filter(([k]) => tabVisible(k))`. Orden: Resumen → Evaluación → **Recetas** → Citas → **Procedimientos** → Órtesis → Clínica → Rehabilitación → Gestión → Documentos. |
+| Pestañas del paciente | `vExp(id, tab)` | Construye `T` con `.filter(([k]) => tabVisible(k))`. Orden: Resumen → Evaluación → **Estudios e imágenes** → Recetas → Citas → **Procedimientos** → Órtesis → Clínica → Rehabilitación → Gestión → Documentos. |
 | Botones Anterior/Siguiente | `_tabOrder` | Usa el mismo `.filter(tabVisible)`, por lo que la secuencia salta las pestañas sin acceso. `_tabRuta()` garantiza que **siempre** se permanece en `p-<id>-<pestaña>`. |
 | Ruta directa | `draw()` | Si alguien escribe `p-71-ortasis` y el rol no tiene `ortesis`, se normaliza a la primera pestaña visible (Resumen). |
 | Registro de paciente | `gp()` | Al crear un paciente (o elegir "Crear como nuevo" ante un duplicado) se navega directo a `p-<id>-evaluacion`. El aviso posterior ofrece continuar a Citas. |
-| Guardar evaluación | `fEval()` / atajo "Nueva evaluación" | Al guardar, navega automáticamente a `p-<id>-recetas`. |
+| Guardar evaluación | `fEval()` / atajo "Nueva evaluación" | Al guardar, navega automáticamente a `p-<id>-estudios` (Estudios e imágenes). |
 | Guardar receta | `fRx()` | Al guardar (nueva, merge o edición) desde el expediente, navega automáticamente a `p-<id>-procedimientos`. Desde la sección principal de Recetas se queda en ella. |
 | Pestañas Órtesis y Recetas | `vExp()` | Muestran el contenido de esa sección **dentro del expediente** (listado filtrado al paciente + acciones "Asignar órtesis" / "Nueva receta"). No existe botón que saque al usuario de la sección. |
 | Pestaña Órtesis (clave `ortasis`) | `B2` / `TD` | **Correspondencia obligatoria:** la pestaña usa la clave histórica `ortasis` (con "a"), mientras la vista y la descripción usan `ortesis` (con "e"). Se definen los alias `B2.ortasis = B2.ortesis` y `TD.ortasis = TD.ortesis` para que la pestaña muestre Órtesis y no caiga en el fallback de Resumen. **Toda pestaña nueva debe tener su clave exacta en `B2` y en `TD`**; si no, `vExp` mostrará Resumen silenciosamente. |
@@ -69,7 +69,7 @@ al hacer clic en la barra lateral:
 
 **Implementación:** `_tabRuta(k)` devuelve siempre `"p-"+id+"-"+k`. `_tabApAttr(k)` ya no inyecta `data-ap` porque `draw()` fija `S.ap` al abrir `p-<id>`. Los botones "Ir a sección de …" se eliminaron de `B2.ortesis` y `B2.recetas`. El breadcrumb del expediente ("Inicio › Pacientes › nombre") se renderiza como **texto plano** (sin `data-r`) para que ningún control dentro del perfil permita salir. Las únicas salidas son la barra lateral y las acciones explícitas del encabezado (por ejemplo "Cerrar paciente").
 
-**Recorrido completo (admin):** Resumen → Evaluación → Recetas → Citas → Procedimientos → Órtesis → Clínica → Rehabilitación → Gestión → Documentos. En la primera pestaña solo aparece "Siguiente"; en la última solo "Anterior". Los roles sin un módulo omiten esa pestaña y el flujo la salta automáticamente.
+**Recorrido completo (admin):** Resumen → Evaluación → Estudios e imágenes → Recetas → Citas → Procedimientos → Órtesis → Clínica → Rehabilitación → Gestión → Documentos. En la primera pestaña solo aparece "Siguiente"; en la última solo "Anterior". Los roles sin un módulo omiten esa pestaña y el flujo la salta automáticamente.
 
 ## Verificación de contenido por pestaña (regla anti-fallback)
 
@@ -84,12 +84,14 @@ para cada k en _tabOrder:
 
 Caso corregido: `ortasis` → alias a `ortesis` en `B2` y en `TD`. Sin esos alias la pestaña Órtesis se veía activa pero mostraba "Estado del paciente / Datos del paciente / Antecedentes".
 
+| Pestaña Estudios e imágenes | `B2.estudios` / `TD.estudios` | Clave `estudios` (mismo módulo que la sección principal). Muestra los estudios del paciente activo, miniaturas, estado de revisión y el botón **Indicar estudio**. El modal `indicarEstudioModal()` crea el registro y vuelve a dibujar la **misma** ruta `p-<id>-estudios`, sin salir del expediente. Los tipos ofrecidos son los permitidos en el perfil del médico. |
+
 ## Transiciones automáticas del flujo clínico
 
 Además del botón Siguiente, ciertas acciones avanzan solas al siguiente paso (siempre dentro del expediente, nunca salen del perfil):
 
 ```
-guardar evaluación  -> p-<id>-recetas
+guardar evaluación  -> p-<id>-estudios
 guardar receta      -> p-<id>-procedimientos
 ```
 
