@@ -121,6 +121,14 @@ en `ip_t`, un `<select>` anidado. Ahora `sl()` acepta `dis` y los tipos son sele
 2. `draw()` se ejecuta en **cada navegación** y vuelve a generar `$("#side").innerHTML = menu(a)` y `$("#main").innerHTML = ... vExp(...)`.
 3. Por lo tanto, al cambiar de usuario (cerrar sesión y entrar con otro), **la barra lateral y las pestañas se recalculan con el perfil nuevo** sin dejar iconos del rol anterior.
 
+## Documentos imprimibles en Recetas
+| Documento | Acciones | Datos |
+|---|---|---|
+| Constancia médica | `cm` → `fConstancia()` | A4 con prestadora, paciente (nombre/cédula/afiliado/expediente), médico (nombre/especialidad/cédula profesional/exequátur), diagnóstico de la última evaluación, texto libre, fecha, firma y sello. Botones Ver e Imprimir. |
+| Licencia médica | `lm` → `fLicencia()` | Campos CNSS/SISALRIL: afiliado y cédula, número de afiliado, aseguradora, prestadora, diagnóstico principal, causa (enfermedad común / accidente no laboral / embarazo), modalidad (ambulatoria / hospitalización / ambas), fecha de inicio, días calendario, fecha de término calculada, médico con cédula, exequátur, firma y sello, más nota aclaratoria sobre el formulario oficial de SISALRIL. |
+
+Los botones aparecen tanto en la sección **Recetas** como en la pestaña **Recetas** del expediente; en este último caso el paciente se pasa explícitamente en la acción (`cm:<id>` / `lm:<id>`). Los datos del médico se toman de `S.user` (cargado desde `/api/yo`) y se pueden editar en el modal sin alterar el perfil.
+
 ## Casos de prueba esperados
 
 | Rol | Módulos | Iconos laterales | Pestañas en expediente |

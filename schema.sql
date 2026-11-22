@@ -15,6 +15,9 @@ alter table usuarios add column if not exists modulos jsonb;
 alter table usuarios add column if not exists procedimientos jsonb;
 -- Tipos de estudio del catálogo que puede indicar cada médico (lista de nombres).
 alter table usuarios add column if not exists estudios jsonb;
+-- Datos del médico para constancias y certificados de licencia (RD).
+alter table usuarios add column if not exists cedula_medica text;
+alter table usuarios add column if not exists exequatur text;
 
 create sequence if not exists paciente_codigo_seq start 1;
 create sequence if not exists paciente_expediente_seq start 1;

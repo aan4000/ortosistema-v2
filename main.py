@@ -293,11 +293,13 @@ def login(d: Login, req: Request):
 @app.get("/api/yo")
 def yo(u=Depends(usuario_actual)):
     with pool.connection() as c:
-        p = c.execute("select correo, cargo, telefono, ultimo_ingreso, preguntas_config_en, modulos, procedimientos, estudios "
+        p = c.execute("select correo, cargo, telefono, cedula_medica, exequatur, ultimo_ingreso, preguntas_config_en, modulos, procedimientos, estudios "
                       "from usuarios where usuario=%s", (u["sub"],)).fetchone()
     return {"usuario": u["sub"], "rol": u["rol"], "nombre": u["nombre"],
             "correo": p["correo"] if p else None,
             "cargo": p["cargo"] if p else None,
+            "cedula_medica": p["cedula_medica"] if p else None,
+            "exequatur": p["exequatur"] if p else None,
             "telefono": p["telefono"] if p else None,
             "modulos": p["modulos"] if p else None,
             "procedimientos": (p["procedimientos"] or []) if p else [],
@@ -482,6 +484,8 @@ class NuevoUsuario(BaseModel):
     correo: str | None = None
     telefono: str | None = None
     cargo: str | None = None
+    cedula_medica: str | None = None
+    exequatur: str | None = None
     modulos: list[str] | None = None
     procedimientos: list[str] | None = None
     estudios: list[str] | None = None
@@ -500,6 +504,8 @@ class CambioUsuario(BaseModel):
     correo: str | None = None
     telefono: str | None = None
     cargo: str | None = None
+    cedula_medica: str | None = None
+    exequatur: str | None = None
 
 
 def _validar(rol=None, password=None):
@@ -514,7 +520,7 @@ def usuarios(u=Depends(solo_admin)):
     with pool.connection() as c:
         return {"usuarios": c.execute(
             "select u.id,u.usuario,u.nombre,u.rol,u.activo,u.debe_cambiar_clave,"
-            "u.correo,u.telefono,u.cargo,u.ultimo_ingreso,"
+            "u.correo,u.telefono,u.cargo,u.cedula_medica,u.exequatur,u.ultimo_ingreso,"
             "(select count(*) from preguntas_seguridad p where p.usuario_id=u.id) preguntas, "
             "u.modulos, u.procedimientos, u.estudios "
             "from usuarios u order by u.usuario").fetchall()}
@@ -527,9 +533,9 @@ def usuario_nuevo(d: NuevoUsuario, u=Depends(solo_admin)):
     with pool.connection() as c:
         if c.execute("select 1 from usuarios where lower(usuario)=%s", (d.usuario.lower(),)).fetchone():
             raise HTTPException(409, "Ese usuario ya existe")
-        r = c.execute("insert into usuarios(usuario,nombre,rol,password_hash,correo,telefono,cargo,"
-                      "modulos,procedimientos,estudios,debe_cambiar_clave) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,true) returning id",
-                      (d.usuario.lower(), d.nombre, d.rol, h, d.correo, d.telefono, d.cargo, Jsonb(d.modulos) if d.modulos is not None else None,
+        r = c.execute("insert into usuarios(usuario,nombre,rol,password_hash,correo,telefono,cargo,cedula_medica,exequatur,"
+                      "modulos,procedimientos,estudios,debe_cambiar_clave) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,true) returning id",
+                      (d.usuario.lower(), d.nombre, d.rol, h, d.correo, d.telefono, d.cargo, d.cedula_medica, d.exequatur, Jsonb(d.modulos) if d.modulos is not None else None,
                        Jsonb(d.procedimientos) if d.procedimientos is not None else None,
                        Jsonb(d.estudios) if d.estudios is not None else None)).fetchone()
         auditar(c, u, "crear", "usuarios", r["id"])
@@ -554,6 +560,10 @@ def usuario_editar(uid: int, d: CambioUsuario, u=Depends(solo_admin)):
         campos["telefono"] = d.telefono.strip() or None
     if d.cargo is not None:
         campos["cargo"] = d.cargo.strip() or None
+    if d.cedula_medica is not None:
+        campos["cedula_medica"] = d.cedula_medica.strip() or None
+    if d.exequatur is not None:
+        campos["exequatur"] = d.exequatur.strip() or None
     if d.resetear_permisos:
         campos["modulos"] = None
     elif d.modulos is not None:
