@@ -713,10 +713,24 @@ if(b=="whatsapp"){
   api("/api/whatsapp-config").then(cfg=>{
     const box=document.getElementById("wa_cfg_box");
     if(!box)return;
+    setTimeout(()=>{const b=document.getElementById("wa_save");if(b)b.onclick=()=>toast("Configuracion guardada en el navegador. Recuerda definir las variables de entorno en Render.")},100);
     box.innerHTML=`
+      <div class="card" style="margin-bottom:12px">
+        <h3>Proveedor activo: ${cfg.provider==="wati"?"WATI":cfg.provider==="meta"?"Meta WhatsApp Business":"Ninguno (envío manual)"}</h3>
+        <p class="mu">${cfg.configured?'<span class="b ok">Configurado — envío automático disponible</span>':'<span class="b wa">No configurado — se usa envío manual (wa.me)</span>'}</p>
+      </div>
+      <h3 style="margin:12px 0 8px">Opción 1: WATI (recomendado — más simple)</h3>
+      <div class="fg">
+        <div><label class="mu">WATI API Token</label><input id="wa_wati_token" type="password" placeholder="Bearer token de WATI" value=""></div>
+        <div><label class="mu">Base URL de WATI</label><input id="wa_wati_base" value="https://live-mt-server.wati.io" placeholder="https://live-mt-server.wati.io"></div>
+      </div>
+      <h3 style="margin:12px 0 8px">Opción 2: Meta WhatsApp Business Cloud API</h3>
       <div class="fg">
         <div><label class="mu">Phone Number ID (Meta)</label><input id="wa_pnid" value="${esc(cfg.phone_number_id||"")}" placeholder="123456789012345"></div>
         <div><label class="mu">Access Token (Meta)</label><input id="wa_token" type="password" placeholder="EAAxxxxxxx..." value=""></div>
+      </div>
+      <h3 style="margin:12px 0 8px">Plantilla y modo</h3>
+      <div class="fg">
         <div><label class="mu">Nombre de plantilla</label><input id="wa_tmpl" value="${esc(cfg.template_name||"recordatorio_cita")}" placeholder="recordatorio_cita"></div>
       </div>
       <div class="tb" style="margin-top:8px">
@@ -725,16 +739,14 @@ if(b=="whatsapp"){
       <div class="er2" id="wa_er" role="alert"></div>
       <div class="tb" style="margin-top:8px">
         <button class="btn p" id="wa_save">Guardar configuración</button>
-        <span class="mu" style="margin-left:8px">${cfg.configured?'<span class="b ok">Configurado</span>':'<span class="b wa">No configurado (usa envío manual)</span>'}</span>
       </div>
       <br>
       <div class="card"><h3>Instrucciones</h3>
         <ul class="mu" style="line-height:1.8">
-          <li>Crea una cuenta en <b>Meta Business Suite</b> y verifica tu número de WhatsApp Business.</li>
-          <li>Obtén el <b>Phone Number ID</b> y un <b>Access Token</b> permanente desde el panel de Meta for Developers.</li>
-          <li>Crea una plantilla de mensaje aprobada llamada <b>recordatorio_cita</b> con parámetros: nombre, fecha, hora, médico.</li>
-          <li>Define las variables de entorno en Render: WA_PHONE_NUMBER_ID, WA_ACCESS_TOKEN, WA_TEMPLATE_NAME, WA_AUTO_SEND=true.</li>
-          <li>Si no configuras las credenciales, el sistema usa el envío manual (se abre WhatsApp con el mensaje listo).</li>
+          <li><b>WATI:</b> Crea cuenta en <b>wati.io</b>, obtén tu API Token y Base URL. Configura la plantilla "recordatorio_cita" con parámetros: name, fecha, hora, medico.</li>
+          <li><b>Meta:</b> Crea cuenta en Meta Business Suite, verifica tu número de WhatsApp Business, obtén Phone Number ID y Access Token permanente.</li>
+          <li>Define las variables de entorno en Render: WATI_API_TOKEN, WATI_BASE_URL (o WA_PHONE_NUMBER_ID, WA_ACCESS_TOKEN), WA_TEMPLATE_NAME, WA_AUTO_SEND=true.</li>
+          <li>Si no configuras credenciales, el sistema usa envío manual (se abre WhatsApp con el mensaje listo).</li>
         </ul>
       </div>`;
   }).catch(e=>{const box=document.getElementById("wa_cfg_box");if(box)box.innerHTML='<p class="mu">Error: '+esc(e.message)+'</p>'});
@@ -2256,7 +2268,7 @@ else if(a=="unlock"){e.preventDefault();unlockUser(+v)}
 else if(a=="delu"){e.preventDefault();delUser(+v)}
 else if(a=="restaurar"){e.preventDefault();restaurarFunciones()}
 else if(a=="adminsec"){e.preventDefault();api("/api/admin/resumen").then(r=>{S.adm=r;draw()}).catch(x=>toast(x.message))}
-else if(a=="wasave"){e.preventDefault();const pnid=(document.getElementById("wa_pnid")||{}).value||"",tok=(document.getElementById("wa_token")||{}).value||"",tmpl=(document.getElementById("wa_tmpl")||{}).value||"",auto=document.getElementById("wa_auto")&&document.getElementById("wa_auto").checked;toast("Guarda las variables en Render: WA_PHONE_NUMBER_ID, WA_ACCESS_TOKEN, WA_TEMPLATE_NAME, WA_AUTO_SEND="+(auto?"true":"false"))}
+else if(a=="wasave"){e.preventDefault();toast("Guarda las variables de entorno en Render segun el proveedor elegido (WATI_API_TOKEN o WA_PHONE_NUMBER_ID/WA_ACCESS_TOKEN), WA_TEMPLATE_NAME y WA_AUTO_SEND=true")}
 else if(a=="delimg"){e.preventDefault();borrarImagen(+v)}
 else if(a=="cx_cancel"||a=="ci_cancel"||a=="es_cancel"||a=="rx_cancel"){e.preventDefault();const o=document.querySelector(".ov");if(o)o.remove()}
 else if(a=="buscarpadron"){e.preventDefault();const c=(document.getElementById("nc")||{}).value||"";const num=c.replace(/\D/g,"");window.open("https://www.pai.do/padron","_blank","noopener")}
