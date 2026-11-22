@@ -37,7 +37,7 @@ const tabVisible = k => {
 | Lugar | Función | Comportamiento |
 |---|---|---|
 | Barra lateral (iconos) | `menu(a)` | Filtra `M` y `AD` con `can(k)`. El grupo "Atención clínica" solo aparece si hay algún módulo visible. El grupo "Gestión"/"Administrativo" solo aparece si hay módulos de gestión permitidos. |
-| Pestañas del paciente | `vExp(id, tab)` | Construye `T` con `.filter(([k]) => tabVisible(k))`. Orden: Resumen → Evaluación → Citas → Clínica → Procedimientos → Órtesis → Rehabilitación → Gestión → Documentos. |
+| Pestañas del paciente | `vExp(id, tab)` | Construye `T` con `.filter(([k]) => tabVisible(k))`. Orden: Resumen → Evaluación → Citas → Órtesis → Clínica → Procedimientos → Rehabilitación → Gestión → Documentos. |
 | Botones Anterior/Siguiente | `_tabOrder` | Usa el mismo `.filter(tabVisible)`, por lo que la secuencia salta las pestañas sin acceso. |
 | Ruta directa | `draw()` | Si alguien escribe `p-71-ortasis` y el rol no tiene `ortesis`, se normaliza a la primera pestaña visible (Resumen). |
 | Registro de paciente | `gp()` | Al crear un paciente (o elegir "Crear como nuevo" ante un duplicado) se navega directo a `p-<id>-evaluacion`. El aviso posterior ofrece continuar a Citas. |
@@ -53,9 +53,9 @@ const tabVisible = k => {
 | Rol | Módulos | Iconos laterales | Pestañas en expediente |
 |---|---|---|---|
 | `admin` | (todos) | Todos + Administración | Las 9 |
-| `medico` (ej. `paolagarabito@gmail.com`) | agenda, pacientes, procedimientos, ortesis, quirofano, estudios | Inicio, Agenda, Pacientes, Procedimientos, Órtesis, Quirófano, Estudios | Resumen, Evaluación, Citas, Clínica, Procedimientos, Órtesis. **No** Rehabilitación, Gestión, Documentos |
-| `secretaria` | (según `DB.PM.secretaria`) | Inicio, Agenda, Pacientes, Procedimientos, Recetas, Órtesis, Documentos, Gestión… | Resumen, Evaluación, Citas, Clínica, Procedimientos, Órtesis, Gestión, Documentos. **No** Rehabilitación |
-| `fisio` | agenda, pacientes, rehab, ortesis, estudios, documentos | Inicio, Agenda, Pacientes, Órtesis, Estudios, Documentos, Rehabilitación | Resumen, Evaluación, Citas, Clínica, Órtesis, Rehabilitación, Documentos. **No** Procedimientos, Gestión |
+| `medico` (ej. `paolagarabito@gmail.com`) | agenda, pacientes, procedimientos, ortesis, quirofano, estudios | Inicio, Agenda, Pacientes, Procedimientos, Órtesis, Quirófano, Estudios | Resumen, Evaluación, Citas, Órtesis, Clínica, Procedimientos. **No** Rehabilitación, Gestión, Documentos |
+| `secretaria` | (según `DB.PM.secretaria`) | Inicio, Agenda, Pacientes, Procedimientos, Recetas, Órtesis, Documentos, Gestión… | Resumen, Evaluación, Citas, Órtesis, Clínica, Procedimientos, Gestión, Documentos. **No** Rehabilitación |
+| `fisio` | agenda, pacientes, rehab, ortesis, estudios, documentos | Inicio, Agenda, Pacientes, Órtesis, Estudios, Documentos, Rehabilitación | Resumen, Evaluación, Citas, Órtesis, Clínica, Rehabilitación, Documentos. **No** Procedimientos, Gestión |
 
 ## Mantenimiento
 - Si se crea una sección nueva, agregarla a `M` o `AD` y a `PERMISO_TAB` con su módulo.
