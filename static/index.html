@@ -104,7 +104,15 @@ ul.l{list-style:none;margin:0;padding:0}ul.l li{padding:6px 0;border-bottom:1px 
 @media(prefers-reduced-motion:reduce){.side{transition:none}html,.main{scroll-behavior:auto}.pg.entra,.pg.entra-der,.pg.entra-izq,.pg.entra>*,.pg.entra-der>*,.pg.entra-izq>*{animation:none}}
 .ic{flex:none;vertical-align:-3px;transition:transform var(--transition-base),opacity var(--transition-base),filter var(--transition-base);stroke-width:1.75}
 .lb{display:flex;align-items:center;gap:10px;color:var(--pri)}
-.lg{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .45s ease}
+.lg{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .45s ease;
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 15%, color-mix(in srgb,var(--pri) 14%,transparent),transparent 65%),
+    radial-gradient(ellipse 50% 40% at 80% 85%, color-mix(in srgb,var(--acc) 10%,transparent),transparent 60%),
+    radial-gradient(ellipse 60% 45% at 50% 50%, color-mix(in srgb,var(--pri2) 35%,transparent),transparent 75%),
+    var(--bg);
+  position:relative;overflow:hidden}
+.lg::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 35% 25% at 75% 25%, color-mix(in srgb,var(--pri) 5%,transparent),transparent 55%);pointer-events:none}
+.lg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 30% 20% at 25% 75%, color-mix(in srgb,var(--acc) 4%,transparent),transparent 50%);pointer-events:none}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .lc{width:min(400px,100%);border-radius:var(--radius);box-shadow:0 8px 32px rgba(10,40,80,.12),0 2px 8px rgba(10,40,80,.06);backdrop-filter:blur(8px);border:1px solid color-mix(in srgb,var(--bd) 60%,transparent);animation:fadeInUp .5s cubic-bezier(.16,.84,.28,1)}.lc h1{margin:14px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em}.lc label{display:block;margin:10px 0;font-size:14px;color:var(--sec)}
 .er2{color:var(--er);min-height:20px;margin:6px 0}
@@ -668,7 +676,7 @@ async function entrar(usuario,password){
   S.route="inicio";
   draw();
 }
-function vSetup(){$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb">${ic("shield",28)}<b style="font-size:20px">OrtoSistema</b></div><h1>Crear administrador</h1><p class="mu">Es la primera vez que se usa el sistema. Esta cuenta podrá crear usuarios y definir las funciones de cada rol.</p><label class="mu">Nombre completo<input id="rn" autocomplete="name" placeholder="Ej. Juan Pérez"></label><label class="mu">Usuario<input id="ru" autocomplete="username" placeholder="tu_usuario"></label><label class="mu">Contraseña (mínimo 10 caracteres)<input id="rp" type="password" autocomplete="new-password" placeholder="••••••••••"></label><label class="mu">Repetir contraseña<input id="rq" type="password" autocomplete="new-password" placeholder="••••••••••"></label><div class="er2" id="re" role="alert"></div><button class="btn p" id="rb" style="width:100%">${ic("shieldcheck",16)} Crear cuenta y entrar</button></div></div>`;
+function vSetup(){$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb" style="flex-direction:column;align-items:center;gap:8px;margin-bottom:12px"><span style="display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;box-shadow:0 6px 20px rgba(13,110,253,.35)">${ic("shield",32)}</span><div style="text-align:center"><b style="font-size:24px;font-weight:700;letter-spacing:-.02em;display:block">OrtoSistema</b><span class="mu" style="font-size:12px">Gestión Ortopédica</span></div></div><h1>Crear administrador</h1><p class="mu">Es la primera vez que se usa el sistema. Esta cuenta podrá crear usuarios y definir las funciones de cada rol.</p><label class="mu">Nombre completo<input id="rn" autocomplete="name" placeholder="Ej. Juan Pérez"></label><label class="mu">Usuario<input id="ru" autocomplete="username" placeholder="tu_usuario"></label><label class="mu">Contraseña (mínimo 10 caracteres)<input id="rp" type="password" autocomplete="new-password" placeholder="••••••••••"></label><label class="mu">Repetir contraseña<input id="rq" type="password" autocomplete="new-password" placeholder="••••••••••"></label><div class="er2" id="re" role="alert"></div><button class="btn p" id="rb" style="width:100%">${ic("shieldcheck",16)} Crear cuenta y entrar</button></div></div>`;
 $("#rb").onclick=async()=>{const nombre=$("#rn").value.trim(),u=$("#ru").value.trim().toLowerCase(),p=$("#rp").value,er=m=>{$("#re").textContent=m};
 if(!nombre||!u)return er("Completa nombre y usuario.");
 if(p.length<10)return er("La contraseña debe tener al menos 10 caracteres.");
@@ -702,7 +710,7 @@ function rst(){
       }catch(ex){b.disabled=false;e(ex.message)}}};
   paso1();
 }
-function vLogin(){if(S.nuevo)return vSetup();$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb">${ic("shield",28)}<b style="font-size:20px">OrtoSistema</b></div><h1>Iniciar sesión</h1><p class="mu">Entra con tu usuario y contraseña.</p><label class="mu">Usuario<input id="lu" autocomplete="username" placeholder="tu_usuario"></label><label class="mu">Contraseña<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••••"></label><div class="er2" id="le" role="alert"></div><button class="btn p" id="lb2" style="width:100%">${ic("unlock",16)} Entrar</button><button class="btn" data-a="rst">${ic("key",16)} ¿Olvidaste tu contraseña?</button></div></div>`;
+function vLogin(){if(S.nuevo)return vSetup();$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb" style="flex-direction:column;align-items:center;gap:8px;margin-bottom:12px"><span style="display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;box-shadow:0 6px 20px rgba(13,110,253,.35)">${ic("shield",32)}</span><div style="text-align:center"><b style="font-size:24px;font-weight:700;letter-spacing:-.02em;display:block">OrtoSistema</b><span class="mu" style="font-size:12px">Gestión Ortopédica</span></div></div><h1>Iniciar sesión</h1><p class="mu">Entra con tu usuario y contraseña.</p><label class="mu">Usuario<input id="lu" autocomplete="username" placeholder="tu_usuario"></label><label class="mu">Contraseña<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••••"></label><div class="er2" id="le" role="alert"></div><button class="btn p" id="lb2" style="width:100%">${ic("unlock",16)} Entrar</button><button class="btn" data-a="rst">${ic("key",16)} ¿Olvidaste tu contraseña?</button></div></div>`;
 const go2=async()=>{const b=$("#lb2"),er=m=>{$("#le").textContent=m};
 const u=$("#lu").value.trim().toLowerCase(),p=$("#lp").value;
 if(!u||!p)return er("Escribe tu usuario y contraseña.");
@@ -845,7 +853,7 @@ function miSeguridad(){
   }).catch(e=>{box.innerHTML=`<div class="er2">${esc(e.message)}</div>`});
 }
 
-function vForzar(){$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb">${ic("shield",28)}<b style="font-size:20px">OrtoSistema</b></div><h1>Cambia tu contraseña</h1><p class="mu">Tu contraseña es temporal. Elige una nueva para continuar.</p><label class="mu">Nueva contraseña (mínimo 10 caracteres)<input id="fp1" type="password" autocomplete="new-password"></label><label class="mu">Repetir contraseña<input id="fp2" type="password" autocomplete="new-password"></label><div class="er2" id="fpe" role="alert"></div><button class="btn p" id="fpb" style="width:100%">${ic("save",16)} Guardar y entrar</button></div></div>`;
+function vForzar(){$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb" style="flex-direction:column;align-items:center;gap:8px;margin-bottom:12px"><span style="display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;box-shadow:0 6px 20px rgba(13,110,253,.35)">${ic("shield",32)}</span><div style="text-align:center"><b style="font-size:24px;font-weight:700;letter-spacing:-.02em;display:block">OrtoSistema</b><span class="mu" style="font-size:12px">Gestión Ortopédica</span></div></div><h1>Cambia tu contraseña</h1><p class="mu">Tu contraseña es temporal. Elige una nueva para continuar.</p><label class="mu">Nueva contraseña (mínimo 10 caracteres)<input id="fp1" type="password" autocomplete="new-password"></label><label class="mu">Repetir contraseña<input id="fp2" type="password" autocomplete="new-password"></label><div class="er2" id="fpe" role="alert"></div><button class="btn p" id="fpb" style="width:100%">${ic("save",16)} Guardar y entrar</button></div></div>`;
 $("#fpb").onclick=async()=>{const a=$("#fp1").value,er=m=>{$("#fpe").textContent=m};if(a.length<10)return er("La contraseña debe tener al menos 10 caracteres.");if(a!==$("#fp2").value)return er("Las contraseñas no coinciden.");
 if(a===S.tmp)return er("Elige una contraseña distinta a la temporal.");
 $("#fpb").disabled=true;
@@ -2323,7 +2331,7 @@ try{
   aplicarTema();
 }catch(err){
   if(/sesi[oó]n|token|credencial/i.test(err.message)){localStorage.removeItem(TK);return vLogin()}
-  $("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb">${ic("shield",28)}<b style="font-size:20px">OrtoSistema</b></div><h1>No se pudo conectar</h1><p class="mu">${esc(err.message)}</p><p class="mu">Revisa que la API esté encendida y vuelve a intentarlo.</p><button class="btn p" id="rbt" style="width:100%">Reintentar</button></div></div>`;
+  $("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb" style="flex-direction:column;align-items:center;gap:8px;margin-bottom:12px"><span style="display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;box-shadow:0 6px 20px rgba(13,110,253,.35)">${ic("shield",32)}</span><div style="text-align:center"><b style="font-size:24px;font-weight:700;letter-spacing:-.02em;display:block">OrtoSistema</b><span class="mu" style="font-size:12px">Gestión Ortopédica</span></div></div><h1>No se pudo conectar</h1><p class="mu">${esc(err.message)}</p><p class="mu">Revisa que la API esté encendida y vuelve a intentarlo.</p><button class="btn p" id="rbt" style="width:100%">Reintentar</button></div></div>`;
   const b=$("#rbt");if(b)b.onclick=()=>boot();return;
 }
 draw()}
