@@ -607,7 +607,8 @@ async function cargar(){
   for(const k of Object.keys(TABLA))DB[k]=(todo[TABLA[k]]||[]).map(r=>fromK(k,r));
   const imgs={};(todo["_imagenes"]||[]).forEach(i=>{if(!imgs[i.estudio_id])imgs[i.estudio_id]=i.id});
   DB.I.forEach(x=>x.im=imgs[x.id]||null);
-  S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config,modulos:yo.modulos||null,procedimientos:yo.procedimientos||[],clinica:S.clinica||localStorage.getItem("orto_clinica")||"Clínica Principal"};
+  S.clinica=S.clinica||localStorage.getItem("orto_clinica")||"Clínica Principal";
+  S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config,modulos:yo.modulos||null,procedimientos:yo.procedimientos||[],clinica:S.clinica};
   if(yo.es_admin){
     const[f,us,med,adm]=await Promise.all([api("/api/funciones"),api("/api/usuarios"),api("/api/medicos"),api("/api/admin/resumen").catch(()=>null)]);
     Object.entries(f.roles).forEach(([r,m])=>DB.PM[r]=m);
@@ -862,7 +863,7 @@ $("#fpb").disabled=true;
 try{const r=await api("/api/cambiar-clave",{method:"POST",body:{actual:S.tmp,nueva:a}});if(r.token)localStorage.setItem(TK,r.token);S.tmp=null;await cargar();S.route="inicio";draw()}
 catch(e){$("#fpb").disabled=false;er(e.message)}};$("#fp1").focus()}
 
-function menu(a){let h=`<h1 class="lb"><span class="lg2">${ic("shield",18)}</span> OrtoSistema</h1><p class="mu" style="margin:0 0 8px 10px;font-size:11px;font-weight:600;color:var(--pri)">${esc(S.clinica||"Clínica Principal")}</p>`;
+function menu(a){let h=`<h1 class="lb"><span class="lg2">${ic("shield",18)}</span> OrtoSistema</h1><p class="mu" style="margin:0 0 8px 10px;font-size:11px;font-weight:600;color:var(--pri)">${esc((S.user&&S.user.clinica)||S.clinica||localStorage.getItem("orto_clinica")||"Clínica Principal")}</p>`;
 const nv=(k,i,l,s="")=>`<a class="nav${s}${a==k||(k=="pacientes"&&(a=="p"||a=="nuevo"||a=="evaluacion"))?" on":""}" href="#" data-r="${k}" title="${esc(DS[k]||"")}"><span class="nav-ic">${ic(i,20)}</span> ${l}</a>`;
 let gl=false;M.forEach(([k,i,l])=>{if(can(k)){if(!gl&&!["inicio","agenda","pacientes"].includes(k)){gl=true;h+='<div class="gl">Atención clínica</div>'}h+=nv(k,i,l)}});
 const ad=AD.filter(x=>can(x[0]));
