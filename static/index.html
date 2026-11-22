@@ -1102,9 +1102,21 @@ function verPreauth(i){
 }
 function vCargos(){const s=e=>mon(fa(DB.B).filter(x=>x.e==e).reduce((a,x)=>a+x.m,0));
 return`<p><button class="btn p" data-r="facturacion-nueva">${ic("plus",16)} Nuevo cargo</button></p>`+`<div class="grid"><div class="card k"><b>${s("Pendiente")}</b>Por cobrar</div><div class="card k"><b>${s("Cobrado")}</b>Cobrado</div></div>`+card("Cargos",tbl(["Fecha","Paciente","Código","Concepto","Médico","Monto","Estado",""],DB.B.map((x,i)=>[x,i]).filter(([x])=>!S.ap||!S.only||x.p==S.ap).map(([x,i])=>[x.f,pl(x.p),esc(x.c||"—"),esc(x.t),esc(x.dr||"—"),mon(x.m),bd(x.e),`<button class="btn" data-a="facp:${i}">${ic("doc",14)} Ver/Imprimir</button> <button class="btn" data-a="ef:${i}">Editar</button> `+(x.e=="Pendiente"?`<button class="btn" data-a="cob:${i}">Registrar cobro</button>`:"")])))}
-function vExp(id,tab="resumen"){const p=pk(id);if(!p.n)return"<p>Paciente no encontrado.</p>";
+function tabVisible(k){
+  if(k=="resumen")return can("pacientes");
+  if(k=="citas")return can("agenda");
+  if(k=="clinica")return can("estudios")||can("pacientes");
+  if(k=="evaluacion")return can("pacientes");
+  if(k=="procedimientos")return can("procedimientos");
+  if(k=="ortasis")return can("ortesis");
+  if(k=="rehab")return can("rehab");
+  if(k=="gestion")return can("referimientos")||can("autorizaciones")||can("facturacion");
+  if(k=="documentos")return can("documentos");
+  return true;
+}
+function vExp(id,tab="resumen"){if(!tabVisible(tab)){const _vis=_tabOrder.length?_tabOrder[0]:"resumen";tab=_vis}const p=pk(id);if(!p.n)return"<p>Paciente no encontrado.</p>";
 const f=a=>DB[a].filter(x=>x.p==id),E=f("E"),I=f("I"),C=f("C"),F=f("F"),M=f("M"),R=f("R"),A=f("A"),B=f("B"),Dd=f("D"),PPn=f("PP"),OPn=f("OP"),Qp=DB.Q.filter(q=>q.p==id);
-const T=[["resumen","Resumen",0],["citas","Citas",Qp.length],["clinica","Clínica",E.length+I.length],["evaluacion","Evaluación",E.length],["procedimientos","Procedimientos",C.length+PPn.length],["ortasis","Órtesis",OPn.length],["rehab","Rehabilitación",F.length+M.length],["gestion","Gestión",R.length+A.length+B.length],["documentos","Documentos",Dd.length]];
+const T=[["resumen","Resumen",0],["citas","Citas",Qp.length],["clinica","Clínica",E.length+I.length],["evaluacion","Evaluación",E.length],["procedimientos","Procedimientos",C.length+PPn.length],["ortasis","Órtesis",OPn.length],["rehab","Rehabilitación",F.length+M.length],["gestion","Gestión",R.length+A.length+B.length],["documentos","Documentos",Dd.length]].filter(([k])=>tabVisible(k));
 const tlRaw=[...E.map(x=>[x.f,"Evaluación: "+x.t]),...I.map(x=>[x.f,x.t]),...C.map(x=>[x.f,"Cirugía: "+x.t]),...F.map(x=>[x.f,"Fisioterapia: "+x.t]),...M.map(x=>[x.f,`${x.t} (${x.s}%)`]),...R.map(x=>[x.f,"Referimiento: "+x.t]),...B.map(x=>[x.f,"Cargo: "+x.t]),...PPn.map(x=>[x.f,"Procedimiento: "+x.t]),...OPn.map(x=>[x.f,"Órtesis: "+x.n])];
 const _seen=new Set();const tl=tlRaw.filter(x=>{const k=x[0]+"|"+x[1];if(_seen.has(k))return false;_seen.add(k);return true}).sort((a,b)=>d8(b[0]).localeCompare(d8(a[0])));
 const B2={resumen:()=>`${card("Estado del paciente",estCard(p))}<br><p><button class="btn p" data-a="ep:${id}">${ic("edit",14)} Editar datos del paciente</button></p><div class="grid g2">${card("Datos del paciente",tbl(["Dato","Detalle"],[["Diagnóstico activo",esc(p.dx||"—")],["Fecha de nacimiento",p.fn?esc(dmy(p.fn))+" ("+edadDe(p.fn)+" años)":"—"],["Sexo",esc(p.sx||"—")],["Alergias",esc(p.al||"Ninguna registrada")],["Aseguradora",esc((p.s||"—")+(p.na?" · afiliado "+p.na:""))],["Cédula",esc(p.c||"—")],["Teléfono",esc((p.tl||"—")+(p.tl&&p.tt?" · "+p.tt:""))],["Correo",esc(p.em||"—")]]))}${card("Antecedentes",tbl(["Tipo","Detalle"],[["Mórbidos",esc(p.am||"No registrados")],["Quirúrgicos",esc(p.aq||"No registrados")],["Medicamentos actuales",esc(p.me||"No registrados")],["Familiares",esc(p.af||"No registrados")],["Hábitos",esc(p.ha||"No registrados")]])+'<p><button class="btn" data-a="ant">Editar antecedentes</button></p>')}</div>${card("Historia en orden cronológico",tbl(["Fecha","Actividad"],tl.map(x=>[x[0],esc(x[1])])))}<br>${card("Historial de estados",tbl(["Fecha y hora","Tipo","Cambio","Usuario","Nota"],(p.hs||[]).slice().reverse().map(x=>[x.f+" "+x.h,esc(x.t),esc(x.de)+" → "+esc(x.a),esc(x.u),esc(x.n||"—")])))}`,
@@ -1117,7 +1129,7 @@ gestion:()=>card("Referimientos",tk("R",id,["Fecha","Detalle","Estado"],x=>[x.f,
 ortesis:()=>`<div class="row" style="margin-bottom:12px"><button class="btn p" data-a="ao:${id}">${ic("plus",16)} Asignar órtesis</button><button class="btn" data-r="ortesis">${ic("bandage",14)} Ir a sección de Órtesis</button></div>`+card("Órtesis indicadas",tk("OP",id,["Fecha","Órtesis","Lado","Talla","Médico","Estado"],x=>[x.f,`<span class="ocell">${ortImg(x.n,"sm")}<span>${esc(x.n)}</span></span>`,esc(x.lado||"—"),esc(x.talla||"—"),esc(x.dr||"—"),bd(x.e)])),
 documentos:()=>`<p><button class="btn p" data-a="ud:${id}">${ic("up",16)} Subir documento</button></p>`+card("Documentos del paciente",tDocs(DB.D.map((x,i)=>[x,i]).filter(([x])=>x.p==id),false))
 };
-const _tabOrder=["resumen","citas","clinica","evaluacion","procedimientos","ortasis","rehab","gestion","documentos"];
+const _tabOrder=["resumen","citas","clinica","evaluacion","procedimientos","ortasis","rehab","gestion","documentos"].filter(k=>tabVisible(k));
 const _tabIdx=_tabOrder.indexOf(tab);
 const _nextTab=_tabIdx>=0&&_tabIdx<_tabOrder.length-1?_tabOrder[_tabIdx+1]:null;
 const _prevTab=_tabIdx>0?_tabOrder[_tabIdx-1]:null;
