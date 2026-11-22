@@ -39,7 +39,7 @@ const tabVisible = k => {
 |---|---|---|
 | Barra lateral (iconos) | `menu(a)` | Filtra `M` y `AD` con `can(k)`. El grupo "Atención clínica" solo aparece si hay algún módulo visible. El grupo "Gestión"/"Administrativo" solo aparece si hay módulos de gestión permitidos. |
 | Pestañas del paciente | `vExp(id, tab)` | Construye `T` con `.filter(([k]) => tabVisible(k))`. Orden: Resumen → Evaluación → **Recetas** → Citas → Órtesis → Clínica → Procedimientos → Rehabilitación → Gestión → Documentos. |
-| Botones Anterior/Siguiente | `_tabOrder` | Usa el mismo `.filter(tabVisible)`, por lo que la secuencia salta las pestañas sin acceso. |
+| Botones Anterior/Siguiente | `_tabOrder` | Usa el mismo `.filter(tabVisible)`, por lo que la secuencia salta las pestañas sin acceso. Además usan `_tabRuta()`/`_tabApAttr()`, por lo que al avanzar a Órtesis o Recetas van **directo a la sección principal** con `data-ap="<id>"`, igual que al hacer clic en la pestaña. |
 | Ruta directa | `draw()` | Si alguien escribe `p-71-ortasis` y el rol no tiene `ortesis`, se normaliza a la primera pestaña visible (Resumen). |
 | Registro de paciente | `gp()` | Al crear un paciente (o elegir "Crear como nuevo" ante un duplicado) se navega directo a `p-<id>-evaluacion`. El aviso posterior ofrece continuar a Citas. |
 | Pestaña Recetas | `vExp()` | Al hacer clic navega a la sección principal `recetas` con `data-ap="<id>"`, igual que Órtesis, preservando el paciente activo. Desde el expediente se puede crear la receta directamente con "Nueva receta". |
