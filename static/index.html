@@ -335,6 +335,7 @@ window.onerror=function(m,s,l){document.body.insertAdjacentHTML("afterbegin",'<p
 </script>
 <script>
 let $=s=>document.querySelector(s),K="orto_v1",d0=new Date(),hoy=String(d0.getDate()).padStart(2,"0")+"/"+String(d0.getMonth()+1).padStart(2,"0")+"/"+d0.getFullYear();
+const CLINICAS=["Clínica Principal","Clínica Norte","Clínica Sur","Clínica Este","Clínica Oeste"];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const IC={
 home:"<path d='M3.5 10.6 12 3.5l8.5 7.1'/><path d='M5.6 9.7V20a1 1 0 0 0 1 1h10.8a1 1 0 0 0 1-1V9.7'/><path d='M9.6 21v-5.4h4.8V21'/>",
@@ -606,7 +607,7 @@ async function cargar(){
   for(const k of Object.keys(TABLA))DB[k]=(todo[TABLA[k]]||[]).map(r=>fromK(k,r));
   const imgs={};(todo["_imagenes"]||[]).forEach(i=>{if(!imgs[i.estudio_id])imgs[i.estudio_id]=i.id});
   DB.I.forEach(x=>x.im=imgs[x.id]||null);
-  S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config,modulos:yo.modulos||null,procedimientos:yo.procedimientos||[]};
+  S.user={u:yo.usuario,nombre:yo.nombre,rol:yo.rol,correo:yo.correo,cargo:yo.cargo,preguntas:yo.preguntas_config,modulos:yo.modulos||null,procedimientos:yo.procedimientos||[],clinica:S.clinica||localStorage.getItem("orto_clinica")||"Clínica Principal"};
   if(yo.es_admin){
     const[f,us,med,adm]=await Promise.all([api("/api/funciones"),api("/api/usuarios"),api("/api/medicos"),api("/api/admin/resumen").catch(()=>null)]);
     Object.entries(f.roles).forEach(([r,m])=>DB.PM[r]=m);
@@ -637,7 +638,7 @@ async function subirImagen(estudioId,dataUrl){
   const r=await api("/api/imagenes",{method:"POST",body:{estudio_id:estudioId,mime,datos_base64:String(dataUrl).split(",")[1]}});
   return r.id;
 }
-const S={user:null,open:false,sel:new Set(),psel:new Set(),pf:{g:"",q:"",pr:false,dr:""},pa:{p:null,dr:"",f:"",e:"Indicado",cg:true},ef:{p:"",t:""},upP:null,ap:null,only:true,ag:null,evi:null,of:{g:"",q:""},pe:{a:"",u:""},os:new Set(),ox:{},oa:{p:null,dr:"",f:"",e:"Indicada",ind:""},route:(location.hash||"#inicio").slice(1)||"inicio",segcat:null,adm:null,aud:[]};
+const S={user:null,open:false,sel:new Set(),clinica:localStorage.getItem("orto_clinica")||"Clínica Principal",psel:new Set(),pf:{g:"",q:"",pr:false,dr:""},pa:{p:null,dr:"",f:"",e:"Indicado",cg:true},ef:{p:"",t:""},upP:null,ap:null,only:true,ag:null,evi:null,of:{g:"",q:""},pe:{a:"",u:""},os:new Set(),ox:{},oa:{p:null,dr:"",f:"",e:"Indicada",ind:""},route:(location.hash||"#inicio").slice(1)||"inicio",segcat:null,adm:null,aud:[]};
 const RL={medico:"Médico",enfermeria:"Enfermería",secretaria:"Secretaría",fisio:"Fisioterapeuta",facturacion:"Facturación",admin:"Administrador"};
 const RD={medico:"Historia clínica completa: evaluaciones, cirugías, estudios, recetas y autorizaciones.",enfermeria:"Apoyo clínico: consulta el expediente y adjunta estudios, documentos y órtesis.",secretaria:"Recepción y gestión: agenda, pacientes, documentos, referimientos, cobros y recetas.",fisio:"Rehabilitación: sesiones, PROMs, órtesis y consulta de documentos y estudios.",facturacion:"Cobros y autorizaciones: cargos, tarifario y preautorizaciones, sin editar la clínica.",admin:"Control total: usuarios, perfiles, seguridad, auditoría y todas las secciones."};
 const M=[["inicio","home","Inicio"],["agenda","cal","Agenda"],["pacientes","users","Pacientes"],["procedimientos","bone-fracture","Procedimientos"],["recetas","pill","Recetas"],["ortesis","bandage","Órtesis"],["quirofano","syringe","Quirófano"],["estudios","scan-heart","Estudios"],["documentos","clipboard-plus","Documentos"],["rehab","activity","Rehabilitación"]];
@@ -670,6 +671,7 @@ async function entrar(usuario,password){
   const r=await api("/api/login",{method:"POST",body:{usuario,password}});
   localStorage.setItem(TK,r.token);
   localStorage.setItem("orto_landing_done","1");
+  localStorage.setItem("orto_clinica",S.clinica||localStorage.getItem("orto_clinica")||"Clínica Principal");
   if(r.debe_cambiar_clave){S.tmp=password;S.user={u:usuario,nombre:r.nombre,rol:r.rol};return vForzar()}
   await cargar();
   aplicarTema();
@@ -710,9 +712,9 @@ function rst(){
       }catch(ex){b.disabled=false;e(ex.message)}}};
   paso1();
 }
-function vLogin(){if(S.nuevo)return vSetup();$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb" style="flex-direction:column;align-items:center;gap:8px;margin-bottom:12px"><span style="display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;box-shadow:0 6px 20px rgba(13,110,253,.35)">${ic("shield",32)}</span><div style="text-align:center"><b style="font-size:24px;font-weight:700;letter-spacing:-.02em;display:block">OrtoSistema</b><span class="mu" style="font-size:12px">Gestión Ortopédica</span></div></div><h1>Iniciar sesión</h1><p class="mu">Entra con tu usuario y contraseña.</p><label class="mu">Usuario<input id="lu" autocomplete="username" placeholder="tu_usuario"></label><label class="mu">Contraseña<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••••"></label><div class="er2" id="le" role="alert"></div><button class="btn p" id="lb2" style="width:100%">${ic("unlock",16)} Entrar</button><button class="btn" data-a="rst">${ic("key",16)} ¿Olvidaste tu contraseña?</button></div></div>`;
+function vLogin(){if(S.nuevo)return vSetup();$("#main").innerHTML=`<div class="lg"><div class="card lc"><div class="lb" style="flex-direction:column;align-items:center;gap:8px;margin-bottom:12px"><span style="display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;box-shadow:0 6px 20px rgba(13,110,253,.35)">${ic("shield",32)}</span><div style="text-align:center"><b style="font-size:24px;font-weight:700;letter-spacing:-.02em;display:block">OrtoSistema</b><span class="mu" style="font-size:12px">Gestión Ortopédica</span></div></div><h1>Iniciar sesión</h1><p class="mu">Entra con tu usuario y contraseña.</p><label class="mu">Clínica<select id="lc" style="margin-bottom:4px"><option value="Clínica Principal">Clínica Principal</option><option value="Clínica Norte">Clínica Norte</option><option value="Clínica Sur">Clínica Sur</option><option value="Clínica Este">Clínica Este</option><option value="Clínica Oeste">Clínica Oeste</option></select></label><label class="mu">Usuario<input id="lu" autocomplete="username" placeholder="tu_usuario"></label><label class="mu">Contraseña<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••••"></label><div class="er2" id="le" role="alert"></div><button class="btn p" id="lb2" style="width:100%">${ic("unlock",16)} Entrar</button><button class="btn" data-a="rst">${ic("key",16)} ¿Olvidaste tu contraseña?</button></div></div>`;
 const go2=async()=>{const b=$("#lb2"),er=m=>{$("#le").textContent=m};
-const u=$("#lu").value.trim().toLowerCase(),p=$("#lp").value;
+const u=$("#lu").value.trim().toLowerCase(),p=$("#lp").value,clinica=$("#lc")?$("#lc").value:"Clínica Principal";localStorage.setItem("orto_clinica",clinica);S.clinica=clinica;
 if(!u||!p)return er("Escribe tu usuario y contraseña.");
 b.disabled=true;er("");
 try{await entrar(u,p)}catch(e){b.disabled=false;er(e.message)}};
@@ -860,7 +862,7 @@ $("#fpb").disabled=true;
 try{const r=await api("/api/cambiar-clave",{method:"POST",body:{actual:S.tmp,nueva:a}});if(r.token)localStorage.setItem(TK,r.token);S.tmp=null;await cargar();S.route="inicio";draw()}
 catch(e){$("#fpb").disabled=false;er(e.message)}};$("#fp1").focus()}
 
-function menu(a){let h=`<h1 class="lb"><span class="lg2">${ic("shield",18)}</span> OrtoSistema</h1>`;
+function menu(a){let h=`<h1 class="lb"><span class="lg2">${ic("shield",18)}</span> OrtoSistema</h1><p class="mu" style="margin:0 0 8px 10px;font-size:11px;font-weight:600;color:var(--pri)">${esc(S.clinica||"Clínica Principal")}</p>`;
 const nv=(k,i,l,s="")=>`<a class="nav${s}${a==k||(k=="pacientes"&&(a=="p"||a=="nuevo"||a=="evaluacion"))?" on":""}" href="#" data-r="${k}" title="${esc(DS[k]||"")}"><span class="nav-ic">${ic(i,20)}</span> ${l}</a>`;
 let gl=false;M.forEach(([k,i,l])=>{if(can(k)){if(!gl&&!["inicio","agenda","pacientes"].includes(k)){gl=true;h+='<div class="gl">Atención clínica</div>'}h+=nv(k,i,l)}});
 const ad=AD.filter(x=>can(x[0]));
