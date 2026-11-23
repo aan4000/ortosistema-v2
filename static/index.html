@@ -296,6 +296,9 @@ tbody tr:nth-child(even):hover{background:var(--bg)}
 .en-paciente .oim.sm{width:30px;height:30px}
 .en-paciente .oim.sm svg{width:24px;height:24px}
 .en-pacientes .pn{font-size:12px}
+.en-pacientes .acts-pac{display:inline-flex;flex-wrap:nowrap;gap:5px;align-items:center}
+.en-pacientes .acts-pac .icb{width:30px;height:30px;min-height:30px;padding:0;flex:none;border-radius:7px}
+.en-pacientes .acts-pac .icb svg{width:15px;height:15px}
 .mu{line-height:1.45}
 h1,h2,h3{letter-spacing:-.01em}
 .pg{padding:20px 28px 56px}
@@ -338,7 +341,7 @@ body{font-size:13.5px;line-height:1.45;-webkit-font-smoothing:antialiased;text-r
 .main{position:relative;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
 .top{min-height:var(--top-h);padding:7px 16px;gap:8px;background:color-mix(in srgb,var(--sf) 92%,transparent)}
 .top input{max-width:360px;min-height:34px;padding:6px 10px;font-size:13px}
-.pg{padding:14px 20px 40px;max-width:none;animation:none}
+.pg{position:relative;padding:14px 20px 40px;max-width:none;animation:none}
 .pg.entra,.pg.entra-der,.pg.entra-izq{animation:none}
 .pg.entra>:not(.ph),.pg.entra-der>:not(.ph),.pg.entra-izq>:not(.ph){animation:secIn .28s ease both}
 .pg.entra>:nth-child(n),.pg.entra-der>:nth-child(n),.pg.entra-izq>:nth-child(n){animation-delay:0s}
@@ -997,7 +1000,7 @@ ${card("1. Conceptos básicos",`
   </ul>`)}
 ${card("2. Inicio",`<p class="mu">Resumen de tu jornada: indicadores (citas hoy, cirugías programadas, estudios por revisar, PROMs bajos, preauth pendientes), agenda del día, alertas y accesos rápidos. Los indicadores son clicables.</p>`)}
 ${card("3. Agenda",`<p class="mu">Citas del día seleccionado y cirugías programadas. Navega entre días con las flechas o elige fecha en el calendario. Botón "Agendar cita" abre el formulario (paciente bloqueado al activo). Cada paciente aparece una sola vez aunque tenga varias citas; las horas se unen. Acciones por cita: Confirmar, Editar, Cancelar. Cirugías: fecha, hora, paciente, procedimiento, sala, estado.</p>`)}
-${card("4. Pacientes",`<p class="mu">Directorio con checkboxes para selección múltiple y botón "Eliminar seleccionados". Buscar por nombre, cédula, teléfono, número de expediente, código del paciente, seguro o diagnóstico; los números se encuentran aunque escribas guiones o espacios de otro modo. Columnas: código / expediente, paciente (avatar+nombre+badge Activo), edad, seguro, diagnóstico, atención, autorización. Filtros por estado de atención y autorización. Botones por fila: Activar/Activo, Abrir expediente, Eliminar. "Nuevo paciente" abre el formulario de registro.</p>`)}
+${card("4. Pacientes",`<p class="mu">Directorio con checkboxes para selección múltiple y botón "Eliminar seleccionados". Buscar por nombre, cédula, teléfono, número de expediente, código del paciente, seguro o diagnóstico; los números se encuentran aunque escribas guiones o espacios de otro modo. Columnas: código / expediente, paciente (avatar+nombre+badge Activo), edad, seguro, diagnóstico, atención, autorización. Filtros por estado de atención y autorización. Botones por fila en iconos alineados: Activar/Activo, Abrir expediente y Eliminar. "Nuevo paciente" abre el formulario de registro.</p>`)}
 ${card("5. Expediente del paciente (pestañas)",`<ul class="mu" style="line-height:1.8">
   <li><b>Resumen:</b> estado del paciente, datos del paciente (diagnóstico, fecha de nacimiento, sexo, alergias, seguro, cédula, teléfono, correo, expediente), antecedentes, historia cronológica, historial de estados. Botón "Editar datos del paciente" para modificar el perfil.</li>
   <li><b>Evaluación:</b> evaluación médica estructurada. Al guardar avanza a Estudios e imágenes.</li>
@@ -1063,7 +1066,7 @@ const SI={agenda:"cal",pacientes:"users",procedimientos:"bone-fracture",ortesis:
 const sec=t=>{const k=S.route.split("-")[0];return`<div class="sh"><h2><span class="hi" style="display:inline-grid;place-items:center;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--pri2),var(--hmb));color:var(--pri);margin-right:12px;vertical-align:middle;box-shadow:0 2px 8px rgba(13,110,253,.12);transition:transform .3s ease">${ic(SI[k]||"chart",22)}</span>${t}</h2><p class="mu">${DS[k]||""}</p></div>`};
 const pacNorm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""),pacDigits=s=>String(s||"").replace(/\D/g,"");
 const pacMatch=(p,q)=>{const s=pacNorm(q).trim(),d=pacDigits(q),text=pacNorm([p.n,p.c,p.s,p.cd,p.xp,p.tl,p.dx,p.em].join(" "));if(!s)return true;if(text.includes(s))return true;return d.length>=3&&[p.c,p.tl,p.xp,p.cd].some(x=>pacDigits(x).includes(d))};
-const listaP=q=>tbl(["","Código / Expediente","Paciente","Edad","Seguro","Diagnóstico","Atención","Autorización",""],DB.P.filter(p=>pacMatch(p,q)&&(!S.pe.a||p.ea==S.pe.a)&&(!S.pe.u||effAu(p)==S.pe.u)).map(p=>[`<input type="checkbox" data-psel="${p.id}" ${S.psel.has(p.id)?"checked":""} aria-label="Seleccionar ${esc(p.n)}">`,`<span class="code">${esc(p.cd||"—")}${p.xp?` · Exp. ${esc(p.xp)}`:""}</span>`,`<span class="pcell">${avSexo(p.sx,"xs")}${pl(p.id)}${S.ap==p.id?' <span class="b in">Activo</span>':""}</span>`,p.e,esc(p.s),esc(p.dx||"—"),chip(EA,p.ea),chip(EU,effAu(p)),`<button class="btn${S.ap==p.id?"":" p"}" data-a="ac:${p.id}">${S.ap==p.id?"Activo":"Activar"}</button> <button class="btn" data-r="p-${p.id}">${ic("folder",14)} Abrir expediente</button> <button class="btn d" data-a="delp:${p.id}" title="Eliminar paciente" aria-label="Eliminar paciente">${ic("trash",14)}</button>`]));
+const listaP=q=>tbl(["","Código / Expediente","Paciente","Edad","Seguro","Diagnóstico","Atención","Autorización",""],DB.P.filter(p=>pacMatch(p,q)&&(!S.pe.a||p.ea==S.pe.a)&&(!S.pe.u||effAu(p)==S.pe.u)).map(p=>[`<input type="checkbox" data-psel="${p.id}" ${S.psel.has(p.id)?"checked":""} aria-label="Seleccionar ${esc(p.n)}">`,`<span class="code">${esc(p.cd||"—")}${p.xp?` · Exp. ${esc(p.xp)}`:""}</span>`,`<span class="pcell">${avSexo(p.sx,"xs")}${pl(p.id)}${S.ap==p.id?' <span class="b in">Activo</span>':""}</span>`,p.e,esc(p.s),esc(p.dx||"—"),chip(EA,p.ea),chip(EU,effAu(p)),`<div class="acts acts-pac"><button class="icb${S.ap==p.id?" p":""}" data-a="ac:${p.id}" data-tip="${S.ap==p.id?"Paciente activo":"Activar paciente"}" aria-label="${S.ap==p.id?"Paciente activo":"Activar paciente"}">${ic("usercheck",16)}</button><button class="icb" data-r="p-${p.id}" data-tip="Abrir expediente" aria-label="Abrir expediente de ${esc(p.n)}">${ic("folder",16)}</button><button class="icb d" data-a="delp:${p.id}" data-tip="Eliminar paciente" aria-label="Eliminar paciente">${ic("trash",16)}</button></div>`]));
 const vPac=()=>`<div class="row">${sec("Pacientes")}<button class="btn p" data-a="np">${ic("plus",16)} Nuevo paciente</button><button class="btn d" data-a="delpsel">${ic("trash",14)} Eliminar seleccionados</button></div><div class="fg"><div><label class="mu" for="ps">Buscar</label><input id="ps" placeholder="Nombre, cédula, teléfono, expediente, código o seguro"></div><div><label class="mu" for="pe1">Estado de atención</label><select id="pe1" data-pe="a"><option value="">Todos</option>${Object.keys(EA).map(s=>`<option${s==S.pe.a?" selected":""}>${s}</option>`).join("")}</select></div><div><label class="mu" for="pe2">Autorización</label><select id="pe2" data-pe="u"><option value="">Todas</option>${Object.keys(EU).map(s=>`<option${s==S.pe.u?" selected":""}>${s}</option>`).join("")}</select></div></div><div id="pl">${listaP("")}</div>`;
 const vRehab=()=>sec("Rehabilitación")+`<p class="tb"><button class="btn p" data-a="fs">${ic("plus",16)} Nueva sesión</button> <button class="btn" data-a="fp">${ic("plus",16)} Nuevo PROM</button></p>`+card("Sesiones de fisioterapia",tbl(["Fecha","Paciente","Sesión","Dolor"],fa(DB.F).map(x=>[x.f,pl(x.p),esc(x.t),x.d+"/10"])))+"<br>"+card("Cuestionarios de resultados reportados por el paciente (PROMs)",tbl(["Fecha","Paciente","Cuestionario","Resultado",""],DB.M.map((x,i)=>[x,i]).filter(([x])=>!S.ap||!S.only||x.p==S.ap).sort((a,b)=>b[0].f.localeCompare(a[0].f)).map(([x,i])=>[x.f,pl(x.p),esc(x.t),`<span class="b ${x.s<50?"er":"ok"}">${x.s}%</span>`,`<button class="btn" data-a="fp:${i}">${ic("edit",14)} Editar</button> <button class="btn d" data-a="dprom:${i}">${ic("trash",14)} Eliminar</button>`])));
 const vRef=()=>sec("Referimientos")+card("Enviados y recibidos",tbl(["Fecha","Paciente","Referimiento","Estado"],fa(DB.R).map(x=>[x.f,pl(x.p),esc(x.t),bd(x.e)])));
@@ -1403,9 +1406,9 @@ function skelOff(){
 /* Skeleton local del expediente: no tapa ni recarga la ficha del paciente. */
 let xpSkelTimer=null;
 const XP_SKEL_HTML=`<div class="xp-sk-tabs"><i></i><i></i><i></i><i></i></div><div class="xp-sk-card"><i></i><i></i><i></i></div><div class="xp-sk-card"><i></i><i></i></div>`;
-function skelTabPulse(){
+function skelTabPulse(destino){
   if(sinMov())return;
-  const zona=document.getElementById("xpZone");if(!zona)return;
+  const zona=destino||document.getElementById("xpZone");if(!zona)return;
   if(xpSkelTimer){clearTimeout(xpSkelTimer);xpSkelTimer=null}
   const anterior=document.getElementById("xpSkel");if(anterior)anterior.remove();
   const el=document.createElement("div");el.id="xpSkel";el.className="xp-skel";el.setAttribute("aria-hidden","true");el.innerHTML=XP_SKEL_HTML;
@@ -1417,14 +1420,27 @@ function skelTabPulse(){
 }
 function tickReloj(){const e=document.getElementById("reloj");if(e)e.textContent=new Date().toLocaleTimeString("es-DO",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:hora12()})}
 setInterval(tickReloj,1000);
-function draw(){VIS=[];$("#side").style.display=S.user?"":"none";if(!S.user){skelOff();return vLogin()}let[a,b,c]=S.route.split("-");
+function draw(op={}){VIS=[];$("#side").style.display=S.user?"":"none";if(!S.user){skelOff();return vLogin()}let[a,b,c]=S.route.split("-");
 if(!(a=="p"||a=="nuevo"||a=="evaluacion"?can("pacientes"):a=="admin"?S.user.rol=="admin":can(a))){a="inicio";S.route="inicio"}if(a=="p"&&pk(b).n)S.ap=+b;
 if(a=="p"&&c&&!tabVisible(c)){c=["resumen","evaluacion","estudios","recetas","citas","procedimientos","ortasis","clinica","rehab","gestion","documentos"].find(tabVisible)||"resumen";S.route="p-"+b+"-"+c}
 const V={inicio:vInicio,agenda:vAgenda,pacientes:vPac,quirofano:vQuir,estudios:()=>vEst(b),procedimientos:vProc,recetas:vRecetas,documentos:vDocs,ortesis:vOrt,rehab:vRehab,referimientos:vRef,autorizaciones:vAut,facturacion:()=>vFac(b),nuevo:vNuevo,evaluacion:()=>vEval(b),admin:()=>vAdmin(b),ayuda:vAyuda};
 const lb=a=="admin"?"Administración":a=="nuevo"?"Nuevo paciente":a=="evaluacion"?"Evaluación "+(b=="fis"?"física":"médica"):a=="recetas"?"Recetas":a=="ayuda"?"Ayuda":([...M,...AD].find(x=>x[0]==a)||[])[2]||a;
 const cr=a=="inicio"?"Inicio":a=="p"?`Inicio › Pacientes › ${esc(pk(b).n||"")}`:`<button class="bc" data-r="inicio">Inicio</button> › `+lb;
 $("#side").innerHTML=menu(a);
-$("#main").innerHTML=bar()+(a=="nuevo"||a=="p"?"":banner())+`<div class="pg"><div class="mu">${cr}</div>${a=="p"?vExp(b,c):(V[a]||vInicio)()}</div>`;
+const main=$("#main"),conAb=!(a=="nuevo"||a=="p")&&!!S.ap;
+const htmlPg=`<div class="pg"><div class="mu">${cr}</div>${a=="p"?vExp(b,c):(V[a]||vInicio)()}</div>`;
+const topPrev=op.keepChrome?main.querySelector(".top"):null;
+const abPrev=op.keepChrome?main.querySelector(".ab"):null;
+const reutilizarAb=abPrev&&conAb&&abPrev.dataset.pid===String(S.ap);
+if(topPrev||reutilizarAb){
+  const temp=document.createElement("div");temp.innerHTML=htmlPg;const pgNuevo=temp.firstElementChild;
+  main.innerHTML="";
+  if(topPrev)main.appendChild(topPrev);else main.insertAdjacentHTML("beforeend",bar());
+  if(reutilizarAb)main.appendChild(abPrev);else if(conAb)main.insertAdjacentHTML("beforeend",banner());
+  main.appendChild(pgNuevo);
+}else{
+  main.innerHTML=bar()+(conAb?banner():"")+htmlPg;
+}
 $("#main").classList.toggle("en-paciente",a=="p");
 $("#main").classList.toggle("en-pacientes",a=="pacientes");
 if(S.route!==RUTA_ANT){const prev=RUTA_ANT;RUTA_ANT=S.route;const dir=prev?dirSub(prev,S.route):null;const pg=$("#main .pg");if(pg&&!sinMov()){if(dir===null)pg.classList.add("entra");else if(dir>0)pg.classList.add("entra-der");else pg.classList.add("entra-izq")}}
@@ -1450,7 +1466,13 @@ function go(r){
       if(m.scrollTop>tope+40)m.scrollTo({top:Math.max(0,tope-8),behavior:sinMov()?"auto":"smooth"})}
     skelTabPulse();
   }else{
-    if(cambio)skelOn();draw();const m=$("#main");if(m){if(sinMov())m.scrollTop=0;else m.scrollTo({top:0,behavior:"smooth"})}
+    const ab=$("#main .ab");
+    const chromeOk=cambio&&n[0]!=="p"&&o[0]!=="p"&&!!S.ap&&ab&&ab.dataset.pid===String(S.ap);
+    if(cambio){
+      if(chromeOk){draw({keepChrome:true});skelTabPulse($("#main .pg"))}
+      else{skelOn();draw()}
+    }else draw();
+    const m=$("#main");if(m){if(sinMov())m.scrollTop=0;else m.scrollTo({top:0,behavior:"smooth"})}
   }
   try{history.replaceState(null,"","#"+r)}catch(e){}}
 
@@ -2394,7 +2416,7 @@ function _flow(){const secs=[...M,...AD].filter(x=>can(x[0])).map(x=>x[0]);retur
 function nextStep(){const secs=_flow();const a=_mainSec();const i=secs.indexOf(a);const ni=(i>=0)?(i+1)%secs.length:0;const key=secs[ni]||secs[0];return {label:key,route:key}}
 function prevStep(){const secs=_flow();const a=_mainSec();const i=secs.indexOf(a);const pi=(i>=0)?(i-1+secs.length)%secs.length:secs.length-1;const key=secs[pi]||secs[secs.length-1];return {label:key,route:key}}
 function banner(){if(S.ap&&!pk(S.ap).n)S.ap=null;if(!S.ap)return"";const p=pk(S.ap),q=[["procedimientos","Procedimientos"],["estudios","Imágenes"],["ortesis","Órtesis"],["documentos","Documentos"],["facturacion","Facturación"]].filter(x=>can(x[0]));
-return`<div class="ab" role="status"><div class="ai">${esc(p.n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase())}</div><div class="am"><b>Paciente activo: ${esc(p.n)}</b><span class="mu"> ${p.e?p.e+" años · ":""}${p.c?"Cédula "+esc(p.c)+" · ":""}${esc(p.s||"Sin seguro")}</span>${p.xp?` <span class="mu">· Expediente ${esc(p.xp)}</span>`:""}${p.al?` <span class="b er">${ic("alert",13)} Alergia: ${esc(p.al)}</span>`:""} ${chip(EA,p.ea)} ${chip(EU,effAu(p))}</div><div class="tb"><button class="btn p" data-a="es:${p.id}">${ic("edit",14)} Cambiar estado</button><button class="btn" data-r="p-${p.id}">Expediente</button><button class="btn" data-a="ant">Antecedentes</button>${can("pacientes")?`<button class="btn" data-a="ev:med">Evaluación médica</button>`:""}${q.map(x=>`<button class="btn" data-r="${x[0]}">${x[1]}</button>`).join("")}<label class="ck"><input type="checkbox" data-pa2="only" ${S.only?"checked":""}> Ver solo este paciente</label><button class="btn" data-a="ca">Cerrar paciente</button></div><div class="tb" style="justify-content:flex-end;margin-top:6px"><button class="btn" data-a="pvstep" aria-label="Anterior">${ic("chevl",14)}</button> <button class="btn" data-a="nxstep" aria-label="Siguiente">${ic("chevr",14)}</button></div></div>`}
+return`<div class="ab" data-pid="${p.id}" role="status"><div class="ai">${esc(p.n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase())}</div><div class="am"><b>Paciente activo: ${esc(p.n)}</b><span class="mu"> ${p.e?p.e+" años · ":""}${p.c?"Cédula "+esc(p.c)+" · ":""}${esc(p.s||"Sin seguro")}</span>${p.xp?` <span class="mu">· Expediente ${esc(p.xp)}</span>`:""}${p.al?` <span class="b er">${ic("alert",13)} Alergia: ${esc(p.al)}</span>`:""} ${chip(EA,p.ea)} ${chip(EU,effAu(p))}</div><div class="tb"><button class="btn p" data-a="es:${p.id}">${ic("edit",14)} Cambiar estado</button><button class="btn" data-r="p-${p.id}">Expediente</button><button class="btn" data-a="ant">Antecedentes</button>${can("pacientes")?`<button class="btn" data-a="ev:med">Evaluación médica</button>`:""}${q.map(x=>`<button class="btn" data-r="${x[0]}">${x[1]}</button>`).join("")}<label class="ck"><input type="checkbox" data-pa2="only" ${S.only?"checked":""}> Ver solo este paciente</label><button class="btn" data-a="ca">Cerrar paciente</button></div><div class="tb" style="justify-content:flex-end;margin-top:6px"><button class="btn" data-a="pvstep" aria-label="Anterior">${ic("chevl",14)}</button> <button class="btn" data-a="nxstep" aria-label="Siguiente">${ic("chevr",14)}</button></div></div>`}
 function conf(m,fn,ok="Eliminar"){const o=modal(`<h3>Confirmar</h3><p>${esc(m)}</p><div class="tb"><button class="btn" id="cn">${ic("x",16)} Cancelar</button><button class="btn p" id="cs">${ic("check",16)} ${esc(ok)}</button></div>`);o.querySelector("#cn").onclick=()=>o.remove();o.querySelector("#cs").onclick=()=>{o.remove();fn()}}
 const RG={E:{n:"evaluación",c:[["f","Fecha","date"],["t","Motivo y hallazgos","area"]]},C:{n:"cirugía",c:[["f","Fecha","date"],["t","Procedimiento","text"],["i","Implante","opt"],["e","Estado","sel:Programada,Realizada,Cancelada"]]},F:{n:"sesión",c:[["f","Fecha","date"],["t","Descripción","text"],["d","Dolor (0 a 10)","num:0:10"]]},M:{n:"cuestionario",c:[["f","Fecha","date"],["t","Cuestionario","text"],["s","Resultado (%)","num:0:100"]]},R:{n:"referimiento",c:[["f","Fecha","date"],["t","Detalle","text"],["e","Estado","sel:Pendiente,Respondido"]]},A:{n:"autorización",c:[["t","Procedimiento","text"],["s","Seguro","text"],["e","Estado","sel:Por solicitar,Enviada,Aprobada,Rechazada"],["d","Días para vencer","num:0:365"]]},OP:{n:"órtesis",c:[["f","Fecha","date"],["n","Órtesis","text"],["lado","Lado","sel:Izquierdo,Derecho,Bilateral,No aplica"],["talla","Talla","sel:Única,XS,S,M,L,XL,XXL"],["ind","Indicación","area"],["dr","Médico","opt"],["e","Estado","sel:Indicada,Entregada"]]},PP:{n:"procedimiento",c:[["f","Fecha","date"],["t","Procedimiento","text"],["dr","Médico","opt"],["pr","Precio (RD$)","num:0:99999999"],["e","Estado","sel:Indicado,Programado,Realizado"]]}};
 function fReg(k,i){const g=RG[k],x=DB[k]&&DB[k][i];if(!g||!x)return;
