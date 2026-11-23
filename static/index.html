@@ -927,7 +927,7 @@ ${card("6. Nuevo paciente",`<p class="mu">Formulario con: datos personales (nomb
 ${card("7. Quirófano",`<p class="mu">Pacientes candidatos a cirugía (procedimientos indicados) y cirugías programadas/realizadas. Programar cirugía desde un candidato o manualmente. Campos: paciente, procedimiento, lado, fecha, hora, duración, sala, cirujano, anestesia, tipo de sangre, implantes, estado, checklist preoperatorio. Las cirugías se agrupan por paciente.</p>`)}
 ${card("8. Estudios e imágenes",`<p class="mu">Galería de estudios por paciente. Subir imágenes: paciente (bloqueado al activo), tipo de estudio (por categorías: Radiografía, Ecografía, RM, TAC, Medicina nuclear, Otros), región anatómica y lado (Izq/Der/Bilateral), fecha, observaciones. Las imágenes se optimizan y guardan en el navegador. Visor con zoom, giro, brillo, contraste.</p>`)}
 ${card("9. Procedimientos",`<p class="mu">Catálogo de procedimientos (código, nombre, categoría, fuente, precio). Asignar procedimientos a un paciente activo (con opción de generar cargo en facturación). Selección múltiple con "Seleccionar todos"/"Limpiar". El desplegable "Médico" filtra la lista por los procedimientos asignados a ese médico en Administración → Usuarios.</p>`)}
-${card("10. Recetas",`<p class="mu">Recetas de medicamentos ortopédicos y prótesis para el paciente activo. Tipos: Medicamento ortopédico / Prótesis. Items con catálogo (medicamentos o prótesis), dosis, presentación, frecuencia, duración, cantidad. Se unifica en una sola receta por paciente y tipo. Botones: Ver/Imprimir, Editar, Verificar.</p><p class="mu">Los botones <b>Constancia médica</b> y <b>Licencia médica</b> generan documentos imprimibles en A4 para el paciente activo: encabezado de la prestadora, datos del paciente, diagnóstico (se toma de la última evaluación), médico con cédula profesional y exequátur, firma y sello. La licencia incluye los campos exigidos por el CNSS/SISALRIL en República Dominicana (afiliado, causa, modalidad, fecha de inicio, días calendario, prestadora y médico). El formulario oficial numerado se genera en la plataforma de SISALRIL. Cédula profesional y exequátur se configuran en Administración → Usuarios → Editar perfil.</p>`)}
+${card("10. Recetas",`<p class="mu">Recetas de medicamentos ortopédicos y prótesis para el paciente activo. Tipos: Medicamento ortopédico / Prótesis. Items con catálogo (medicamentos o prótesis), dosis, presentación, frecuencia, duración, cantidad. Se unifica en una sola receta por paciente y tipo. Botones: Ver/Imprimir, Editar, Verificar.</p><p class="mu">Los botones <b>Constancia médica</b> y <b>Licencia médica</b> generan documentos imprimibles en A4 para el paciente activo: encabezado de la prestadora, datos del paciente, diagnóstico (se toma de la última evaluación), médico con cédula profesional y exequátur, firma y sello. La licencia incluye los campos exigidos por el CNSS/SISALRIL en República Dominicana (afiliado, causa, modalidad, fecha de inicio, duración en días, semanas o meses —solo se imprime la unidad elegida—, prestadora y médico). El formulario oficial numerado se genera en la plataforma de SISALRIL. Cédula profesional y exequátur se configuran en Administración → Usuarios → Editar perfil.</p>`)}
 ${card("11. Documentos",`<p class="mu">Subir documentos (consentimientos, informes, etc.) al paciente activo. Ver, descargar, eliminar. Verificación por registro.</p>`)}
 ${card("12. Órtesis",`<p class="mu">Asignar órtesis al paciente activo: categoría, talla, lado, indicación, médico, estado (Indicada/Entregada). Genera cargo opcional.</p>`)}
 ${card("13. Rehabilitación",`<p class="mu">Sesiones de fisioterapia (fecha, descripción, dolor 0-10) y PROMs (cuestionarios: WOMAC, DASH, Oswestry, KOOS, Harris Hip, Lysholm, VAS) con preguntas seleccionables por checkmark, puntuación automática y campo manual. Editar y eliminar PROMs.</p>`)}
@@ -1771,6 +1771,19 @@ const certFoot=()=>`<div class="foot">Documento generado por OrtoSistema · ${ne
 const certFechaLarga=f=>{const d=new Date(String(f||"")+"T12:00:00");return isNaN(d)?String(f||"—"):d.toLocaleDateString("es-DO",{day:"numeric",month:"long",year:"numeric"})};
 const certDx=pid=>{const ev=DB.E.filter(x=>x.p==pid).sort((a,b)=>iso(b.f).localeCompare(iso(a.f)))[0];const dx=ev&&ev.d&&(ev.d.dxt||ev.d.dx)||"";if(dx)return dx;const t=(ev&&ev.t||"");const m=t.match(/(?:^|\s·\s)Dx:\s*([^·]+)/);return (m&&m[1].trim())||pk(pid).dx||""};
 const certMed=()=>({dr:(S.user&&S.user.nombre)||"",esp:(S.user&&S.user.cargo)||"",ced:(S.user&&S.user.cedulaMedica)||"",ex:(S.user&&S.user.exequatur)||"",ins:S.clinica||""});
+/* Duración: solo se muestra la unidad elegida (días calendario, semanas o meses). */
+const UND_TIEMPO=[["dias","días"],["semanas","semanas"],["meses","meses"]];
+const durTexto=(cant,uni)=>{const n=Math.max(1,parseInt(cant,10)||0);if(!n)return"";
+  if(uni==="semanas")return n+" "+(n===1?"semana":"semanas");
+  if(uni==="meses")return n+" "+(n===1?"mes":"meses");
+  return n+" "+(n===1?"día calendario":"días calendario")};
+const finPorDuracion=(ini,cant,uni)=>{const d=new Date(String(ini||"")+"T12:00:00");if(isNaN(d))return"";
+  const n=Math.max(1,parseInt(cant,10)||1);
+  if(uni==="semanas")d.setDate(d.getDate()+n*7-1);
+  else if(uni==="meses"){const dia=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);
+    const ultimo=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(dia,ultimo)-1)}
+  else d.setDate(d.getDate()+n-1);
+  return isoD(d)};
 
 function fConstancia(pid){
   const idp=+(pid||S.ap||0),p=pk(idp);
@@ -1782,18 +1795,20 @@ function fConstancia(pid){
     <div class="fg"><div><label>Médico<input id="co_dr" value="${esc(m.dr)}"></label></div><div><label>Especialidad / Cargo<input id="co_esp" value="${esc(m.esp)}"></label></div></div>
     <div class="fg"><div><label>Cédula profesional<input id="co_ced" value="${esc(m.ced)}" placeholder="Ej. 001-0000000-0"></label></div><div><label>Exequátur<input id="co_ex" value="${esc(m.ex)}" placeholder="Ej. 12345"></label></div></div>
     <label class="mu" for="co_dx">Diagnóstico / motivo de la constancia</label><textarea id="co_dx" rows="2">${esc(dx)}</textarea>
+    <div class="fg"><div><label>Duración indicada (opcional)<input id="co_dur" type="number" min="1" max="365" placeholder="Ej. 5"></label></div><div><label>Unidad<select id="co_uni">${UND_TIEMPO.map(([u,n])=>`<option value="${u}">${n}</option>`).join("")}</select></label></div></div>
     <label class="mu" for="co_txt">Texto adicional (opcional)</label><textarea id="co_txt" rows="2" placeholder="Ej. Se expide para presentar ante la empresa..."></textarea>
     <div class="tb" style="margin-top:12px"><button class="btn" id="co_cancel">Cancelar</button><button class="btn" id="co_view">${ic("eye",16)} Ver</button><button class="btn p" id="co_print">${ic("printer",16)} Imprimir</button></div>`, "w");
   const q=x=>o.querySelector(x),val=x=>q(x).value.trim();
   q("#co_cancel").onclick=()=>o.remove();
   const build=()=>{
-    const f=val("#co_f"),dr=val("#co_dr"),esp=val("#co_esp"),ced=val("#co_ced"),ex=val("#co_ex"),ins=val("#co_ins"),dx=val("#co_dx"),txt=val("#co_txt");
+    const f=val("#co_f"),dr=val("#co_dr"),esp=val("#co_esp"),ced=val("#co_ced"),ex=val("#co_ex"),ins=val("#co_ins"),dx=val("#co_dx"),txt=val("#co_txt"),dur=durTexto(val("#co_dur"),val("#co_uni"));
     return certHead(ins||"Centro médico","CONSTANCIA MEDICA","Se expide a solicitud del interesado")
       +`<table class="info"><tr><th>Paciente</th><td class="w"><b>${esc(p.n)}</b></td><th>Cédula</th><td>${esc(p.c||"—")}</td></tr>`
       +`<tr><th>Fecha de nacimiento</th><td>${p.fn?esc(dmy(p.fn))+(p.e?" ("+esc(p.e)+" años)":""):" — "}</td><th>Sexo</th><td>${esc(p.sx||"—")}</td></tr>`
       +`<tr><th>Seguro / Afiliado</th><td>${esc((p.s||"—")+(p.na?" · "+p.na:""))}</td><th>Expediente</th><td>${esc(p.xp||"—")}</td></tr></table>`
       +`<p class="txt">Yo, <b>${esc(dr||"________________")}</b>${esp?", "+esc(esp):""}, con cédula profesional No. <b>${esc(ced||"____________")}</b> y exequátur No. <b>${esc(ex||"____________")}</b>, certifico que en fecha ${esc(certFechaLarga(f))} he examinado al(a la) paciente <b>${esc(p.n)}</b>, identificado(a) con cédula No. ${esc(p.c||"—")}, y que según mi juicio clínico presenta:</p>`
       +`<div class="box">${dx?esc(dx):"________________________________________________________________"}</div>`
+      +(dur?`<p class="txt">Duración indicada: <b>${esc(dur)}</b>.</p>`:"")
       +(txt?`<p class="txt">${esc(txt)}</p>`:`<p class="txt">Se expide la presente constancia para los fines que estimen convenientes.</p>`)
       +`<p class="txt">Se firma y sella en ${esc(ins||"________________")}, a ${esc(certFechaLarga(f))}.</p>`
       +`<div class="firm"><div><div class="line">Firma del médico<br><b>${esc(dr||"________________")}</b></div></div><div><div class="line">Sello de la prestadora<br>${esc(ins||"________________")}</div></div></div>`
@@ -1807,26 +1822,26 @@ function fLicencia(pid){
   const idp=+(pid||S.ap||0),p=pk(idp);
   if(!p.n)return toast("Activa un paciente primero");
   const m=certMed(),dx=certDx(idp),hoyISO=isoD(new Date());
-  const finDe=(ini,dias)=>{const d=new Date(String(ini||hoyISO)+"T12:00:00");if(isNaN(d))return"";d.setDate(d.getDate()+Math.max(1,+dias||1)-1);return isoD(d)};
+  const finDe=(ini,cant,uni)=>finPorDuracion(ini||hoyISO,cant,uni);
   const o=modal(`<h3>${ic("printer",18)} Licencia médica (CNSS / SISALRIL)</h3>
     <p class="mu">Afiliado: <b>${esc(p.n)}</b> · Cédula ${esc(p.c||"—")} · Seguro ${esc(p.s||"—")}${p.na?" · Afiliado "+esc(p.na):""}</p>
     <label class="mu" for="li_dx">Diagnóstico principal</label><textarea id="li_dx" rows="2">${esc(dx)}</textarea>
     <div class="fg"><div><label>Causa<select id="li_causa"><option>Enfermedad común</option><option>Accidente no laboral</option><option>Embarazo</option></select></label></div>
     <div><label>Modalidad<select id="li_mod"><option>Ambulatoria</option><option>Hospitalización</option><option>Ambulatoria y hospitalización</option></select></label></div></div>
-    <div class="fg"><div><label>Fecha de inicio<input id="li_ini" type="date" value="${hoyISO}"></label></div><div><label>Días calendario<input id="li_dias" type="number" min="1" max="365" value="5"></label></div></div>
-    <p class="mu">Fecha estimada de término: <b id="li_fin">${esc(dmy(finDe(hoyISO,5)))}</b></p>
+    <div class="fg"><div><label>Fecha de inicio<input id="li_ini" type="date" value="${hoyISO}"></label></div><div><label>Cantidad<input id="li_dias" type="number" min="1" max="365" value="5"></label></div><div><label>Unidad<select id="li_uni">${UND_TIEMPO.map(([u,n])=>`<option value="${u}">${n}</option>`).join("")}</select></label></div></div>
+    <p class="mu">Fecha estimada de término: <b id="li_fin">${esc(dmy(finDe(hoyISO,5,"dias")))}</b></p>
     <div class="fg"><div><label>Prestadora de salud<input id="li_ins" value="${esc(m.ins)}"></label></div><div><label>Médico tratante<input id="li_dr" value="${esc(m.dr)}"></label></div></div>
     <div class="fg"><div><label>Cédula profesional del médico<input id="li_ced" value="${esc(m.ced)}"></label></div><div><label>Exequátur<input id="li_ex" value="${esc(m.ex)}"></label></div></div>
     <div class="er2" id="li_er" role="alert"></div>
     <div class="tb" style="margin-top:12px"><button class="btn" id="li_cancel">Cancelar</button><button class="btn" id="li_view">${ic("eye",16)} Ver</button><button class="btn p" id="li_print">${ic("printer",16)} Imprimir</button></div>`, "w");
   const q=x=>o.querySelector(x),val=x=>q(x).value.trim();
-  const upd=()=>{q("#li_fin").textContent=dmy(finDe(val("#li_ini"),val("#li_dias")))||"—"};
-  q("#li_ini").oninput=upd;q("#li_dias").oninput=upd;
+  const upd=()=>{q("#li_fin").textContent=dmy(finDe(val("#li_ini"),val("#li_dias"),val("#li_uni")))||"—"};
+  q("#li_ini").oninput=upd;q("#li_dias").oninput=upd;q("#li_uni").onchange=upd;
   q("#li_cancel").onclick=()=>o.remove();
   const build=()=>{
-    const ini=val("#li_ini"),dias=val("#li_dias"),fin=finDe(ini,dias);
+    const ini=val("#li_ini"),dias=val("#li_dias"),uni=val("#li_uni"),fin=finDe(ini,dias,uni),dur=durTexto(dias,uni);
     const diagnostico=val("#li_dx"),causa=val("#li_causa"),mod=val("#li_mod"),ins=val("#li_ins"),dr=val("#li_dr"),ced=val("#li_ced"),ex=val("#li_ex");
-    if(!ini||!+dias){q("#li_er").textContent="Indica la fecha de inicio y los días calendario.";return null}
+    if(!ini||!dur){q("#li_er").textContent="Indica la fecha de inicio y la duración.";return null}
     q("#li_er").textContent="";
     return certHead(ins||"Centro médico","LICENCIA MEDICA","Certificado para subsidio por enfermedad · CNSS / SISALRIL")
       +`<table class="info"><tr><th>Afiliado</th><td class="w"><b>${esc(p.n)}</b></td><th>Cédula</th><td>${esc(p.c||"—")}</td></tr>`
@@ -1834,11 +1849,11 @@ function fLicencia(pid){
       +`<tr><th>Prestadora</th><td colspan="3">${esc(ins||"—")}</td></tr></table>`
       +`<table class="info"><tr><th>Diagnóstico principal</th><td colspan="3">${esc(diagnostico||"—")}</td></tr>`
       +`<tr><th>Causa</th><td>${esc(causa)}</td><th>Modalidad</th><td>${esc(mod)}</td></tr>`
-      +`<tr><th>Fecha de inicio</th><td>${esc(dmy(ini))}</td><th>Días calendario</th><td>${esc(dias)}</td></tr>`
+      +`<tr><th>Fecha de inicio</th><td>${esc(dmy(ini))}</td><th>Duración</th><td>${esc(dur)}</td></tr>`
       +`<tr><th>Fecha de término</th><td>${esc(dmy(fin))}</td><th>Fecha de emisión</th><td>${esc(dmy(hoyISO))}</td></tr></table>`
-      +`<p class="txt">Certifico que el(a) afiliado(a) <b>${esc(p.n)}</b>, con cédula No. ${esc(p.c||"—")}, fue evaluado(a) por mí y presenta el diagnóstico antes indicado, por lo que requiere licencia médica en la modalidad de <b>${esc(mod)}</b>, por un total de <b>${esc(dias)} día(s) calendario</b>, a partir del ${esc(dmy(ini))}.</p>`
+      +`<p class="txt">Certifico que el(a) afiliado(a) <b>${esc(p.n)}</b>, con cédula No. ${esc(p.c||"—")}, fue evaluado(a) por mí y presenta el diagnóstico antes indicado, por lo que requiere licencia médica en la modalidad de <b>${esc(mod)}</b>, por un total de <b>${esc(dur)}</b>, a partir del ${esc(dmy(ini))}.</p>`
       +`<div class="firm"><div><div class="line">Firma y sello del médico<br><b>${esc(dr||"________________")}</b><br>Cédula profesional: ${esc(ced||"—")}<br>Exequátur: ${esc(ex||"—")}</div></div><div><div class="line">Sello de la prestadora<br>${esc(ins||"________________")}<br><br></div></div></div>`
-      +`<div class="nota"><b>Nota CNSS / SISALRIL:</b> Este documento contiene los datos exigidos para la licencia médica por enfermedad común (nombre y cédula del afiliado, diagnóstico principal, causa, modalidad, fecha de inicio, días calendario, prestadora y médico con cédula, exequátur, firma y sello). Para solicitar el subsidio, el formulario oficial numerado debe generarse en la plataforma de SISALRIL.</div>`
+      +`<div class="nota"><b>Nota CNSS / SISALRIL:</b> Este documento contiene los datos exigidos para la licencia médica por enfermedad común (nombre y cédula del afiliado, diagnóstico principal, causa, modalidad, fecha de inicio, duración indicada, prestadora y médico con cédula, exequátur, firma y sello). Para solicitar el subsidio, el formulario oficial numerado debe generarse en la plataforma de SISALRIL.</div>`
       +certFoot();
   };
   q("#li_view").onclick=()=>{const h=build();if(h)certOpen(h,false)};
