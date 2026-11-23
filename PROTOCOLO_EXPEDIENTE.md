@@ -67,6 +67,15 @@ Después de cualquier cambio en este flujo, comprobar:
 
 ---
 
+## Verificación ejecutada (23/11/2026, `?v=213`)
+
+- `/api/salud` responde `{"ok":true}` tras aplicar el esquema (incluidos `NOT NULL`, `CHECK` y `DO` de secuencias).
+- Los 2 pacientes existentes tienen `codigo` y `expediente`, sin duplicados.
+- Creación de prueba con `codigo: null` y `expediente: null` → la API devolvió `P-0078` / `EXP-0079` (generados por la BD). Registro eliminado después.
+- Edición de prueba enviando códigos nulos → los códigos se conservaron (`P-0079` / `EXP-0080`). Registro eliminado después.
+- `toK("P")` con campos vacíos no incluye las claves `codigo` ni `expediente`.
+- En Editar datos del paciente, escribir `42` ajustó la fecha a `1984-11-23` y mostró `42 años (aprox.)`.
+
 ## Prohibiciones
 
 - No asignar `EXP-` manualmente desde el front-end ni desde scripts.
