@@ -84,7 +84,7 @@ para cada k en _tabOrder:
 
 Caso corregido: `ortasis` → alias a `ortesis` en `B2` y en `TD`. Sin esos alias la pestaña Órtesis se veía activa pero mostraba "Estado del paciente / Datos del paciente / Antecedentes".
 
-Caso corregido: el botón **Editar datos del paciente** del Resumen usa `data-a="epac:<id>"`. La acción `ep:<id>` está reservada para editar procedimientos del catálogo; al compartir nombre se abría el modal equivocado y los cambios no se veían en el Resumen. `epac` llama a `fEditPac(+v)` y, tras guardar, `draw()` vuelve a renderizar la pestaña activa.
+Caso corregido: el botón **Editar datos del paciente** del Resumen usa `data-a="epac:<id>"`. La acción `ep:<id>` está reservada para editar procedimientos del catálogo; al compartir nombre se abría el modal equivocado y los cambios no se veían en el Resumen. `epac` llama a `fEditPac(+v)` y, tras guardar, `draw()` vuelve a renderizar la pestaña activa. El manejador debe declararse `epac:()=>fEditPac(+v)`: si se escribe `epac:v=>fEditPac(+v)`, ese parámetro `v` local oculta el `v` del `data-a` y llega `NaN`, por lo que el modal no se abre.
 
 Alergias forma parte de **Antecedentes**: en Resumen es la primera fila de esa tarjeta (ya no aparece en Datos del paciente), en Nuevo paciente se captura dentro de la tarjeta Antecedentes (`nl`) y en el expediente se edita desde **Editar antecedentes** (`ga`). La alerta roja del paciente activo y los documentos imprimibles la siguen mostrando por seguridad. Al seleccionar un antecedente familiar oncológico (`nh`/`gf`) se abre `famCancerModal()` para elegir familiares; el valor se guarda como `Antecedente · Familiar1, Familiar2` y se muestra bajo el selector.
 
