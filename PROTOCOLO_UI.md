@@ -48,6 +48,15 @@ El bloque final de `static/index.html` (`Sistema visual 2026`) manda sobre el CS
 - Al navegar entre módulos con el **mismo paciente activo**, `go()` llama a `draw({keepChrome:true})`: se conservan los nodos `.top` y `.ab` y solo se sustituye `.pg`. El skeleton es local sobre `.pg`, no global.
 - Cualquier cambio de datos llama a `draw()` sin opciones, por lo que la barra se regenera y refleja alergias, atención, autorización, etc.
 - En la lista de Pacientes, las acciones `Activar/Activo`, `Abrir expediente` y `Eliminar` son botones `.icb` icon-only dentro de `.acts-pac` (`inline-flex`, `flex-wrap:nowrap`), con `data-tip` y `aria-label`. Así permanecen alineados aunque cambie el ancho de las columnas.
+- En el Resumen del expediente, `Editar datos del paciente` (lápiz) y `Editar antecedentes` (portapapeles) también son `.icb` icon-only dentro de `.acts-edit`, conservando `data-a="epac:<id>"` y `data-a="ant"`.
+
+### Estados médicos y ruta clínica
+
+- `EA` amplía la atención con estados médicos: `Evaluación completada`, `Estudios indicados`, `Estudios revisados`, `Diagnóstico definido`, `Tratamiento indicado`, `En tratamiento`, `Cirugía programada`, `Postoperatorio`, `Órtesis indicada`, `En rehabilitación` y `En control`. Se guardan en `estado_atencion`; no requieren migración.
+- `TA` define transiciones válidas desde cada estado. `NEXT`/`NL` se mantienen para los botones rápidos de la agenda.
+- `ETAPAS` y `FLUJO` derivan la etapa del proceso, la sección sugerida y el texto de ayuda desde `p.ea`. **No se guarda un campo nuevo**: los registros antiguas siguen funcionando.
+- `rutaHtml(p,id)` dibuja el stepper en `#xpZone`; la pestaña sugerida lleva la clase `sug` y el resumen muestra la fila «Proceso clínico».
+- `banner()` y `listaP()` muestran la etapa actual. Tras guardar `fEst()` se llama a `draw()` completo para que cabecera y barra se actualicen; la navegación por pestañas sigue siendo parcial.
 
 ---
 
@@ -72,8 +81,10 @@ Después de cualquier cambio visual:
 5. Navegar entre pestañas del mismo paciente: `#xpZone` cambia, pero `.card.ph` sigue siendo el mismo nodo; solo aparece `#xpSkel` local.
 6. En Pacientes, confirmar que los tres iconos de acción siguen en una sola línea (`flex-wrap:nowrap`).
 7. Navegar entre módulos con paciente activo: `.ab` debe ser el mismo nodo (`isSameNode === true`).
-8. Revisar consola: cero errores.
-9. Probar con `prefers-reduced-motion`: sin skeleton y sin animaciones.
+8. En el Resumen, confirmar que los dos iconos de edición están en una sola línea y que abren `fEditPac` y `fAnt`.
+9. Cambiar el estado a «Estudios indicados»: el stepper avanza a Estudios, la pestaña sugerida se marca y el banner del paciente refleja la etapa.
+10. Revisar consola: cero errores.
+11. Probar con `prefers-reduced-motion`: sin skeleton y sin animaciones.
 
 ---
 
@@ -83,3 +94,4 @@ Después de cualquier cambio visual:
 |---|---|
 | este commit | Sistema visual 2026: compactación, tokens finales, skeleton y limpieza de CSS duplicado. |
 | este commit | Navegación por pestañas del paciente sin redibujar la ficha; skeleton local y tabs con estilo propio. |
+| este commit | Acciones de edición icon-only en el Resumen y estados médicos con ruta clínica derivada del estado de atención. |
