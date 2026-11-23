@@ -63,6 +63,7 @@ Si se agrega una sección nueva, añadir una tarjeta nueva y renumerar si es nec
 - La sección Ayuda debe renderizar sin `undefined` ni errores en consola.
 - El enlace "Ayuda" en el menú lateral debe estar visible para todos los roles.
 - La descripción debe coincidir con el comportamiento real del sistema.
+- Las alergias se muestran y editan dentro de Antecedentes (resumen, alta y expediente); la alerta del paciente activo se mantiene aparte.
 
 ## Responsable
 Quien realice el cambio funcional es responsable de actualizar la ayuda en el mismo commit.

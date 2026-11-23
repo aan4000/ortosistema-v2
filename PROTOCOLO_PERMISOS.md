@@ -84,6 +84,8 @@ para cada k en _tabOrder:
 
 Caso corregido: `ortasis` → alias a `ortesis` en `B2` y en `TD`. Sin esos alias la pestaña Órtesis se veía activa pero mostraba "Estado del paciente / Datos del paciente / Antecedentes".
 
+Alergias forma parte de **Antecedentes**: en Resumen es la primera fila de esa tarjeta (ya no aparece en Datos del paciente), en Nuevo paciente se captura dentro de la tarjeta Antecedentes (`nl`) y en el expediente se edita desde **Editar antecedentes** (`ga`). La alerta roja del paciente activo y los documentos imprimibles la siguen mostrando por seguridad.
+
 | Pestaña Estudios e imágenes | `B2.estudios` / `TD.estudios` | Clave `estudios` (mismo módulo que la sección principal). Muestra los estudios del paciente activo, miniaturas, estado de revisión y el botón **Indicar estudio**. El modal `indicarEstudioModal()` crea el registro y vuelve a dibujar la **misma** ruta `p-<id>-estudios`, sin salir del expediente. Los tipos ofrecidos son los permitidos en el perfil del médico. |
 
 ## Transiciones automáticas del flujo clínico
