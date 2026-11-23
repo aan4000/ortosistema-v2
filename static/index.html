@@ -560,13 +560,19 @@ function fromK(k,r){
 
 /* Objeto del front-end -> datos que acepta la API */
 function toK(k,o){
-  if(k=="P")return{nombre:o.n,edad:o.e===""||o.e==null?null:+o.e,cedula:o.c||null,seguro:o.s||null,
-    alergias:o.al||null,diagnostico:o.dx||null,fecha_nacimiento:o.fn||null,sexo:o.sx||null,
-    telefono:o.tl||null,telefono_tipo:o.tt||null,correo:o.em||null,numero_afiliado:o.na||null,expediente:o.xp||null,ocupacion:o.oc||null,estado_civil:o.ec||null,
-    antecedentes_morbidos:o.am||null,antecedentes_quirurgicos:o.aq||null,
-    medicamentos:o.me||null,antecedentes_familiares:o.af||null,habitos:o.ha||null,
-    estado_atencion:o.ea||"Por agendar",estado_autorizacion:o.eu||"Por solicitar",
-    autorizacion:o.au||{},historial:o.hs||[]};
+  if(k=="P"){
+    const d={nombre:o.n,edad:o.e===""||o.e==null?null:+o.e,cedula:o.c||null,seguro:o.s||null,
+      alergias:o.al||null,diagnostico:o.dx||null,fecha_nacimiento:o.fn||null,sexo:o.sx||null,
+      telefono:o.tl||null,telefono_tipo:o.tt||null,correo:o.em||null,numero_afiliado:o.na||null,ocupacion:o.oc||null,estado_civil:o.ec||null,
+      antecedentes_morbidos:o.am||null,antecedentes_quirurgicos:o.aq||null,
+      medicamentos:o.me||null,antecedentes_familiares:o.af||null,habitos:o.ha||null,
+      estado_atencion:o.ea||"Por agendar",estado_autorizacion:o.eu||"Por solicitar",
+      autorizacion:o.au||{},historial:o.hs||[]};
+    /* Código y expediente los genera la BD. Si están vacíos se omiten: nunca null. */
+    if(o.cd)d.codigo=o.cd;
+    if(o.xp)d.expediente=o.xp;
+    return d;
+  }
   if(k=="Q")return{paciente_id:o.p,fecha:d2f(o.f)||d2f(hoy),hora:o.h||null,duracion:+o.du||30,
     tipo:o.ty||"Control",motivo:o.t||null,medico:o.dr||null,estado:o.e||"Programada",
     motivo_cancelacion:o.mot||null};
@@ -596,10 +602,12 @@ function toK(k,o){
 async function crearK(k,o){
   const r=await api("/api/guardar",{method:"POST",body:{tabla:TABLA[k],datos:toK(k,o)}});
   o.id=r.id;
+  if(k=="P"){if(r.codigo)o.cd=r.codigo;if(r.expediente)o.xp=r.expediente}
   return r.id;
 }
 async function editarK(k,o){
-  await api("/api/guardar",{method:"POST",body:{tabla:TABLA[k],id:o.id,datos:toK(k,o)}});
+  const r=await api("/api/guardar",{method:"POST",body:{tabla:TABLA[k],id:o.id,datos:toK(k,o)}});
+  if(k=="P"&&r){if(r.codigo)o.cd=r.codigo;if(r.expediente)o.xp=r.expediente}
   if("v" in o)o.v=null;
 }
 async function borrarK(k,o){await api("/api/datos/"+TABLA[k]+"/"+o.id,{method:"DELETE"})}
@@ -1629,6 +1637,13 @@ ${f("ep_dx","Diagnóstico",`<input id="ep_dx" value="${esc(p.dx||"")}">`)}
 </div><div class="er2" id="ep_er" role="alert"></div><div class="tb"><button class="btn" id="ep_cancel">Cancelar</button><button class="btn p" id="ep_g">Guardar cambios</button></div>`);
 const v=i=>o.querySelector(i).value.trim(),er=m=>{o.querySelector("#ep_er").textContent=m};
 o.querySelector("#ep_cancel").onclick=()=>o.remove();
+/* Escribir la edad calcula la fecha de nacimiento aproximada; si se ajusta la fecha, se recalcula la edad. */
+const epEdad=o.querySelector("#ep_e");
+const epEdadAFecha=()=>{const a=+epEdad.value.replace(/\D/g,"");if(!a||a<0||a>130)return;
+  const d=new Date();d.setFullYear(d.getFullYear()-a);fNacSet("ep_fn",d.toISOString().slice(0,10));epEdad.value=a+" años (aprox.)"};
+epEdad.oninput=epEdadAFecha;epEdad.onchange=epEdadAFecha;
+["ep_fn_d","ep_fn_m","ep_fn_y"].map(s=>o.querySelector("#"+s)).filter(Boolean)
+  .forEach(s=>s.addEventListener("change",()=>{const e=edadDe(fNacRead("ep_fn"));if(e!=="")epEdad.value=e}));
 o.querySelector("#ep_g").onclick=async()=>{
   const n=v("#ep_n"),fn=fNacRead("ep_fn");
   if(!n)return er("Escribe el nombre.");

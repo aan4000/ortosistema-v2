@@ -21,7 +21,6 @@ alter table usuarios add column if not exists exequatur text;
 
 create sequence if not exists paciente_codigo_seq start 1;
 create sequence if not exists paciente_expediente_seq start 1;
-select setval('paciente_expediente_seq', coalesce((select max(id) from pacientes), 1));
 create table if not exists pacientes(
   id serial primary key,
   codigo text unique,
@@ -36,6 +35,46 @@ alter table pacientes add column if not exists estado_civil text;
 alter table pacientes add column if not exists expediente text unique;
 alter table pacientes alter column expediente set default ('EXP-' || lpad(nextval('paciente_expediente_seq')::text, 4, '0'));
 alter table pacientes alter column codigo set default ('P-' || lpad(nextval('paciente_codigo_seq')::text, 4, '0'));
+-- REGLA: los códigos los genera siempre la base de datos, nunca la aplicación.
+-- Alinear secuencias con los códigos ya existentes (sufijo numérico) y con el último id,
+-- sin retroceder ni avanzar en reinicios sucesivos (idempotente).
+do $$
+declare n int; prox int; actual int;
+begin
+  select greatest(coalesce(max(substring(codigo from '[0-9]+')::int), 0),
+                  coalesce(max(id), 0)) into n from pacientes;
+  select last_value + case when is_called then 1 else 0 end into actual from paciente_codigo_seq;
+  prox := greatest(n + 1, actual);
+  if prox <= 1 then perform setval('paciente_codigo_seq', 1, false);
+  else perform setval('paciente_codigo_seq', prox - 1, true); end if;
+end $$;
+do $$
+declare n int; prox int; actual int;
+begin
+  select greatest(coalesce(max(substring(expediente from '[0-9]+')::int), 0),
+                  coalesce(max(id), 0)) into n from pacientes;
+  select last_value + case when is_called then 1 else 0 end into actual from paciente_expediente_seq;
+  prox := greatest(n + 1, actual);
+  if prox <= 1 then perform setval('paciente_expediente_seq', 1, false);
+  else perform setval('paciente_expediente_seq', prox - 1, true); end if;
+end $$;
+-- Backfill idempotente de registros históricos con código vacío o nulo.
+update pacientes set codigo = 'P-' || lpad(nextval('paciente_codigo_seq')::text, 4, '0')
+  where codigo is null or btrim(codigo) = '';
+update pacientes set expediente = 'EXP-' || lpad(nextval('paciente_expediente_seq')::text, 4, '0')
+  where expediente is null or btrim(expediente) = '';
+-- Garantía final: ningún paciente puede quedar sin código ni expediente.
+alter table pacientes alter column codigo set not null;
+alter table pacientes alter column expediente set not null;
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname='pacientes_codigo_no_vacio' and conrelid='pacientes'::regclass) then
+    alter table pacientes add constraint pacientes_codigo_no_vacio check (btrim(codigo) <> '');
+  end if;
+  if not exists (select 1 from pg_constraint where conname='pacientes_expediente_no_vacio' and conrelid='pacientes'::regclass) then
+    alter table pacientes add constraint pacientes_expediente_no_vacio check (btrim(expediente) <> '');
+  end if;
+end $$;
 alter table pacientes add column if not exists antecedentes_morbidos text;
 alter table pacientes add column if not exists antecedentes_quirurgicos text;
 alter table pacientes add column if not exists medicamentos text;
@@ -285,5 +324,5 @@ create table if not exists recuperaciones(
   exito boolean not null default false,
   creado_en timestamptz not null default now());
 create index if not exists ix_recup_fecha on recuperaciones(creado_en);
--- backfill expediente para pacientes existentes
-update pacientes set expediente='EXP-'||lpad(id::text,4,'0') where expediente is null;
+-- El backfill de códigos y expedientes se hace al inicio de este archivo, con las secuencias
+-- alineadas, para no sobrescribir expedientes ya generados ni colisionar con ellos.

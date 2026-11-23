@@ -1082,11 +1082,25 @@ class Guardar(BaseModel):
 def guardar(g: Guardar, u=Depends(usuario_actual)):
     exigir(u, "escribir", g.tabla)
     cols = [k for k in g.datos if k in TABLAS[g.tabla]]
+    # REGLA: código y expediente vacíos nunca se envían a la BD; así se aplica el DEFAULT
+    # de la secuencia en INSERT y no se borra un código existente en UPDATE.
+    if g.tabla == "pacientes":
+        cols = [k for k in cols
+                if not (k in ("codigo", "expediente")
+                        and (g.datos[k] is None or not str(g.datos[k]).strip()))]
     if not cols:
         raise HTTPException(400, "No hay campos válidos para guardar")
     vals = [Jsonb(g.datos[k]) if k in JSONB else g.datos[k] for k in cols]
     with pool.connection() as c:
         if g.id:
+            if g.tabla == "pacientes":
+                # Cumple la regla incluso en filas históricas: si no tienen código, se genera aquí.
+                c.execute("""update pacientes set
+                    codigo = coalesce(nullif(btrim(codigo), ''),
+                                      'P-' || lpad(nextval('paciente_codigo_seq')::text, 4, '0')),
+                    expediente = coalesce(nullif(btrim(expediente), ''),
+                                      'EXP-' || lpad(nextval('paciente_expediente_seq')::text, 4, '0'))
+                    where id=%s""", (g.id,))
             extra = ", verificado_por=null, verificado_en=null" if g.tabla in VERIFICABLES else ""
             if g.tabla == "citas":  # al mover o cambiar una cita, el recordatorio vuelve a pendiente
                 extra += ", recordatorio_en=null"
@@ -1096,11 +1110,18 @@ def guardar(g: Guardar, u=Depends(usuario_actual)):
                 raise HTTPException(404, "Registro no encontrado")
             accion = "editar"
         else:
+            retorno = "id, codigo, expediente" if g.tabla == "pacientes" else "id"
             r = c.execute(f"insert into {g.tabla}({','.join(cols)}) "
-                          f"values ({','.join(['%s'] * len(cols))}) returning id", vals).fetchone()
+                          f"values ({','.join(['%s'] * len(cols))}) returning {retorno}", vals).fetchone()
             accion = "crear"
         auditar(c, u, accion, g.tabla, r["id"])
-    return {"ok": True, "id": r["id"]}
+        respuesta = {"ok": True, "id": r["id"]}
+        if g.tabla == "pacientes":
+            fila = c.execute("select codigo, expediente from pacientes where id=%s",
+                             (r["id"],)).fetchone()
+            respuesta["codigo"] = fila["codigo"]
+            respuesta["expediente"] = fila["expediente"]
+    return respuesta
 
 
 class Recordatorio(BaseModel):
