@@ -1300,7 +1300,7 @@ function fAnt(){const p=pk(S.ap||(S.route.split("-")[0]=="p"?S.route.split("-")[
 const it=(p.am||"").split(/,\s*/).filter(Boolean),sel=it.filter(x=>mbAll.includes(x)),otros=it.filter(x=>!mbAll.includes(x)).join(", ");
 const t=(i,l,v)=>`<label>${l}<textarea id="${i}" rows="2">${esc(v||"")}</textarea></label>`;
 const alg=(i,v)=>`<label>Alergias<input id="${i}" list="alg-ant" value="${esc(v||"")}" placeholder="Medicamentos, látex, alimentos"><datalist id="alg-ant">${ALG.map(x=>`<option value="${esc(x)}">`).join("")}</datalist></label>`;
-const o=modal(`<h3>Antecedentes de ${esc(p.n)}</h3>${alg("ga",p.al)}${mbSel(sel)}${t("gm","Otros antecedentes mórbidos",otros)}${t("gq","Antecedentes quirúrgicos",p.aq)}${t("gx","Medicamentos actuales",p.me)}${t("gf","Antecedentes familiares",p.af)}${t("gh","Hábitos (tabaco, alcohol, actividad)",p.ha)}<button class="btn p" id="gg">Guardar antecedentes</button>`,"w");
+const o=modal(`<h3>Antecedentes de ${esc(p.n)}</h3>${alg("ga",p.al)}${mbSel(sel)}${t("gm","Otros antecedentes mórbidos",otros)}${t("gq","Antecedentes quirúrgicos",p.aq)}${t("gx","Medicamentos actuales",p.me)}${antField("gf","Antecedentes familiares",FAMH,null,null,p.af)}${t("gh","Hábitos (tabaco, alcohol, actividad)",p.ha)}<button class="btn p" id="gg">Guardar antecedentes</button>`,"w");
 const gg=o.querySelector("#gg");
 const guardarAnt=async()=>{const v=i=>o.querySelector("#"+i).value.trim(),mb=[...o.querySelectorAll(".mb")].filter(x=>x.checked).map(x=>x.value);Object.assign(p,{al:v("ga"),am:mb.concat(v("gm")?[v("gm")]:[]).join(", "),aq:v("gq"),me:v("gx"),af:v("gf"),ha:v("gh")});
 try{await editarK("P",p);draw();toast("Antecedentes guardados");gg.innerHTML=ic("x",16)+" Cancelar";gg.className="btn";gg.onclick=()=>o.remove()}catch(e){toast(e.message)}};
@@ -1395,7 +1395,32 @@ const PROTS=[
   "Faja lumbar","Muletas","Bastón","Andador"]]];
 const SURGS=[["Cirugias ortopedicas",["Artroscopia de rodilla","Artroscopia de hombro","Reemplazo total de rodilla","Reemplazo total de cadera","Reduccion abierta y fijacion interna (RAFI)","Osteosintesis de fractura","Fijacion de fractura de radio distal","Cirugia de hallux valgus","Discectomia lumbar","Fusion lumbar","Laminectomia","Cirugia de tunel carpiano","Reparacion de manguito rotador","Reconstruccion de LCA","Meniscectomia","Osteotomia","Extraccion de material de osteosintesis"]],["Cirugias generales",["Apendicectomia","Colecistectomia","Hernioplastia inguinal","Histerectomia","Cesarea","Prostatectomia","Tiroidectomia","Amigdalectomia","Septoplastia","Liberacion de Dupuytren"]],["Cirugias de columna",["Discectomia cervical","Discectomia lumbar","Fusion lumbar","Laminectomia","Artroplastia de facet"]],["Otras cirugias",["Cirugia cardiovascular","Cirugia vascular","Cirugia oncologica","Cirugia bariatri","Trasplante de organo"]]];
 const FAMH=["Diabetes mellitus","Hipertension arterial","Cardiopatia isquemica","Accidente cerebrovascular","Cancer (mama)","Cancer (prostata)","Cancer (colon)","Artritis reumatoide","Artrosis","Osteoporosis","Gota","Asma","EPOC","Epilepsia","Enfermedad de Alzheimer","Enfermedad renal cronica","Hepatopatia","Trastorno de coagulacion","Obesidad","Dislipidemia","Enfermedad tiroidea","Tuberculosis","Anemia","Migraña","SIDA","Fibrosis quistica","Enfermedad de Parkinson","Sarcoidosis","Lupus eritematoso sistemico"];
-const antField=(id,label,catalog,groups,hint)=>`<div class="af"><label class="mu">${label}</label><select id="${id}_sel" data-ant="${id}" class="ant-sel"><option value="">Selecciona...</option>${groups?groups.map(([g,items])=>`<optgroup label="${esc(g)}">${items.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}</optgroup>`).join(""):catalog.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}<option value="__otros__">Otros</option></select><textarea id="${id}_other" rows="2" style="display:none;margin-top:6px" placeholder="Especifica..."></textarea><input type="hidden" id="${id}">${hint?`<p class="mu" style="margin:6px 0 0">${hint}</p>`:""}</div>`;
+const FAM_REL=[["Padres",["Padre","Madre"]],["Hermanos",["Hermano mayor","Hermana mayor","Hermano menor","Hermana menor"]],["Abuelos",["Abuelo","Abuela","Abuelo materno","Abuela materna","Abuelo paterno","Abuela paterna"]],["Otros familiares",["Tío","Tía","Primo","Prima","Cuñado/a","Sobrino/a"]]],famRelAll=FAM_REL.flatMap(x=>x[1]),famCancer=/c[aá]ncer/i;
+const famSplit=v=>{const s=String(v||""),i=s.indexOf(" · ");return i<0?[s,""]:[s.slice(0,i),s.slice(i+3)]};
+const famCancerModal=(hid,sum,disease)=>{
+  const cur=famSplit(hid.value)[1],rels=cur?cur.split(/,\s*/):[],extra=rels.filter(x=>!famRelAll.includes(x)).join(", ");
+  const o=modal(`<h3>Familiares con ${esc(disease)}</h3><p class="mu">Selecciona quién(es) de la familia presentan este antecedente.</p>
+    ${FAM_REL.map(([g,it])=>`<div style="margin:8px 0"><b>${g}</b><div class="chips">${it.map(x=>`<label class="ck"><input type="checkbox" class="frel" value="${esc(x)}"${rels.includes(x)?" checked":""}> ${esc(x)}</label>`).join("")}</div></div>`).join("")}
+    <label class="ck" style="margin:8px 0"><input type="checkbox" id="frel_add_on"${extra?" checked":""}> Familiar adicional</label>
+    <input id="frel_add" placeholder="Ej. bisabuela, primo segundo" value="${esc(extra)}" style="${extra?"":"display:none"}">
+    <div class="er2" id="frel_er" role="alert"></div>
+    <div class="tb" style="margin-top:12px"><button class="btn" id="frel_cancel">Cancelar</button><button class="btn p" id="frel_save">Guardar</button></div>`,"w");
+  const add=o.querySelector("#frel_add"),on=o.querySelector("#frel_add_on");
+  on.onchange=()=>{add.style.display=on.checked?"":"none";if(!on.checked)add.value=""};
+  o.querySelector("#frel_cancel").onclick=()=>o.remove();
+  o.querySelector("#frel_save").onclick=()=>{
+    const chosen=[...o.querySelectorAll(".frel:checked")].map(x=>x.value),ex=on.checked?(add.value||"").trim():"",list=[...chosen,...ex.split(/,\s*/).filter(Boolean)];
+    if(!list.length){o.querySelector("#frel_er").textContent="Selecciona al menos un familiar.";return}
+    hid.value=disease+" · "+list.join(", ");
+    if(sum){sum.style.display="";sum.textContent="Familiares: "+list.join(", ")}
+    o.remove();
+  };
+};
+const antField=(id,label,catalog,groups,hint,val="")=>{
+  const known=catalog||(groups?groups.flatMap(g=>g[1]):[]),[d,rel]=famSplit(val),selVal=!val?"":(known.includes(d)?d:"__otros__"),otherVal=selVal==="__otros__"?val:"",shownRel=selVal!=="__otros__"&&famCancer.test(selVal)?rel:"";
+  const opts=groups?groups.map(([g,it])=>`<optgroup label="${esc(g)}">${it.map(m=>`<option value="${esc(m)}"${m===selVal?" selected":""}>${esc(m)}</option>`).join("")}</optgroup>`).join(""):known.map(m=>`<option value="${esc(m)}"${m===selVal?" selected":""}>${esc(m)}</option>`).join("");
+  return`<div class="af"><label class="mu">${label}</label><select id="${id}_sel" data-ant="${id}" class="ant-sel"><option value=""${selVal?"":" selected"}>Selecciona...</option>${opts}<option value="__otros__"${selVal==="__otros__"?" selected":""}>Otros</option></select><textarea id="${id}_other" rows="2" style="display:${selVal==="__otros__"?"":"none"};margin-top:6px" placeholder="Especifica...">${esc(otherVal)}</textarea><input type="hidden" id="${id}" value="${esc(val||"")}">${shownRel?`<p class="mu" id="${id}_rel" style="margin:6px 0 0">Familiares: ${esc(shownRel)}</p>`:`<p class="mu" id="${id}_rel" style="margin:6px 0 0;display:none"></p>`}${hint?`<p class="mu" style="margin:6px 0 0">${hint}</p>`:""}</div>`;
+};
 const OCUPACIONES={
 "Hogar y personal":["Ama de casa","Estudiante","Desempleado/a","Jubilado/a","Pensionado/a","Nino/a"],
 "Salud":["Médico/a","Enfermero/a","Farmaceutico/a","Odontologo/a","Fisioterapeuta","Psicologo/a","Nutricionista","Veterinario/a","Tecnico de laboratorio"],
@@ -2486,7 +2511,8 @@ else if(e.key=="/"&&!g){e.preventDefault();pal()}
 else if(e.key&&e.key.toLowerCase()=="n"&&!g&&!e.ctrlKey&&!e.metaKey){e.preventDefault();go("nuevo")}});
 document.addEventListener("change",e=>{const g=e.target,d=g.dataset;
 if(d.pm){const[r,k]=d.pm.split(":"),l=DB.PM[r];DB.PM[r]=g.checked?[...new Set([...l,k])]:l.filter(x=>x!=k);api("/api/funciones",{method:"PUT",body:{rol:r,modulos:DB.PM[r]}}).catch(e=>{toast(e.message);draw()})}
-else if(d.ant){const id=d.ant,sel=document.getElementById(id+"_sel"),ta=document.getElementById(id+"_other"),hid=document.getElementById(id);if(sel.value==="__otros__"){ta.style.display="";hid.value=ta.value}else{ta.style.display="none";hid.value=sel.value}}
+else if(d.ant){const id=d.ant,sel=document.getElementById(id+"_sel"),ta=document.getElementById(id+"_other"),hid=document.getElementById(id),sum=document.getElementById(id+"_rel");if(sel.value==="__otros__"){ta.style.display="";hid.value=ta.value;if(sum){const rel=famSplit(hid.value)[1];if(rel){sum.style.display="";sum.textContent="Familiares: "+rel}else sum.style.display="none"}}else{ta.style.display="none";hid.value=sel.value;const rel=famSplit(hid.value)[1];if(sum){if(rel){sum.style.display="";sum.textContent="Familiares: "+rel}else sum.style.display="none"}if(famCancer.test(sel.value))famCancerModal(hid,sum,sel.value)}}
+else if((g.id==="nh_other"||g.id==="gf_other")&&famCancer.test(g.value)){const id=g.id.replace("_other",""),hid=document.getElementById(id),sum=document.getElementById(id+"_rel");if(sum)sum.style.display="none";famCancerModal(hid,sum,g.value)}
 else if(d.pf){S.pf[d.pf]=d.pf=="pr"?g.checked:g.value;if(d.pf=="dr"){S.pa.dr=S.pf.dr||S.pa.dr;const e=$("#pa2");if(e&&S.pf.dr)e.value=S.pf.dr}$("#pcl").innerHTML=listaProc().html}
 else if(d.sl!=null){const i=+d.sl;g.checked?S.sel.add(i):S.sel.delete(i);$("#psel").innerHTML=panelSel()}
 else if(d.psel!=null){const id=+d.psel;g.checked?S.psel.add(id):S.psel.delete(id)}
