@@ -40,6 +40,8 @@ El bloque final de `static/index.html` (`Sistema visual 2026`) manda sobre el CS
 - Se eliminaron `@keyframes` duplicados (`fadeInUp`, `slideInLeft`, `scaleIn`, `shimmer`, `pulse`, `bounceIn`).
 - Se unificaron las definiciones duplicadas de `.nav-ic` y del fondo de `.lg`.
 - Se redujo la animación de entrada de 1 s a 280 ms para evitar sensación de lentitud.
+- Los tooltips de `.icb` usan `display:none` fuera de `:hover`/`:focus-visible`, por lo que no generan scroll horizontal; al mostrarse usan `tipIn` y texto con salto de línea.
+- `.pcell` recorta los nombres largos de pacientes con elipsis para no empujar el ancho de la tabla.
 
 ---
 
