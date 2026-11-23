@@ -1345,17 +1345,23 @@ const sinMov=()=>matchMedia("(prefers-reduced-motion:reduce)").matches;
 /* Skeleton: se muestra sobre el contenido mientras se redibuja la sección. El DOM queda listo de inmediato. */
 let skelTimer=null;
 const SKEL_HTML=`<div class="sk-head"><div class="sk-ico"></div><div style="flex:1"><div class="sk-t"></div><div class="sk-s"></div></div></div><div class="sk-grid"><div class="sk-b"></div><div class="sk-b"></div><div class="sk-b"></div></div><div class="sk-card"><div class="sk-l w90"></div><div class="sk-l w75"></div><div class="sk-l w60"></div><div class="sk-l w45"></div></div><div class="sk-card"><div class="sk-l w75"></div><div class="sk-l w90"></div><div class="sk-l w60"></div></div>`;
+const SKEL_MIN=180;
 function skelOn(){
   if(skelTimer){clearTimeout(skelTimer);skelTimer=null}
   const viejo=document.getElementById("skelLayer");if(viejo)viejo.remove();
   if(sinMov())return;
-  const el=document.createElement("div");el.id="skelLayer";el.className="skel-layer";el.setAttribute("aria-hidden","true");el.innerHTML=SKEL_HTML;
+  const el=document.createElement("div");el.id="skelLayer";el.className="skel-layer";el.setAttribute("aria-hidden","true");el.dataset.inicio=String(Date.now());el.innerHTML=SKEL_HTML;
   document.body.appendChild(el);
 }
 function skelOff(){
   const el=document.getElementById("skelLayer");if(!el)return;
-  el.classList.add("out");
-  skelTimer=setTimeout(()=>{el.remove();skelTimer=null},220);
+  const espera=Math.max(0,SKEL_MIN-(Date.now()-Number(el.dataset.inicio||Date.now())));
+  if(skelTimer)clearTimeout(skelTimer);
+  skelTimer=setTimeout(()=>{
+    const actual=document.getElementById("skelLayer");if(!actual){skelTimer=null;return}
+    actual.classList.add("out");
+    skelTimer=setTimeout(()=>{actual.remove();skelTimer=null},220);
+  },espera);
 }
 function tickReloj(){const e=document.getElementById("reloj");if(e)e.textContent=new Date().toLocaleTimeString("es-DO",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:hora12()})}
 setInterval(tickReloj,1000);

@@ -24,9 +24,9 @@ El bloque final de `static/index.html` (`Sistema visual 2026`) manda sobre el CS
 
 ## 2. Skeleton de transición
 
-- `skelOn()` crea `#skelLayer` en `document.body` antes de redibujar.
+- `skelOn()` crea `#skelLayer` en `document.body` antes de redibujar y registra `dataset.inicio`.
 - `go()` lo activa solo cuando la ruta cambia.
-- `draw()` siempre llama a `skelOff()` al terminar; el overlay se desvanece en 220 ms.
+- `draw()` siempre llama a `skelOff()` al terminar; el overlay permanece visible al menos `SKEL_MIN = 180 ms` y luego se desvanece en 220 ms. Así el skeleton sí se ve aunque `draw()` sea síncrono.
 - El DOM se actualiza de forma síncrona: ningún código posterior a `go()` necesita esperar.
 - Con `prefers-reduced-motion: reduce`, el skeleton no se muestra.
 - El marcador inicial de carga ya es un skeleton, no el texto «Cargando…».
