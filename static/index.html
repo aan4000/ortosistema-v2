@@ -380,6 +380,25 @@ td .btn,.acts .icb{min-height:28px;height:28px;padding:0 8px;font-size:11.5px}
 .lc{padding:22px;border-radius:16px}
 .lc h1{font-size:22px}
 .row,.tb,.ph-head,.ph-actions{align-items:center}
+/* Perfil del paciente: las pestañas cambian sin redibujar la cabecera. */
+.xp-zone{position:relative;min-height:220px}
+.xp-zone .tabs{gap:4px;margin:12px 0 10px;padding:4px;border:1px solid var(--bd);border-radius:10px;background:color-mix(in srgb,var(--sf) 72%,var(--bg));box-shadow:var(--sh);scrollbar-width:thin}
+.xp-zone .tabs button{min-height:34px;padding:0 12px;border:1px solid transparent;border-radius:7px;font-size:12.5px;font-weight:600;color:var(--sec);white-space:nowrap}
+.xp-zone .tabs button:hover{background:var(--pri2);color:var(--pri)}
+.xp-zone .tabs button.on{background:var(--pri);border-color:var(--pri);color:var(--onp);box-shadow:0 2px 8px color-mix(in srgb,var(--pri) 25%,transparent)}
+.xp-zone .tabs button.on:hover{color:var(--onp);filter:brightness(1.04)}
+.xp-zone>.td{margin:0 2px 10px}
+.xp-zone .tab-content{animation:tabIn .22s ease both}
+.xp-zone .xp-nav{padding-top:10px;border-top:1px solid var(--bd)}
+.xp-skel{position:absolute;inset:0;z-index:8;padding:12px 2px;background:var(--bg);border-radius:12px;overflow:hidden;transition:opacity .2s ease;pointer-events:none}
+.xp-skel.out{opacity:0}
+.xp-sk-tabs{display:flex;gap:6px;margin-bottom:12px}
+.xp-sk-tabs i{display:block;width:96px;height:32px;border-radius:7px;background:linear-gradient(90deg,var(--bg) 25%,var(--bd) 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmer 1.15s linear infinite}
+.xp-sk-card{height:96px;margin:10px 0;padding:14px;border:1px solid var(--bd);border-radius:12px;background:var(--sf)}
+.xp-sk-card i{display:block;height:10px;margin:8px 0;border-radius:5px;background:linear-gradient(90deg,var(--bg) 25%,var(--bd) 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmer 1.15s linear infinite}
+.xp-sk-card i:nth-child(1){width:85%}.xp-sk-card i:nth-child(2){width:65%}.xp-sk-card i:nth-child(3){width:75%}
+@keyframes tabIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.xp-zone .tab-content{animation:none}.xp-skel{display:none}}
 /* Evita que tooltips y nombres largos generen scroll horizontal. */
 .pcell{display:flex;min-width:0;max-width:100%;overflow:hidden;white-space:nowrap}
 .pcell .pn{min-width:0;margin:0;padding:2px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1242,12 +1261,23 @@ const _prevTab=_tabIdx>0?_tabOrder[_tabIdx-1]:null;
    Solo la barra lateral (menu) puede sacar al usuario de la sección. */
 const _tabRuta=k=>"p-"+id+"-"+k;
 const _tabApAttr=k=>"";
-const _navBtns=`<div class="tb" style="margin-top:16px;justify-content:space-between">
+const _navBtns=`<div class="tb xp-nav" style="margin-top:16px;justify-content:space-between">
   ${_prevTab?`<button class="btn" data-r="${_tabRuta(_prevTab)}"${_tabApAttr(_prevTab)}>${ic("chevl",14)} Anterior</button>`:'<span></span>'}
   ${_nextTab?`<button class="btn p" data-r="${_tabRuta(_nextTab)}"${_tabApAttr(_nextTab)}>Siguiente ${ic("chevr",14)}</button>`:''}
 </div>`;
 return `<div class="card ph"><div class="ph-head"><div class="ph-id">${avSexo(p.sx,"lg")}<div class="ph-info"><div class="ph-name-row"><h2>${esc(p.n)}</h2>${p.cd?`<span class="code">${esc(p.cd)}</span>`:""}${p.xp?`<span class="code">${esc(p.xp)}</span>`:""}</div><div class="ph-meta">${p.e} años · Cédula ${esc(p.c||"—")} · ${p.oc?p.oc+" · ":""}${esc(p.s||"Sin seguro")}${p.ec?" \u00b7 "+esc(p.ec):""}${p.xp?" \u00b7 Expediente "+esc(p.xp):""}</div><div class="ph-chips">${chip(EA,p.ea)}${chip(EU,effAu(p))}${p.al?`<span class="b er">${ic("alert",13)} Alergia</span>`:""}</div></div></div><div class="ph-actions"><button class="btn p" data-a="ev:med" data-ic="1">${ic(DB.E.some(e=>e.p==p.id&&e.tp=="Médica")?"usercheck":"stethoscope",14)} Evaluación médica</button><button class="btn" data-a="recp:${id}">${ic("printer",14)} Imprimir/Enviar</button><button class="btn d" data-a="delp:${id}">${ic("trash",14)} Eliminar</button></div></div>${p.al?`<div class="al2">${ic("alert",16)} Alergia: ${esc(p.al)}</div>`:""}</div>
-<div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="${_tabRuta(k)}"${_tabApAttr(k)}>${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p><div class="tab-content">${(B2[tab]||B2.resumen)()}</div>${_navBtns}`}
+<div class="xp-zone" id="xpZone"><div class="tabs">${T.map(([k,l,n])=>`<button class="${k==tab?"on":""}" data-r="${_tabRuta(k)}"${_tabApAttr(k)}>${l}${n?` (${n})`:""}</button>`).join("")}</div><p class="mu td">${TD[tab]||TD.resumen}</p><div class="tab-content">${(B2[tab]||B2.resumen)()}</div>${_navBtns}</div>`}
+/* Actualiza SOLO las pestañas y el contenido del expediente; la cabecera del paciente queda intacta. */
+function actualizarExpTab(ruta){
+  const partes=String(ruta||"").split("-");if(partes[0]!=="p")return false;
+  const id=+partes[1],tab=partes[2]||"resumen",zona=document.getElementById("xpZone");
+  if(!zona||!pk(id).n)return false;
+  const doc=new DOMParser().parseFromString("<div>"+vExp(id,tab)+"</div>","text/html");
+  const nueva=doc.getElementById("xpZone");if(!nueva)return false;
+  S.ap=id;
+  zona.innerHTML=nueva.innerHTML;
+  return true;
+}
 function fDelP(id){
   const p=pk(id);if(!p||!p.n)return;
   const nE=DB.E.filter(x=>x.p==id).length,nX=DB.X.filter(x=>x.p==id).length,nB=DB.B.filter(x=>x.p==id).length,nD=DB.D.filter(x=>x.p==id).length;
@@ -1370,6 +1400,21 @@ function skelOff(){
     skelTimer=setTimeout(()=>{actual.remove();skelTimer=null},220);
   },espera);
 }
+/* Skeleton local del expediente: no tapa ni recarga la ficha del paciente. */
+let xpSkelTimer=null;
+const XP_SKEL_HTML=`<div class="xp-sk-tabs"><i></i><i></i><i></i><i></i></div><div class="xp-sk-card"><i></i><i></i><i></i></div><div class="xp-sk-card"><i></i><i></i></div>`;
+function skelTabPulse(){
+  if(sinMov())return;
+  const zona=document.getElementById("xpZone");if(!zona)return;
+  if(xpSkelTimer){clearTimeout(xpSkelTimer);xpSkelTimer=null}
+  const anterior=document.getElementById("xpSkel");if(anterior)anterior.remove();
+  const el=document.createElement("div");el.id="xpSkel";el.className="xp-skel";el.setAttribute("aria-hidden","true");el.innerHTML=XP_SKEL_HTML;
+  zona.appendChild(el);
+  xpSkelTimer=setTimeout(()=>{
+    el.classList.add("out");
+    xpSkelTimer=setTimeout(()=>{el.remove();xpSkelTimer=null},220);
+  },180);
+}
 function tickReloj(){const e=document.getElementById("reloj");if(e)e.textContent=new Date().toLocaleTimeString("es-DO",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:hora12()})}
 setInterval(tickReloj,1000);
 function draw(){VIS=[];$("#side").style.display=S.user?"":"none";if(!S.user){skelOff();return vLogin()}let[a,b,c]=S.route.split("-");
@@ -1395,7 +1440,19 @@ const df=$("#dfile");if(df)df.onchange=()=>{const n=$("#dfile_name");if(n)n.text
 const bfq=$("#bf_q");if(bfq)bfq.onchange=()=>{const t=DB.T[bfq.value];if(!t)return;const k=$("#bf_k"),tt=$("#bf_t"),m=$("#bf_m");if(k)k.value=t.c||"";if(tt)tt.value=t.n;if(m&&t.p)m.value=t.p};
 const bfg=$("#bf_g");if(bfg)bfg.onclick=async()=>{const v=s=>$("#"+s).value.trim(),er=m=>{$("#bf_e2").textContent=m};const pp=+v("bf_p"),fi=v("bf_f"),t=v("bf_t"),m=+v("bf_m");if(!pp)return er("Elige el paciente.");if(!fi)return er("Elige la fecha.");if(!t)return er("Escribe el concepto.");if(!(m>=0))return er("Monto inválido.");const r={p:pp,f:dmy(fi),c:v("bf_k"),t,m,dr:v("bf_d"),e:v("bf_e")};try{const id=await crearK("B",r);DB.B.push({...r,id});toast("Factura guardada");go("facturacion")}catch(e){er(e.message)}}
 skelOff();}
-function go(r){const cambio=S.route!==r;if(cambio)skelOn();S.route=r;$("#side").classList.remove("open");draw();const m=$("#main");if(m){if(sinMov())m.scrollTop=0;else m.scrollTo({top:0,behavior:"smooth"})}try{history.replaceState(null,"","#"+r)}catch(e){}}
+function go(r){
+  const ant=S.route||"",cambio=ant!==r,n=String(r).split("-"),o=ant.split("-");
+  const tabChange=n[0]=="p"&&o[0]=="p"&&n[1]===o[1]&&(n[2]||"resumen")!==(o[2]||"resumen");
+  S.route=r;$("#side").classList.remove("open");
+  if(tabChange&&actualizarExpTab(r)){
+    const m=$("#main"),z=$("#xpZone");
+    if(m&&z){const tope=z.getBoundingClientRect().top-m.getBoundingClientRect().top+m.scrollTop;
+      if(m.scrollTop>tope+40)m.scrollTo({top:Math.max(0,tope-8),behavior:sinMov()?"auto":"smooth"})}
+    skelTabPulse();
+  }else{
+    if(cambio)skelOn();draw();const m=$("#main");if(m){if(sinMov())m.scrollTop=0;else m.scrollTo({top:0,behavior:"smooth"})}
+  }
+  try{history.replaceState(null,"","#"+r)}catch(e){}}
 
 function fAnt(){const p=pk(S.ap||(S.route.split("-")[0]=="p"?S.route.split("-")[1]:0));if(!p.n)return toast("Activa un paciente primero");
 const it=(p.am||"").split(/,\s*/).filter(Boolean),sel=it.filter(x=>mbAll.includes(x)),otros=it.filter(x=>!mbAll.includes(x)).join(", ");
